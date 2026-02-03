@@ -7,12 +7,8 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: false,
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'example.com',
-      },
-    ],
+    remotePatterns: [],
+    unoptimized: false,
   },
 };
 
