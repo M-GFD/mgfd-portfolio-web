@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { technologies } from '@/constants/technologies';
 
 export default function Technologies() {
@@ -14,7 +15,15 @@ export default function Technologies() {
                 key={tech.name}
                 className="flex flex-col items-center p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
               >
-                <div className="text-5xl mb-4">{tech.icon}</div>
+                <div className="w-16 h-16 mb-4">
+                  <Image
+                    src={`/images/technologies/${tech.name.toLowerCase()}.png`}
+                    alt={tech.name}
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
                 <h3 className="text-lg font-semibold text-black">{tech.name}</h3>
               </div>
             ))}

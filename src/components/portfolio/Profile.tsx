@@ -1,48 +1,32 @@
+import Image from 'next/image';
+
 export default function Profile() {
   return (
-    <section id="about" className="py-24 bg-gradient-to-b from-gray-50 to-white">
-      <div className="container mx-auto px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Profile Image */}
-            <div className="flex justify-center">
-              <div className="relative">
-                <div className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center overflow-hidden">
-                  <div className="text-center">
-                    <div className="text-6xl mb-2">👨‍💻</div>
-                    <p className="text-gray-600 font-medium">MGFD</p>
-                  </div>
-                </div>
+    <section id="about" className="py-16 px-6 bg-gray-50">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row items-center gap-12">
+          <div className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center flex-shrink-0">
+            <div className="w-56 h-56 md:w-72 md:h-72 rounded-full bg-white flex items-center justify-center">
+              <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden">
+                <Image
+                  src="/images/profile/profile.jpg"
+                  alt="MGFD - Profile"
+                  width={256}
+                  height={256}
+                  className="w-full h-full object-cover"
+                  priority
+                />
               </div>
             </div>
-
-            {/* Profile Content */}
-            <div className="text-center md:text-left">
-              <h2 className="text-4xl md:text-5xl font-bold text-black mb-6">
-                About Me
-              </h2>
-              <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                I'm a passionate web developer and designer with expertise in creating modern, 
-                responsive, and user-friendly applications. My approach combines clean code with 
-                stunning visuals to deliver exceptional digital experiences.
-              </p>
-              <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                With a strong foundation in both design and development, I bridge the gap between 
-                creative vision and technical implementation. I believe in writing maintainable, 
-                scalable code while never compromising on aesthetics.
-              </p>
-              <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                <span className="px-4 py-2 bg-black text-white rounded-full text-sm">
-                  Web Development
-                </span>
-                <span className="px-4 py-2 bg-black text-white rounded-full text-sm">
-                  UI/UX Design
-                </span>
-                <span className="px-4 py-2 bg-black text-white rounded-full text-sm">
-                  Creative Direction
-                </span>
-              </div>
-            </div>
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h3 className="text-4xl font-bold text-black mb-4">About Me</h3>
+            <p className="text-lg text-gray-600 mb-6">
+              I'm a passionate designer and developer with expertise in creating digital experiences that connect brands with their audiences. With years of experience in UI/UX design and web development, I transform ideas into reality.
+            </p>
+            <p className="text-lg text-gray-600">
+              My approach combines creative thinking with technical excellence, ensuring every project not only looks beautiful but also performs exceptionally well.
+            </p>
           </div>
         </div>
       </div>

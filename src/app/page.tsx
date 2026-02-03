@@ -34,7 +34,7 @@ export default function HomePage() {
               <h2 className="text-4xl md:text-5xl font-bold text-black text-center mb-16">
                 Projects
               </h2>
-              <ProjectList onSeeMore={handleSeeMore} />
+              <ProjectList onSeeMore={handleSeeMore} projects={[]} loading={false} />
             </div>
           </div>
         </section>
