@@ -1,7 +1,6 @@
 'use client';
 
 import { ChevronRight, Loader2 } from 'lucide-react';
-import Image from 'next/image';
 import { Project } from '@/types/portfolio';
 
 interface ProjectListProps {
@@ -29,11 +28,10 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
           {/* Project Image */}
           <div className="w-full md:w-1/2">
             <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl overflow-hidden shadow-lg">
-              <Image
-                src={`/images/projects/project-${project.id}.png`}
+              <img
+                src={`/project-${project.id}.png`}
                 alt={project.title}
-                fill
-                className="object-cover"
+                className="w-full h-full object-cover"
               />
             </div>
           </div>
