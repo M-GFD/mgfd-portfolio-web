@@ -5,7 +5,7 @@ export default function Hero() {
         <div className="relative w-full max-w-4xl mx-auto mb-6">
           <img
             src="/images/title-image.png"
-            alt="Creating Digital Experiences"
+            alt="portfolio_mgfd_design"
             className="w-full h-auto object-contain"
           />
         </div>
