@@ -26,4 +26,19 @@ export const technologies: Technology[] = [
     icon: '▲',
     color: '#000000',
   },
+  {
+    name: 'Z AI',
+    icon: '▲',
+    color: '#000000',
+  },
+  {
+    name: 'Kling',
+    icon: '▲',
+    color: '#000000',
+  },
+  {
+    name: 'Slack',
+    icon: '▲',
+    color: '#000000',
+  },
 ];
