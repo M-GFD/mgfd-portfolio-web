@@ -7,7 +7,7 @@ export default function Footer() {
           <div className="text-center md:text-left">
             <div className="mb-4">
               <img
-                src="/_mgfd_logo.png"
+                src="images/_mgfd_logo.png"
                 alt="mgfd design portfolio"
                 className="h-10 w-auto"
               />
