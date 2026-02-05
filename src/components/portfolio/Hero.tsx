@@ -4,7 +4,7 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto text-center">
         <div className="relative w-full max-w-4xl mx-auto mb-6">
           <img
-            src="/images/title-image.png"
+            src="/images/title-image.svg"
             alt="portfolio_mgfd_design"
             className="w-full h-auto object-contain"
           />
