@@ -29,7 +29,7 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
           <div className="w-full md:w-1/2">
             <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl overflow-hidden shadow-lg">
               <img
-                src={`/project-${project.id}.png`}
+                src={`/images/project-${project.id}.png`}
                 alt={project.title}
                 className="w-full h-full object-cover"
               />
