@@ -4,7 +4,7 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto text-center">
         <div className="relative w-full max-w-4xl mx-auto mb-6">
           <img
-            src="/title-image.jpg"
+            src="/images/title-image.png"
             alt="Creating Digital Experiences"
             className="w-full h-auto object-contain"
           />
