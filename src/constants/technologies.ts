@@ -17,28 +17,13 @@ export const technologies: Technology[] = [
     color: '#FF9A00',
   },
   {
-    name: 'React',
+    name: 'Gemini',
     icon: '⚛️',
     color: '#61DAFB',
   },
   {
-    name: 'Next.js',
+    name: 'X-Design',
     icon: '▲',
     color: '#000000',
-  },
-  {
-    name: 'TypeScript',
-    icon: '📘',
-    color: '#3178C6',
-  },
-  {
-    name: 'Tailwind',
-    icon: '🌊',
-    color: '#06B6D4',
-  },
-  {
-    name: 'Node.js',
-    icon: '🟢',
-    color: '#339933',
   },
 ];
