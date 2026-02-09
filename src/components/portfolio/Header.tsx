@@ -28,7 +28,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
         <div className="flex items-center">
           <a href="/" className="flex items-center">
             <img
-              src="images/_mgfd_logo.png"
+              src="images/_mgfd_logo.svg"
               alt="mgfd design portfolio"
               className="h-8 w-auto"
             />
