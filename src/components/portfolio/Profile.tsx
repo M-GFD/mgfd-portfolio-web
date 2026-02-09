@@ -14,10 +14,10 @@ export default function Profile() {
           <div className="flex-1 text-center md:text-left">
             <h3 className="text-4xl font-bold text-black mb-4">About Me</h3>
             <p className="text-lg text-gray-600 mb-6">
-              I'm a passionate designer with expertise in creating digital experiences that connect brands with their audiences. With years of experience in Graphic Design and UI/UX Design, I transform ideas into reality.
+              Hi, my name is Mateo and I'm a designer with expertise in creating digital experiences that connect brands with their audiences. With years of experience in Graphic Design and UI/UX Design, I transform ideas into reality.
             </p>
             <p className="text-lg text-gray-600">
-              My approach combines creative thinking with technical skills, ensuring every project not only looks beautiful but also performs exceptionally well.
+              My approach: creative thinking with technical skills, ensuring every project not only looks beautiful but also performs exceptionally well.
             </p>
           </div>
         </div>
