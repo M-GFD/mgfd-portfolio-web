@@ -6,7 +6,7 @@ export default function Profile() {
           {/* Profile Image - SIN GRADIENTE VIOLETA */}
           <div className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
             <img
-              src="/images/profile/profile.jpg"
+              src="/images/profile/profile.png"
               alt="MGFD - Profile"
               className="w-full h-full object-cover"
             />
