@@ -17,7 +17,7 @@ export default function Profile() {
               Hi, my name is Mateo and I'm a designer with expertise in creating digital experiences that connect brands with their audiences. With years of experience in Graphic Design and UI/UX Design, I transform ideas into reality.
             </p>
             <p className="text-justify text-gray-600">
-              My approach: creative thinking with technical skills, ensuring every project not only looks beautiful but also performs exceptionally well.
+              My approach: user-centered crwative thinking with technical graphic skills, ensuring every project not only looks great but also performs exceptionally well at the same time.
             </p>
           </div>
         </div>
