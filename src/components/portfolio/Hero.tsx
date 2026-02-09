@@ -10,7 +10,7 @@ export default function Hero() {
           />
         </div>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Graphic Arts - UI Interface
+          Graphic Design - UI Design
         </p>
       </div>
     </section>
