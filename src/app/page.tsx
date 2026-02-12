@@ -28,7 +28,7 @@ const projects = [
       'Diseño del dashboard web para monitoreo de cilindros, altas semanales y mapa operativo en tiempo real.',
     objective:
       'Intención visual: interfaz clara sobre laptop, priorizando datos de operación y contexto geográfico.',
-    tools: ['Figma', 'X Design', 'Gemini'],
+    tools: ['Photoshop', 'Illustrator', 'Figma', 'X Design', 'Gemini'],
   },
   {
     title: 'Doninas Website',
@@ -40,13 +40,13 @@ const projects = [
     tools: ['Photoshop', 'Illustrator', 'Figma'],
   },
   {
-    title: 'Teamestudio Branding / Visual',
+    title: 'Temps Studio Branding / Visual',
     image: '/images/project-4.png',
     description:
       'Desarrollo de identidad gráfica y aplicación visual para marca creativa, enfocada en presencia digital.',
     objective:
       'Intención visual: branding protagonista, composición centrada y lectura rápida de marca.',
-    tools: ['Kling', 'Slack', 'Z AI'],
+    tools: ['Photoshop', 'Illustrator', 'Figma', 'Gemini', 'Kling', 'Slack', 'X Design', 'Z AI'],
   },
 ];
 
