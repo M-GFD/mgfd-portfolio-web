@@ -4,6 +4,7 @@ export interface Project {
   subtitle: string;
   description: string;
   fullDescription: string;
+  image: string;
   technologies?: string[];
   tags?: string[];
   reversed: boolean;
