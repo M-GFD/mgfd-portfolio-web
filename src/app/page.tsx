@@ -62,7 +62,7 @@ function ToolBadges({ names }: { names: string[] }) {
             key={name}
             className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs"
           >
-            <Image src={tech.icon} alt={name} width={16} height={16} className="h-4 w-4 rounded-sm" />
+            <Image src={tech.icon} alt={name} width={16} height={16} className="h-5 w-5 object-contain" />
             {name}
           </span>
         );
@@ -195,7 +195,7 @@ export default function HomePage() {
                 key={tech.name}
                 className="flex flex-col items-center gap-2 rounded-xl border border-white/15 bg-white/5 p-4"
               >
-                <Image src={tech.icon} alt={tech.name} width={64} height={64} className="h-10 w-10" />
+                <Image src={tech.icon} alt={tech.name} width={64} height={64} className="h-12 w-12 object-contain" />
                 <span className="text-xs text-white/80">{tech.name}</span>
               </div>
             ))}
