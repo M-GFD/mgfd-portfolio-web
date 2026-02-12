@@ -19,7 +19,7 @@ const projects = [
       'Artes para OTT y piezas de campaña para AFA Play, trabajando composiciones de alto impacto para deportes en vivo.',
     objective:
       'Intención visual: hero deportivo, contraste fuerte y foco en jugadores para comunicar “contenido exclusivo”.',
-    tools: ['Photoshop', 'Illustrator', 'Figma'],
+    tools: ['Photoshop', 'Illustrator', 'Figma', 'Gemini'],
   },
   {
     title: 'Novogas Web App',
@@ -28,7 +28,7 @@ const projects = [
       'Diseño del dashboard web para monitoreo de cilindros, altas semanales y mapa operativo en tiempo real.',
     objective:
       'Intención visual: interfaz clara sobre laptop, priorizando datos de operación y contexto geográfico.',
-    tools: ['Photoshop', 'Illustrator', 'Figma', 'X Design', 'Gemini'],
+    tools: ['Photoshop', 'Illustrator', 'Figma'],
   },
   {
     title: 'Doninas Website',
