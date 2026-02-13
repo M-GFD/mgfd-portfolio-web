@@ -9,6 +9,7 @@ import ProjectList from '@/components/portfolio/ProjectList';
 import ProjectModal from '@/components/portfolio/ProjectModal';
 import Footer from '@/components/portfolio/Footer';
 import { Project } from '@/types/portfolio';
+import { projects } from '@/data/projects';
 
 export default function HomePage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -32,9 +33,9 @@ export default function HomePage() {
           <div className="container mx-auto px-6">
             <div className="max-w-6xl mx-auto">
               <h2 className="text-4xl md:text-5xl font-bold text-black text-center mb-16">
-                Projects
+                Works / Projects
               </h2>
-              <ProjectList onSeeMore={handleSeeMore} projects={[]} loading={false} />
+              <ProjectList onSeeMore={handleSeeMore} projects={projects} loading={false} />
             </div>
           </div>
         </section>

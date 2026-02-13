@@ -1,10 +1,4 @@
-import { Inter } from "next/font/google";
-
-// Usamos Inter como fallback ya que Inclusive Sans no está en next/font/google
-// La fuente Inclusive Sans se cargará via Google Fonts
-const inter = Inter({
-  subsets: ["latin"],
+// Inclusive Sans is loaded via <link> in layout.tsx to avoid build-time font fetching.
+export const inter = {
   variable: "--font-inclusive-sans",
-});
-
-export { inter };
+};
