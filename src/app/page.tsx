@@ -13,6 +13,9 @@ import { projects } from '@/data/projects';
 
 export default function HomePage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const experienceProjects = projects.filter((project) =>
+    ['1190 Sports', 'Novogas', 'Poli Design Studio', 'Unbrella E-Commerce'].includes(project.title)
+  );
 
   const handleSeeMore = (project: Project) => {
     setSelectedProject(project);
@@ -35,7 +38,7 @@ export default function HomePage() {
               <h2 className="text-4xl md:text-5xl font-bold text-black text-center mb-16">
                 Works / Projects
               </h2>
-              <ProjectList onSeeMore={handleSeeMore} projects={projects} loading={false} />
+              <ProjectList onSeeMore={handleSeeMore} projects={experienceProjects} loading={false} />
             </div>
           </div>
         </section>
