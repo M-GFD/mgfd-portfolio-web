@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="MGFD Studio - Diseño, branding y desarrollo web."
+    />
+    <title>MGFD — Studio Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inclusive+Sans:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header" id="home">
+      <div class="container nav-wrap">
+        <a class="brand" href="#home" aria-label="Ir al inicio">MGFD</a>
+
+        <button class="menu-toggle" aria-expanded="false" aria-controls="main-nav">
+          <span></span><span></span><span></span>
+          <span class="sr-only">Abrir menú</span>
+        </button>
+
+        <nav id="main-nav" class="main-nav" aria-label="Menú principal">
+          <a href="#services">Servicios</a>
+          <a href="#portfolio">Portfolio</a>
+          <a href="#about">Nosotros</a>
+          <a href="#contact" class="btn btn-outline">Contacto</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero reveal">
+        <div class="container hero-grid">
+          <div>
+            <p class="eyebrow">ESTUDIO CREATIVO</p>
+            <h1>Construimos marcas digitales con foco en estética y rendimiento.</h1>
+            <p class="lead">
+              Diseño visual, desarrollo web y soluciones de producto para empresas que quieren destacar.
+            </p>
+            <div class="hero-actions">
+              <a href="#portfolio" class="btn">Ver proyectos</a>
+              <a href="#contact" class="btn btn-ghost">Solicitar propuesta</a>
+            </div>
+          </div>
+          <figure class="hero-media">
+            <img src="https://via.placeholder.com/640x760" width="640" height="760" alt="Mockup principal" />
+          </figure>
+        </div>
+      </section>
+
+      <section id="services" class="section reveal">
+        <div class="container">
+          <h2>Servicios</h2>
+          <div class="cards-grid">
+            <article class="card">
+              <h3>Branding</h3>
+              <p>Identidad visual, guidelines y sistemas de marca listos para escalar.</p>
+            </article>
+            <article class="card">
+              <h3>Diseño UI/UX</h3>
+              <p>Interfaces limpias, prototipos interactivos y experiencias centradas en el usuario.</p>
+            </article>
+            <article class="card">
+              <h3>Desarrollo Web</h3>
+              <p>Webs rápidas, SEO técnico y arquitectura moderna para alto rendimiento.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="portfolio" class="section section-muted reveal">
+        <div class="container">
+          <h2>Portfolio</h2>
+          <div class="portfolio-grid">
+            <article class="project">
+              <img src="https://via.placeholder.com/600x440" width="600" height="440" alt="Proyecto 1" />
+              <div class="project-content">
+                <h3>Fintech Dashboard</h3>
+                <p>Rediseño de producto digital con +35% de mejora en conversión.</p>
+              </div>
+            </article>
+            <article class="project">
+              <img src="https://via.placeholder.com/600x440" width="600" height="440" alt="Proyecto 2" />
+              <div class="project-content">
+                <h3>Ecommerce Premium</h3>
+                <p>Arquitectura frontend optimizada para mobile-first y performance.</p>
+              </div>
+            </article>
+            <article class="project">
+              <img src="https://via.placeholder.com/600x440" width="600" height="440" alt="Proyecto 3" />
+              <div class="project-content">
+                <h3>Marca Personal</h3>
+                <p>Sitio editorial con narrativa visual y animaciones de scroll.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="section reveal">
+        <div class="container about-grid">
+          <img src="https://via.placeholder.com/520x620" width="520" height="620" alt="Equipo MGFD" />
+          <div>
+            <h2>Sobre MGFD</h2>
+            <p>
+              Combinamos dirección de arte, ingeniería y estrategia digital para entregar
+              productos visualmente sólidos y técnicamente robustos.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="section reveal">
+        <div class="container contact-wrap">
+          <h2>Hablemos de tu proyecto</h2>
+          <form id="contact-form" novalidate>
+            <div class="form-grid">
+              <label>
+                Nombre
+                <input type="text" name="name" required minlength="3" />
+              </label>
+              <label>
+                Email
+                <input type="email" name="email" required />
+              </label>
+            </div>
+            <label>
+              Mensaje
+              <textarea name="message" rows="5" required minlength="10"></textarea>
+            </label>
+            <button type="submit" class="btn">Enviar consulta</button>
+            <p id="form-feedback" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-wrap">
+        <p>© <span id="year"></span> MGFD Studio.</p>
+        <a href="#home">Volver arriba ↑</a>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+
+<!-- puto el que lee -->
+<!-- 420 HIGHTIMES 4EVER -->
+<!-- 420 HIGHTIMES. NOW & FOREVER. -->

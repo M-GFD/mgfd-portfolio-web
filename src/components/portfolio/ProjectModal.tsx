@@ -32,6 +32,10 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
         </div>
         <p className="text-xl text-gray-500 mb-6">{project.subtitle}</p>
 
+        <div className="relative aspect-video bg-gray-100 rounded-xl overflow-hidden mb-6">
+          <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
+        </div>
+
         <div className="prose prose-lg text-gray-600 leading-relaxed">
           {project.fullDescription.split('\n').map((paragraph, index) => (
             <p key={index} className="mb-4">
