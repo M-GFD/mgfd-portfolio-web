@@ -28,7 +28,7 @@ export const projects: Project[] = [
 - Diseñé thumbnails, posters y banners orientados a alcance y engagement.
 - Adapté artes para laptop/mobile con foco en legibilidad, contraste y jerarquía tipográfica.
 - Produje material gráfico consistente para campañas digitales y publicaciones diarias.`,
-    image: 'https://via.placeholder.com/1280x720/0f172a/ffffff?text=1190+Sports',
+    image: '/images/project-1.png',
     technologies: ['Photoshop', 'Illustrator', 'PowerPoint', 'Figma'],
     tags: ['Sports', 'OTT', 'Social Media', 'Decks'],
     reversed: false,
