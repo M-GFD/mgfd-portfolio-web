@@ -34,6 +34,29 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
             />
           </div>
 
+          {project.galleryImages && project.galleryImages.length > 0 && (
+            <div className="px-4 pt-3 pb-0">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Galería</p>
+              <button
+                type="button"
+                onClick={() => onSeeMore(project)}
+                className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-thin hover:opacity-90 transition-opacity"
+                aria-label={`Ver galería de ${project.title}`}
+              >
+                {project.galleryImages.slice(0, 6).map((src, i) => (
+                  <span key={i} className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border border-white/20 bg-gray-100/80">
+                    <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  </span>
+                ))}
+                {project.galleryImages.length > 6 && (
+                  <span className="flex-shrink-0 w-14 h-14 rounded-lg bg-black/10 dark:bg-white/10 flex items-center justify-center text-xs text-gray-600 dark:text-gray-400">
+                    +{project.galleryImages.length - 6}
+                  </span>
+                )}
+              </button>
+            </div>
+          )}
+
           <div className="p-6">
             <h4 className="text-2xl font-bold text-black dark:text-white mb-2">{project.title}</h4>
             <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mb-3">{project.subtitle}</p>

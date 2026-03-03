@@ -11,6 +11,8 @@ export interface Project {
   createdAt?: string;
   /** Imágenes por sección para mostrar en el modal (ej. Wilson System) */
   sectionImages?: { sectionTitle: string; images: string[] }[];
+  /** Galería de imágenes de la card (se muestran en mini galería / modal) */
+  galleryImages?: string[];
 }
 
 export interface Technology {
