@@ -14,9 +14,15 @@ export default function Hero() {
             className="w-full h-auto object-contain"
           />
         </div>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
           {t('hero.subtitle')}
         </p>
+        <a
+          href="#contact"
+          className="inline-block px-8 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+        >
+          {t('hero.cta')}
+        </a>
       </div>
     </section>
   );
