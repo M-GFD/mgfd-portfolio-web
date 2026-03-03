@@ -49,13 +49,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Links */}
-          <div className="flex gap-6 text-gray-600 text-sm">
-            <a href="#features" className="hover:text-black transition-colors">Features</a>
-            <a href="#learn-more" className="hover:text-black transition-colors">Learn more</a>
-            <a href="#support" className="hover:text-black transition-colors">Support</a>
-          </div>
-
           {/* Copyright */}
           <div className="text-gray-500 text-sm">
             © 2026 mgfd design. All rights reserved.
