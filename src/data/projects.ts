@@ -1,5 +1,8 @@
 import { Project } from '@/types/portfolio';
 
+// Bump when you replace image files (same names) so the browser loads the new versions
+const IMG_V = 'v=2';
+
 export const projects: Project[] = [
   {
     id: 1,
@@ -14,23 +17,23 @@ Implementación del sistema "Wilson" para diseñar de forma simultánea múltipl
 Desarrollo de piezas promocionales para social media y YouTube con foco en CTR y recordación (thumbnails, banners, posters), optimizando producción mediante sistema multi-cut. Creación de key visuals para campañas OTT de AFA Play con jugadores destacados, versiones para home hero, social push y material promocional de temporada.
 
 Diseño de presentaciones institucionales: quiénes somos, portfolio, partners y clientes, con estilos visuales, retícula y componentes reutilizables para propuestas comerciales.`,
-    image: '/images/project-01.png',
+    image: `/images/project-01.png?${IMG_V}`,
     technologies: ['Photoshop', 'Illustrator', 'Figma', 'PowerPoint'],
     tags: ['Sports', 'Decks', 'Wilson System', 'OTT', 'Social Media', 'Branding'],
     reversed: false,
     galleryImages: [
-      '/images/1190_asset_01.png',
-      '/images/1190_asset_02.png',
-      '/images/1190_asset_03.png',
-      '/images/1190_asset_04.png',
-      '/images/1190_asset_05.png',
-      '/images/1190_asset_06.png',
-      '/images/1190_asset_07.png',
+      `/images/1190_asset_01.png?${IMG_V}`,
+      `/images/1190_asset_02.png?${IMG_V}`,
+      `/images/1190_asset_03.png?${IMG_V}`,
+      `/images/1190_asset_04.png?${IMG_V}`,
+      `/images/1190_asset_05.png?${IMG_V}`,
+      `/images/1190_asset_06.png?${IMG_V}`,
+      `/images/1190_asset_07.png?${IMG_V}`,
     ],
     sectionImages: [
       {
         sectionTitle: 'Wilson System',
-        images: ['/images/wilson mastantuono.png', '/images/wilson_superclasico.png'],
+        images: [`/images/wilson mastantuono.png?${IMG_V}`, `/images/wilson_superclasico.png?${IMG_V}`],
       },
     ],
   },
@@ -45,7 +48,7 @@ Diseño de presentaciones institucionales: quiénes somos, portfolio, partners y
 Diseño del home y esquema completo de la web app: vistas de registro, login, mapa interactivo, analytics, formularios y estados operativos en dark/light mode para empresas distribuidoras (monitoreo de cilindros, estado por zonas y métricas clave).
 
 Diseño de app mobile para usuarios finales con monitoreo en tiempo real del estado del cilindro, vistas en light y dark mode, componentes de estado, indicadores de consumo y acciones de recarga/pedido.`,
-    image: '/images/project-02.png',
+    image: `/images/project-02.png?${IMG_V}`,
     technologies: ['Figma', 'Design System', 'UX Research', 'Mobile UI'],
     tags: ['UX/UI', 'SaaS', 'Web App', 'Mobile App', 'IoT'],
     reversed: true,
@@ -59,7 +62,7 @@ Diseño de app mobile para usuarios finales con monitoreo en tiempo real del est
     fullDescription: `Experiencia en POLI Studio trabajando en corrección de color, propuestas creativas y revisión de diseños para múltiples clientes.
 
 Participación en campañas visuales, piezas para redes y mejoras iterativas de comunicación gráfica orientada a negocio.`,
-    image: '/images/project-03.png',
+    image: `/images/project-03.png?${IMG_V}`,
     technologies: ['Photoshop', 'Illustrator', 'Social Design'],
     tags: ['Graphic Design', 'Branding', 'Agency'],
     reversed: false,
@@ -71,7 +74,7 @@ Participación en campañas visuales, piezas para redes y mejoras iterativas de 
     description:
       'Agencia de soluciones audiovisuales. Diseño gráfico. Diseño UX/UI. Diseño audiovisual con IA.',
     fullDescription: `Agencia de soluciones audiovisuales. Diseño gráfico. Diseño UX/UI. Diseño audiovisual con IA.`,
-    image: '/images/project-04.png',
+    image: `/images/project-04.png?${IMG_V}`,
     technologies: [],
     tags: ['Audiovisual', 'Graphic Design', 'UX/UI', 'IA'],
     reversed: true,
