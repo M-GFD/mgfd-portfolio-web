@@ -1,6 +1,6 @@
 export default function Hero() {
   return (
-    <section className="py-20 px-6">
+    <section className="pt-28 pb-20 px-6">
       <div className="max-w-7xl mx-auto text-center">
         <div className="relative w-full max-w-4xl mx-auto mb-6">
           <img
@@ -10,7 +10,7 @@ export default function Hero() {
           />
         </div>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Graphic Design - UI Design
+          Graphic design, multimedia and UX/UI solutions.
         </p>
       </div>
     </section>

@@ -9,6 +9,8 @@ export interface Project {
   tags?: string[];
   reversed: boolean;
   createdAt?: string;
+  /** Imágenes por sección para mostrar en el modal (ej. Wilson System) */
+  sectionImages?: { sectionTitle: string; images: string[] }[];
 }
 
 export interface Technology {
