@@ -1,4 +1,2 @@
-// Inclusive Sans is loaded via <link> in layout.tsx to avoid build-time font fetching.
-export const inter = {
-  variable: "--font-inclusive-sans",
-};
+// Geist y Geist Mono se cargan vía Google Fonts en layout.tsx.
+// Geist Mono es la tipografía base del sitio (font-sans).
