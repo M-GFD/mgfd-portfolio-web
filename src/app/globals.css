@@ -117,6 +117,10 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* Reducción global: ~4–6 pt menos (todos los textos más pequeños) */
+  html {
+    font-size: 75%;
+  }
   body {
     @apply bg-background text-foreground;
   }
