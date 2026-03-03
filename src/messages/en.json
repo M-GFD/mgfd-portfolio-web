@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "about": "About",
+    "contact": "Contact",
+    "works": "Works"
+  },
+  "hero": {
+    "subtitle": "Graphic design, multimedia and UX/UI solutions."
+  },
+  "about": {
+    "title": "What about me?",
+    "p1": "My name is Mateo and I'm a designer with years of expertise in creating digital experiences, static graphic design and multimedia projects that connect brands with their audiences. AI researcher and enthusiast. With years of experience in Graphic Design and UI/UX Design, I'm always working to transform ideas of any kind into reality.",
+    "p2": "My approach: user-centered creative thinking combined with technical skills, ensuring every project not only looks and feels good but also performs with excellence."
+  },
+  "technologies": {
+    "title": "Technologies & Tools"
+  },
+  "projects": {
+    "sectionTitle": "Works / Projects",
+    "seeMore": "See more",
+    "gallery": "Gallery",
+    "galleryAria": "View gallery for",
+    "technologies": "Technologies",
+    "tags": "Tags",
+    "close": "Close",
+    "previous": "Previous",
+    "next": "Next",
+    "closeAria": "Close",
+    "previousAria": "Previous",
+    "nextAria": "Next"
+  },
+  "projectsList": {
+    "1": {
+      "title": "1190 Sports",
+      "subtitle": "Deck design, Wilson System, social media, OTT and corporate presentations",
+      "description": "Full decks, Wilson multi-format system, social and YouTube assets, AFA Play OTT key visuals and institutional presentations for 1190 Sports.",
+      "fullDescription": "Project focused on creating full decks for 1190 Sports: visual research, photo selection, image treatment and high-impact compositions for commercial presentations (PowerPoint) related to image rights and sponsorships in Argentina, Peru and Brazil.\n\nImplementation of the \"Wilson\" system to design multiple campaign pieces simultaneously across resolutions. Applied to content such as Franco Mastantuono and Superclásico to ensure visual consistency across desktop, mobile, banners and thumbnails. Result: reduced production time and stronger brand consistency across channels.\n\nDevelopment of promotional pieces for social media and YouTube with a focus on CTR and recall (thumbnails, banners, posters), optimizing production through a multi-cut system. Creation of key visuals for AFA Play OTT campaigns with featured players, versions for home hero, social push and seasonal promotional material.\n\nDesign of institutional presentations: who we are, portfolio, partners and clients, with visual styles, grid and reusable components for commercial proposals."
+    },
+    "2": {
+      "title": "Novogas",
+      "subtitle": "CX & UX/UI, Web App and Mobile App for gas-tech ecosystem",
+      "description": "UX/UI design for digital platform and mobile app: login, navigation, operational panels, interactive map, analytics and real-time consumption monitoring.",
+      "fullDescription": "UX/UI project for Novogas covering login, navigation, operational panels and mobile experience. User flows, interface components and visual guidelines to improve operational clarity.\n\nDesign of the home and full web app layout: registration views, login, interactive map, analytics, forms and operational states in dark/light mode for distribution companies (cylinder monitoring, status by zone and key metrics).\n\nDesign of mobile app for end users with real-time cylinder status monitoring, light and dark mode views, state components, consumption indicators and refill/order actions."
+    },
+    "3": {
+      "title": "POLI Design Studio",
+      "subtitle": "Graphic Designer — Branding & visual campaigns",
+      "description": "Over 2 years creating visual pieces for startups and entrepreneurs with a focus on quality and art direction.",
+      "fullDescription": "Experience at POLI Studio working on color grading, creative proposals and design review for multiple clients.\n\nInvolvement in visual campaigns, social pieces and iterative improvements to business-oriented graphic communication."
+    },
+    "4": {
+      "title": "Temps Studio",
+      "subtitle": "Audiovisual solutions and design",
+      "description": "Agency for audiovisual solutions. Graphic design. UX/UI design. AI-powered audiovisual design.",
+      "fullDescription": "Agency for audiovisual solutions. Graphic design. UX/UI design. AI-powered audiovisual design."
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 mgfd design. All rights reserved."
+  }
+}

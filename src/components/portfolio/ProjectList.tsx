@@ -2,6 +2,7 @@
 
 import { ChevronRight, Loader2 } from 'lucide-react';
 import { Project } from '@/types/portfolio';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ProjectListProps {
   projects: Project[];
@@ -10,6 +11,8 @@ interface ProjectListProps {
 }
 
 export default function ProjectList({ projects, loading, onSeeMore }: ProjectListProps) {
+  const { t } = useLanguage();
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
@@ -36,12 +39,12 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
 
           {project.galleryImages && project.galleryImages.length > 0 && (
             <div className="px-4 pt-3 pb-0">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Galería</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('projects.gallery')}</p>
               <button
                 type="button"
                 onClick={() => onSeeMore(project)}
                 className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-thin hover:opacity-90 transition-opacity"
-                aria-label={`Ver galería de ${project.title}`}
+                aria-label={`${t('projects.galleryAria')} ${project.title}`}
               >
                 {project.galleryImages.slice(0, 6).map((src, i) => (
                   <span key={i} className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border border-white/20 bg-gray-100/80">
@@ -76,7 +79,7 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
               onClick={() => onSeeMore(project)}
               className="inline-flex items-center gap-2 bg-black/80 dark:bg-white/20 text-white px-5 py-2.5 rounded-lg hover:bg-black dark:hover:bg-white/30 transition-colors border border-white/20 backdrop-blur-sm"
             >
-              See more
+              {t('projects.seeMore')}
               <ChevronRight size={16} />
             </button>
           </div>

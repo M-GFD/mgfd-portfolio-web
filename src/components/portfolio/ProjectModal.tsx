@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { X, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Project } from '@/types/portfolio';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ProjectModalProps {
   project: Project | null;
@@ -10,6 +11,7 @@ interface ProjectModalProps {
 }
 
 export default function ProjectModal({ project, onClose }: ProjectModalProps) {
+  const { t } = useLanguage();
   const [galleryLightboxIndex, setGalleryLightboxIndex] = useState<number | null>(null);
 
   const galleryImages = project?.galleryImages ?? [];
@@ -50,7 +52,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-black dark:hover:text-white transition-colors"
-            aria-label="Close"
+            aria-label={t('projects.closeAria')}
           >
             <X size={24} />
           </button>
@@ -71,7 +73,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
 
         {galleryImages.length > 0 && (
           <div className="mt-8">
-            <h4 className="text-lg font-semibold text-black dark:text-white mb-3">Galería</h4>
+            <h4 className="text-lg font-semibold text-black dark:text-white mb-3">{t('projects.gallery')}</h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {galleryImages.map((src, i) => (
                 <button
@@ -103,7 +105,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
 
         {project.technologies && project.technologies.length > 0 && (
           <div className="mt-8">
-            <h4 className="text-lg font-semibold text-black dark:text-white mb-3">Technologies</h4>
+            <h4 className="text-lg font-semibold text-black dark:text-white mb-3">{t('projects.technologies')}</h4>
             <div className="flex flex-wrap gap-2">
               {project.technologies.map((tech, index) => (
                 <span
@@ -119,7 +121,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
 
         {project.tags && project.tags.length > 0 && (
           <div className="mt-6">
-            <h4 className="text-lg font-semibold text-black dark:text-white mb-3">Tags</h4>
+            <h4 className="text-lg font-semibold text-black dark:text-white mb-3">{t('projects.tags')}</h4>
             <div className="flex flex-wrap gap-2">
               {project.tags.map((tag, index) => (
                 <span
@@ -137,7 +139,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
           onClick={onClose}
           className="mt-8 inline-flex items-center gap-2 bg-black/80 dark:bg-white/20 text-white px-6 py-3 rounded-lg hover:bg-black dark:hover:bg-white/30 transition-colors border border-white/20 backdrop-blur-sm"
         >
-          Close
+          {t('projects.close')}
           <ChevronRight size={16} />
         </button>
       </div>
@@ -148,13 +150,13 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
           onClick={closeLightbox}
           aria-modal
           role="dialog"
-          aria-label="Galería de imágenes"
+          aria-label={t('projects.gallery')}
         >
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); goPrev(); }}
             className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
-            aria-label="Anterior"
+            aria-label={t('projects.previousAria')}
           >
             <ChevronLeft size={28} />
           </button>
@@ -168,7 +170,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
             type="button"
             onClick={(e) => { e.stopPropagation(); goNext(); }}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
-            aria-label="Siguiente"
+            aria-label={t('projects.nextAria')}
           >
             <ChevronRight size={28} />
           </button>
@@ -176,7 +178,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
             type="button"
             onClick={(e) => { e.stopPropagation(); closeLightbox(); }}
             className="absolute top-4 right-4 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
-            aria-label="Cerrar"
+            aria-label={t('projects.closeAria')}
           >
             <X size={24} />
           </button>

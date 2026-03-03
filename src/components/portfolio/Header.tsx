@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface HeaderProps {
   onMenuToggle?: (isOpen: boolean) => void;
@@ -9,6 +10,7 @@ interface HeaderProps {
 
 export default function Header({ onMenuToggle }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { locale, setLocale, t } = useLanguage();
 
   const handleMenuToggle = () => {
     const newState = !mobileMenuOpen;
@@ -35,11 +37,41 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           </a>
         </div>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation + Language switch */}
         <nav className="hidden md:flex items-center gap-8">
-          <a href="#about" className="text-gray-600 hover:text-black transition-colors">About</a>
-          <a href="#contact" className="text-gray-600 hover:text-black transition-colors">Contact</a>
-          <a href="#works" className="text-gray-600 hover:text-black transition-colors">Works</a>
+          <a href="#about" className="text-gray-600 hover:text-black transition-colors">
+            {t('nav.about')}
+          </a>
+          <a href="#contact" className="text-gray-600 hover:text-black transition-colors">
+            {t('nav.contact')}
+          </a>
+          <a href="#works" className="text-gray-600 hover:text-black transition-colors">
+            {t('nav.works')}
+          </a>
+          <div className="flex items-center gap-1 border-l border-gray-200 pl-6">
+            <button
+              type="button"
+              onClick={() => setLocale('es')}
+              className={`px-2 py-1 text-sm font-medium rounded transition-colors ${
+                locale === 'es' ? 'text-black bg-gray-100' : 'text-gray-500 hover:text-black'
+              }`}
+              aria-pressed={locale === 'es'}
+              aria-label="Español"
+            >
+              ES
+            </button>
+            <button
+              type="button"
+              onClick={() => setLocale('en')}
+              className={`px-2 py-1 text-sm font-medium rounded transition-colors ${
+                locale === 'en' ? 'text-black bg-gray-100' : 'text-gray-500 hover:text-black'
+              }`}
+              aria-pressed={locale === 'en'}
+              aria-label="English"
+            >
+              EN
+            </button>
+          </div>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -60,22 +92,39 @@ export default function Header({ onMenuToggle }: HeaderProps) {
             className="block py-2 text-gray-600 hover:text-black transition-colors"
             onClick={handleNavClick}
           >
-            About
+            {t('nav.about')}
           </a>
           <a
             href="#contact"
             className="block py-2 text-gray-600 hover:text-black transition-colors"
             onClick={handleNavClick}
           >
-            Contact
+            {t('nav.contact')}
           </a>
           <a
             href="#works"
             className="block py-2 text-gray-600 hover:text-black transition-colors"
             onClick={handleNavClick}
           >
-            Works
+            {t('nav.works')}
           </a>
+          <div className="flex items-center gap-2 pt-3 mt-3 border-t border-gray-100">
+            <span className="text-sm text-gray-500">Idioma / Language</span>
+            <button
+              type="button"
+              onClick={() => { setLocale('es'); handleNavClick(); }}
+              className={`px-3 py-1.5 text-sm font-medium rounded ${locale === 'es' ? 'bg-gray-100 text-black' : 'text-gray-600'}`}
+            >
+              ES
+            </button>
+            <button
+              type="button"
+              onClick={() => { setLocale('en'); handleNavClick(); }}
+              className={`px-3 py-1.5 text-sm font-medium rounded ${locale === 'en' ? 'bg-gray-100 text-black' : 'text-gray-600'}`}
+            >
+              EN
+            </button>
+          </div>
         </nav>
       )}
     </header>

@@ -1,13 +1,17 @@
+'use client';
+
 import Image from 'next/image';
 import { technologies } from '@/constants/technologies';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Technologies() {
+  const { t } = useLanguage();
   return (
     <section id="technologies" className="py-24 bg-white">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-black text-center mb-16">
-            Technologies & Tools
+            {t('technologies.title')}
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {technologies.map((tech) => (

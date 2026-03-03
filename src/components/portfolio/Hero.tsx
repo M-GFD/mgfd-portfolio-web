@@ -1,4 +1,9 @@
+'use client';
+
+import { useLanguage } from '@/contexts/LanguageContext';
+
 export default function Hero() {
+  const { t } = useLanguage();
   return (
     <section className="pt-28 pb-20 px-6">
       <div className="max-w-7xl mx-auto text-center">
@@ -10,7 +15,7 @@ export default function Hero() {
           />
         </div>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Graphic design, multimedia and UX/UI solutions.
+          {t('hero.subtitle')}
         </p>
       </div>
     </section>

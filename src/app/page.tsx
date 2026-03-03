@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Header from '@/components/portfolio/Header';
 import Hero from '@/components/portfolio/Hero';
 import Profile from '@/components/portfolio/Profile';
@@ -10,9 +10,23 @@ import ProjectModal from '@/components/portfolio/ProjectModal';
 import Footer from '@/components/portfolio/Footer';
 import { Project } from '@/types/portfolio';
 import { projects } from '@/data/projects';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function HomePage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const { t } = useLanguage();
+
+  const projectsWithLocale = useMemo(
+    () =>
+      projects.map((p) => ({
+        ...p,
+        title: t(`projectsList.${p.id}.title`),
+        subtitle: t(`projectsList.${p.id}.subtitle`),
+        description: t(`projectsList.${p.id}.description`),
+        fullDescription: t(`projectsList.${p.id}.fullDescription`),
+      })),
+    [t]
+  );
 
   const handleSeeMore = (project: Project) => {
     setSelectedProject(project);
@@ -29,13 +43,13 @@ export default function HomePage() {
         <Hero />
         <Profile />
         <Technologies />
-        <section id="projects" className="py-24 bg-gradient-to-b from-gray-50 to-white">
+        <section id="works" className="py-24 bg-gradient-to-b from-gray-50 to-white">
           <div className="container mx-auto px-6">
             <div className="max-w-6xl mx-auto">
               <h2 className="text-4xl md:text-5xl font-bold text-black text-center mb-16">
-                Works / Projects
+                {t('projects.sectionTitle')}
               </h2>
-              <ProjectList onSeeMore={handleSeeMore} projects={projects} loading={false} />
+              <ProjectList onSeeMore={handleSeeMore} projects={projectsWithLocale} loading={false} />
             </div>
           </div>
         </section>

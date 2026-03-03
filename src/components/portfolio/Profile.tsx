@@ -1,9 +1,13 @@
+'use client';
+
+import { useLanguage } from '@/contexts/LanguageContext';
+
 export default function Profile() {
+  const { t } = useLanguage();
   return (
     <section id="about" className="py-16 px-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-center gap-12">
-          {/* Profile Image - SIN GRADIENTE VIOLETA */}
           <div className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
             <img
               src="/images/profile.png"
@@ -12,12 +16,12 @@ export default function Profile() {
             />
           </div>
           <div className="flex-1 text-justify md:text-left">
-            <h3 className="text-4xl font-bold text-black mb-4">What about me?</h3>
+            <h3 className="text-4xl font-bold text-black mb-4">{t('about.title')}</h3>
             <p className="text-justify text-gray-600 mb-6">
-              My name is Mateo and I'm a designer with years of expertise in creating digital experiences, static graphic design and, multimedia projects that connect brands with their audiences. AI researcher, AI enthusiastic. With years of experience in Graphic Design and UI/UX Design, I'm always trying to transform ideas of any kind into reality.
+              {t('about.p1')}
             </p>
             <p className="text-justify text-gray-600">
-              My approach: user-centered creative thinking with technical skills, ensuring every project not only looks and feels good, but also, performs with excelence at the same time.
+              {t('about.p2')}
             </p>
           </div>
         </div>
