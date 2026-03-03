@@ -117,9 +117,9 @@
   * {
     @apply border-border outline-ring/50;
   }
-  /* Reducción global: ~4–6 pt menos (todos los textos más pequeños) */
+  /* Tamaño base tipografía (87.5% ≈ +2 pt respecto a 75%) */
   html {
-    font-size: 75%;
+    font-size: 87.5%;
   }
   body {
     @apply bg-background text-foreground;
