@@ -9,7 +9,7 @@ export interface Project {
   tags?: string[];
   reversed: boolean;
   createdAt?: string;
-  /** Imágenes por sección para mostrar en el modal (ej. Wilson System) */
+  /** Imágenes por sección para mostrar en el modal (ej. Sistema multi-corte) */
   sectionImages?: { sectionTitle: string; images: string[] }[];
   /** Galería de imágenes de la card (se muestran en mini galería / modal) */
   galleryImages?: string[];

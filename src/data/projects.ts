@@ -7,7 +7,7 @@ export const projects: Project[] = [
   {
     id: 1,
     title: '1190 Sports',
-    subtitle: 'Deck design, Wilson System, social media, OTT y presentaciones corporativas',
+    subtitle: 'Deck design, Sistema multi-corte, social media, OTT y presentaciones corporativas',
     description:
       'Decks completos, sistema multi-formato Wilson, piezas para redes y YouTube, key visuals AFA Play OTT y presentaciones institucionales para 1190 Sports.',
     fullDescription: `Proyecto enfocado en la creación de decks completos para 1190 Sports: investigación visual, selección de fotografías, tratamiento de imagen y composiciones de alto impacto para presentaciones comerciales (PowerPoint) vinculadas a derechos de imagen y patrocinios en Argentina, Perú y Brasil.
@@ -32,7 +32,7 @@ Diseño de presentaciones institucionales: quiénes somos, portfolio, partners y
     ],
     sectionImages: [
       {
-        sectionTitle: 'Wilson System',
+        sectionTitle: 'Sistema multi-corte',
         images: [`/images/wilson mastantuono.png?${IMG_V}`, `/images/wilson_superclasico.png?${IMG_V}`],
       },
     ],
