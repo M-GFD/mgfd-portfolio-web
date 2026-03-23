@@ -6,6 +6,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useEffect, useRef } from 'react';
 
 const SPIN_SPEED_RAD_S = 0.525;
+/** Escala visual de cada ítem del carrusel respecto al diseño base */
+const ITEM_SCALE = 2.5;
 
 function techImageSrc(tech: (typeof technologies)[number]) {
   return `/images/${tech.name.toLowerCase()}.${tech.imageExt ?? 'png'}`;
@@ -13,17 +15,29 @@ function techImageSrc(tech: (typeof technologies)[number]) {
 
 function TechItem({ tech }: { tech: (typeof technologies)[number] }) {
   return (
-    <div className="pointer-events-none flex w-[7rem] flex-col items-center gap-3">
-      <div className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center">
+    <div
+      className="pointer-events-none flex flex-col items-center"
+      style={{ width: `${7 * ITEM_SCALE}rem`, gap: `${0.75 * ITEM_SCALE}rem` }}
+    >
+      <div
+        className="relative flex flex-shrink-0 items-center justify-center"
+        style={{ width: `${3 * ITEM_SCALE}rem`, height: `${3 * ITEM_SCALE}rem` }}
+      >
         <Image
           src={techImageSrc(tech)}
           alt={tech.name}
-          width={48}
-          height={48}
+          width={Math.round(48 * ITEM_SCALE)}
+          height={Math.round(48 * ITEM_SCALE)}
           className="h-full w-full object-contain"
         />
       </div>
-      <h3 className="max-w-[6.5rem] text-center text-sm font-semibold leading-tight text-black">
+      <h3
+        className="text-center font-semibold leading-tight text-black"
+        style={{
+          maxWidth: `${6.5 * ITEM_SCALE}rem`,
+          fontSize: `${0.875 * ITEM_SCALE}rem`,
+        }}
+      >
         {tech.name}
       </h3>
     </div>
@@ -39,7 +53,7 @@ export default function Technologies() {
   );
 
   const spinRef = useRef(0);
-  const radiusPxRef = useRef(260);
+  const radiusPxRef = useRef(260 * ITEM_SCALE);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -47,7 +61,10 @@ export default function Technologies() {
 
     const updateRadius = () => {
       const w = el.getBoundingClientRect().width;
-      radiusPxRef.current = Math.min(300, Math.max(140, w * 0.32));
+      radiusPxRef.current = Math.min(
+        300 * ITEM_SCALE,
+        Math.max(140 * ITEM_SCALE, w * 0.32 * ITEM_SCALE),
+      );
     };
 
     const ro = new ResizeObserver(updateRadius);
@@ -102,11 +119,13 @@ export default function Technologies() {
       <div
         ref={containerRef}
         className="relative w-full py-6"
-        style={{ perspective: 'min(1100px, 100vw)' }}
+        style={{
+          perspective: `min(${1100 * ITEM_SCALE}px, 100vw)`,
+        }}
       >
         <div
           className="relative mx-auto w-full overflow-visible"
-          style={{ height: 'min(380px, 52vw)' }}
+          style={{ height: `min(${380 * ITEM_SCALE}px, ${52 * ITEM_SCALE}vw)` }}
         >
           <div
             className="absolute left-1/2 top-1/2"
@@ -122,8 +141,9 @@ export default function Technologies() {
                 ref={(el) => {
                   itemRefs.current[i] = el;
                 }}
-                className="absolute left-1/2 top-1/2 w-[7rem]"
+                className="absolute left-1/2 top-1/2"
                 style={{
+                  width: `${7 * ITEM_SCALE}rem`,
                   transformStyle: 'preserve-3d',
                   willChange: 'transform, opacity',
                 }}
