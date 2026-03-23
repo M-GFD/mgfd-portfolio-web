@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react';
 
 const SPIN_SPEED_RAD_S = 0.525;
 /** Escala visual de cada ítem del carrusel respecto al diseño base */
-const ITEM_SCALE = 1.25;
+const ITEM_SCALE = 1.75;
 
 function techImageSrc(tech: (typeof technologies)[number]) {
   return `/images/${tech.name.toLowerCase()}.${tech.imageExt ?? 'png'}`;
@@ -107,10 +107,10 @@ export default function Technologies() {
   }, [n]);
 
   return (
-    <section id="technologies" className="py-24 bg-white">
+    <section id="technologies" className="bg-white pt-10 pb-5 md:pt-12 md:pb-6">
       <div className="container mx-auto px-6">
         <div className="mx-auto max-w-6xl">
-          <h2 className="mb-16 text-center text-4xl font-bold text-black md:text-5xl">
+          <h2 className="mb-3 text-center text-4xl font-bold text-black md:mb-4 md:text-5xl">
             {t('technologies.title')}
           </h2>
         </div>
@@ -118,7 +118,7 @@ export default function Technologies() {
 
       <div
         ref={containerRef}
-        className="relative w-full py-6"
+        className="relative w-full py-1 md:py-2"
         style={{
           perspective: `min(${1100 * ITEM_SCALE}px, 100vw)`,
         }}

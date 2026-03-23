@@ -43,10 +43,13 @@ export default function HomePage() {
         <Hero />
         <Profile />
         <Technologies />
-        <section id="works" className="py-24 bg-gradient-to-b from-gray-50 to-white">
+        <section
+          id="works"
+          className="bg-gradient-to-b from-gray-50 to-white pt-6 pb-24 md:pt-8"
+        >
           <div className="container mx-auto px-6">
             <div className="max-w-6xl mx-auto">
-              <h2 className="text-4xl md:text-5xl font-bold text-black text-center mb-16">
+              <h2 className="mb-16 text-center text-4xl font-bold text-black md:text-5xl">
                 {t('projects.sectionTitle')}
               </h2>
               <ProjectList onSeeMore={handleSeeMore} projects={projectsWithLocale} loading={false} />
