@@ -8,6 +8,9 @@ import { useEffect, useRef } from 'react';
 const SPIN_SPEED_RAD_S = 0.525;
 /** Escala visual de cada ítem del carrusel respecto al diseño base */
 const ITEM_SCALE = 1.75;
+/** Altura del área 3D (base px / vw antes de ITEM_SCALE); más baja = menos “hueco” bajo el título */
+const CAROUSEL_VIEWPORT_H_PX = 340;
+const CAROUSEL_VIEWPORT_VW = 44;
 
 function techImageSrc(tech: (typeof technologies)[number]) {
   return `/images/${tech.name.toLowerCase()}.${tech.imageExt ?? 'png'}`;
@@ -110,7 +113,7 @@ export default function Technologies() {
     <section id="technologies" className="bg-white pt-10 pb-5 md:pt-12 md:pb-6">
       <div className="container mx-auto px-6">
         <div className="mx-auto max-w-6xl">
-          <h2 className="mb-1 text-center text-4xl font-bold text-black md:mb-2 md:text-5xl">
+          <h2 className="mb-0 text-center text-4xl font-bold text-black md:text-5xl">
             {t('technologies.title')}
           </h2>
         </div>
@@ -118,17 +121,19 @@ export default function Technologies() {
 
       <div
         ref={containerRef}
-        className="relative w-full pt-0 pb-1 md:pb-2"
+        className="relative w-full pt-1 pb-4 md:pb-5"
         style={{
           perspective: `min(${1100 * ITEM_SCALE}px, 100vw)`,
         }}
       >
         <div
           className="relative mx-auto w-full overflow-visible"
-          style={{ height: `min(${380 * ITEM_SCALE}px, ${52 * ITEM_SCALE}vw)` }}
+          style={{
+            height: `min(${CAROUSEL_VIEWPORT_H_PX * ITEM_SCALE}px, ${CAROUSEL_VIEWPORT_VW * ITEM_SCALE}vw)`,
+          }}
         >
           <div
-            className="absolute left-1/2 top-1/2"
+            className="absolute left-1/2 top-24 -translate-x-1/2 md:top-28"
             style={{
               width: 0,
               height: 0,
