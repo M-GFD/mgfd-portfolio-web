@@ -14,16 +14,14 @@ function techImageSrc(tech: (typeof technologies)[number]) {
 function TechItem({ tech }: { tech: (typeof technologies)[number] }) {
   return (
     <div className="pointer-events-none flex w-[7rem] flex-col items-center gap-3">
-      <div className="flex h-[5.25rem] w-[5.25rem] flex-shrink-0 items-center justify-center rounded-full bg-gray-50 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)] ring-1 ring-gray-200/90">
-        <div className="relative h-12 w-12">
-          <Image
-            src={techImageSrc(tech)}
-            alt={tech.name}
-            width={48}
-            height={48}
-            className="h-full w-full object-contain"
-          />
-        </div>
+      <div className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center">
+        <Image
+          src={techImageSrc(tech)}
+          alt={tech.name}
+          width={48}
+          height={48}
+          className="h-full w-full object-contain"
+        />
       </div>
       <h3 className="max-w-[6.5rem] text-center text-sm font-semibold leading-tight text-black">
         {tech.name}
