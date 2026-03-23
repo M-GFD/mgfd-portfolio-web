@@ -22,9 +22,10 @@ export const technologies: Technology[] = [
     color: '#61DAFB',
   },
   {
-    name: 'X-Design',
+    name: 'Antigravity',
     icon: '▲',
     color: '#000000',
+    imageExt: 'svg',
   },
   {
     name: 'Cursor',

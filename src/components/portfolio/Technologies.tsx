@@ -21,7 +21,7 @@ export default function Technologies() {
               >
                 <div className="w-16 h-16 mb-4">
                   <Image
-                    src={`/images/${tech.name.toLowerCase()}.png`}
+                    src={`/images/${tech.name.toLowerCase()}.${tech.imageExt ?? 'png'}`}
                     alt={tech.name}
                     width={64}
                     height={64}

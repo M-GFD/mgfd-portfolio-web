@@ -19,6 +19,7 @@ export interface Technology {
   name: string;
   icon: string;
   color: string;
+  imageExt?: string;
 }
 
 export interface SocialLink {
