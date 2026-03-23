@@ -39,21 +39,19 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
-      <main className="flex-1">
+      <main className="flex flex-1 flex-col gap-20 md:gap-28">
         <Hero />
         <Profile />
         <Technologies />
         <section
           id="works"
-          className="bg-gradient-to-b from-gray-50 to-white py-16 md:py-20"
+          className="bg-gradient-to-b from-gray-50 to-white px-6 pb-20 pt-10 md:pb-28 md:pt-14"
         >
-          <div className="container mx-auto px-6">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="mb-16 text-center text-4xl font-bold text-black md:text-5xl">
-                {t('projects.sectionTitle')}
-              </h2>
-              <ProjectList onSeeMore={handleSeeMore} projects={projectsWithLocale} loading={false} />
-            </div>
+          <div className="container mx-auto max-w-6xl">
+            <h2 className="mb-16 text-center text-4xl font-bold text-black md:text-5xl">
+              {t('projects.sectionTitle')}
+            </h2>
+            <ProjectList onSeeMore={handleSeeMore} projects={projectsWithLocale} loading={false} />
           </div>
         </section>
       </main>

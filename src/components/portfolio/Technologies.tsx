@@ -110,7 +110,7 @@ export default function Technologies() {
   }, [n]);
 
   return (
-    <section id="technologies" className="bg-white py-16 md:py-20">
+    <section id="technologies" className="bg-white py-8 md:py-10">
       <div className="container mx-auto px-6">
         <div className="mx-auto max-w-6xl">
           <h2 className="mb-0 text-center text-4xl font-bold text-black md:text-5xl">

@@ -5,7 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 export default function Hero() {
   const { t } = useLanguage();
   return (
-    <section className="px-6 pt-28 pb-16 md:pb-20">
+    <section className="px-6 pb-0 pt-28">
       <div className="max-w-7xl mx-auto text-center">
         <div className="relative w-full max-w-4xl mx-auto mb-6">
           <img
