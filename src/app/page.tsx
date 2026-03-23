@@ -45,7 +45,7 @@ export default function HomePage() {
         <Technologies />
         <section
           id="works"
-          className="bg-gradient-to-b from-gray-50 to-white pt-6 pb-24 md:pt-8"
+          className="bg-gradient-to-b from-gray-50 to-white pt-3 pb-24 md:pt-4"
         >
           <div className="container mx-auto px-6">
             <div className="max-w-6xl mx-auto">
