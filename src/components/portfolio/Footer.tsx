@@ -5,7 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 export default function Footer() {
   const { t } = useLanguage();
   return (
-    <footer id="contact" className="bg-gray-50 border-t border-gray-200 mt-20">
+    <footer id="contact" className="mt-0 border-t border-gray-200 bg-gray-50">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           {/* Logo */}
