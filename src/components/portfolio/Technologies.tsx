@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react';
 
 const SPIN_SPEED_RAD_S = 0.525;
 /** Escala visual de cada ítem del carrusel respecto al diseño base */
-const ITEM_SCALE = 2.5;
+const ITEM_SCALE = 1.25;
 
 function techImageSrc(tech: (typeof technologies)[number]) {
   return `/images/${tech.name.toLowerCase()}.${tech.imageExt ?? 'png'}`;
