@@ -110,7 +110,10 @@ export default function Technologies() {
   }, [n]);
 
   return (
-    <section id="technologies" className="bg-white py-8 md:py-10">
+    <section
+      id="technologies"
+      className="border-b border-gray-100 bg-white pb-0 pt-8 md:pt-10"
+    >
       <div className="container mx-auto px-6">
         <div className="mx-auto max-w-6xl">
           <h2 className="mb-0 text-center text-4xl font-bold text-black md:text-5xl">
@@ -121,7 +124,7 @@ export default function Technologies() {
 
       <div
         ref={containerRef}
-        className="relative w-full py-5 md:py-6"
+        className="relative w-full pt-5 pb-2 md:pt-6 md:pb-3"
         style={{
           perspective: `min(${1100 * ITEM_SCALE}px, 100vw)`,
         }}

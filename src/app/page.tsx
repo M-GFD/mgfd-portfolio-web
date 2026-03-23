@@ -39,13 +39,13 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
-      <main className="flex flex-1 flex-col gap-20 md:gap-28">
+      <main className="flex flex-1 flex-col gap-12 md:gap-16">
         <Hero />
         <Profile />
         <Technologies />
         <section
           id="works"
-          className="bg-gradient-to-b from-gray-50 to-white px-6 pb-20 pt-10 md:pb-28 md:pt-14"
+          className="bg-gradient-to-b from-gray-50 to-white px-6 pb-20 pt-6 md:pb-28 md:pt-8"
         >
           <div className="container mx-auto max-w-6xl">
             <h2 className="mb-16 text-center text-4xl font-bold text-black md:text-5xl">
