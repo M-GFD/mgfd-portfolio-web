@@ -5,7 +5,7 @@ import { technologies } from '@/constants/technologies';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useEffect, useRef } from 'react';
 
-const SPIN_SPEED_RAD_S = 1.05;
+const SPIN_SPEED_RAD_S = 0.525;
 
 function techImageSrc(tech: (typeof technologies)[number]) {
   return `/images/${tech.name.toLowerCase()}.${tech.imageExt ?? 'png'}`;
@@ -36,7 +36,6 @@ export default function Technologies() {
   const { t } = useLanguage();
   const n = technologies.length;
   const containerRef = useRef<HTMLDivElement>(null);
-  const groupRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>(
     Array.from({ length: technologies.length }, () => null),
   );
@@ -71,11 +70,7 @@ export default function Technologies() {
       spinRef.current += velocityRef.current * dt;
       const spin = spinRef.current;
       const radius = radiusPxRef.current;
-
-      const group = groupRef.current;
-      if (group) {
-        group.style.transform = `rotateY(${spin * (180 / Math.PI)}deg)`;
-      }
+      const spinDeg = spin * (180 / Math.PI);
 
       for (let i = 0; i < n; i++) {
         const el = itemRefs.current[i];
@@ -85,10 +80,10 @@ export default function Technologies() {
         const c = Math.cos(rel);
         const depth = (c + 1) / 2;
         const opacity = 0.08 + 0.92 * depth;
-        const scale = 0.42 + 0.58 * depth;
-        const deg = (360 / n) * i;
+        const baseDeg = (360 / n) * i;
+        const yawDeg = baseDeg + spinDeg;
         el.style.opacity = String(opacity);
-        el.style.transform = `translate(-50%, -50%) rotateY(${deg}deg) translateZ(${radius}px) scale(${scale})`;
+        el.style.transform = `translate(-50%, -50%) rotateY(${yawDeg}deg) translateZ(${radius}px) rotateY(${-yawDeg}deg)`;
       }
 
       raf = requestAnimationFrame(tick);
@@ -131,13 +126,11 @@ export default function Technologies() {
           style={{ height: 'min(380px, 52vw)' }}
         >
           <div
-            ref={groupRef}
             className="absolute left-1/2 top-1/2"
             style={{
               width: 0,
               height: 0,
               transformStyle: 'preserve-3d',
-              willChange: 'transform',
             }}
           >
             {technologies.map((tech, i) => (
@@ -149,7 +142,6 @@ export default function Technologies() {
                 className="absolute left-1/2 top-1/2 w-[7rem]"
                 style={{
                   transformStyle: 'preserve-3d',
-                  backfaceVisibility: 'hidden',
                   willChange: 'transform, opacity',
                 }}
               >
