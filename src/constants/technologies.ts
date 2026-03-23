@@ -27,7 +27,7 @@ export const technologies: Technology[] = [
     color: '#000000',
   },
   {
-    name: 'Z AI',
+    name: 'Cursor',
     icon: '▲',
     color: '#000000',
   },
