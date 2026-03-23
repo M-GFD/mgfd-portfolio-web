@@ -113,7 +113,7 @@ export default function Technologies() {
     <section id="technologies" className="bg-white pt-10 pb-5 md:pt-12 md:pb-6">
       <div className="container mx-auto px-6">
         <div className="mx-auto max-w-6xl">
-          <h2 className="mb-0.5 text-center text-4xl font-bold text-black md:mb-1 md:text-5xl">
+          <h2 className="mb-0 text-center text-4xl font-bold text-black md:text-5xl">
             {t('technologies.title')}
           </h2>
         </div>
@@ -121,7 +121,7 @@ export default function Technologies() {
 
       <div
         ref={containerRef}
-        className="relative w-full pt-2 pb-4 md:pt-3 md:pb-5"
+        className="relative w-full py-5 md:py-6"
         style={{
           perspective: `min(${1100 * ITEM_SCALE}px, 100vw)`,
         }}
