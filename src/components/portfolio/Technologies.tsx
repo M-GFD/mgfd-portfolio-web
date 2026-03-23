@@ -42,7 +42,6 @@ export default function Technologies() {
 
   const spinRef = useRef(0);
   const radiusPxRef = useRef(260);
-  const velocityRef = useRef(0);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -67,7 +66,7 @@ export default function Technologies() {
       const dt = Math.min((now - last) / 1000, 0.064);
       last = now;
 
-      spinRef.current += velocityRef.current * dt;
+      spinRef.current += SPIN_SPEED_RAD_S * dt;
       const spin = spinRef.current;
       const radius = radiusPxRef.current;
       const spinDeg = spin * (180 / Math.PI);
@@ -78,8 +77,7 @@ export default function Technologies() {
         const θ = (2 * Math.PI * i) / n;
         const rel = θ + spin;
         const c = Math.cos(rel);
-        const depth = (c + 1) / 2;
-        const opacity = 0.08 + 0.92 * depth;
+        const opacity = Math.max(0, Math.min(1, (c + 1) / 2));
         const baseDeg = (360 / n) * i;
         const yawDeg = baseDeg + spinDeg;
         el.style.opacity = String(opacity);
@@ -93,15 +91,6 @@ export default function Technologies() {
     return () => cancelAnimationFrame(raf);
   }, [n]);
 
-  const onMove = (clientX: number) => {
-    const el = containerRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const mid = rect.width / 2;
-    velocityRef.current = x < mid ? SPIN_SPEED_RAD_S : -SPIN_SPEED_RAD_S;
-  };
-
   return (
     <section id="technologies" className="py-24 bg-white">
       <div className="container mx-auto px-6">
@@ -114,12 +103,8 @@ export default function Technologies() {
 
       <div
         ref={containerRef}
-        className="relative w-full cursor-ew-resize select-none py-6"
+        className="relative w-full py-6"
         style={{ perspective: 'min(1100px, 100vw)' }}
-        onMouseMove={(e) => onMove(e.clientX)}
-        onMouseLeave={() => {
-          velocityRef.current = 0;
-        }}
       >
         <div
           className="relative mx-auto w-full overflow-visible"
