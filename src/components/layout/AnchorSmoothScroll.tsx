@@ -9,6 +9,26 @@ function getMaxScrollY(): number {
   return Math.max(0, height - window.innerHeight);
 }
 
+/** ScrollY para alinear el borde superior del ancla justo bajo el header (sin hueco extra). */
+function computeTargetScrollY(section: Element, header: Element | null, maxY: number): number {
+  const headerH = header?.getBoundingClientRect().height ?? 0;
+  const raw = section.getBoundingClientRect().top + window.scrollY - headerH;
+  return Math.min(Math.max(0, raw), maxY);
+}
+
+function finishScroll(hash: string) {
+  const section = document.querySelector(hash);
+  if (!section) {
+    history.replaceState(null, '', hash);
+    return;
+  }
+  const headerEl = document.querySelector('header');
+  const maxY = getMaxScrollY();
+  const y = Math.round(computeTargetScrollY(section, headerEl, maxY));
+  window.scrollTo(0, y);
+  history.replaceState(null, '', hash);
+}
+
 /**
  * λ adaptativo: respuesta clara con mucho recorrido, y amortiguación muy suave
  * al acercarse al destino (velocidad → 0 sin “último fotograma” brusco).
@@ -70,20 +90,14 @@ export function AnchorSmoothScroll() {
       cancelScroll();
 
       const header = document.querySelector('header');
-      const headerH = header?.getBoundingClientRect().height ?? 0;
-      const gap = 8;
-
-      const rawTarget =
-        section.getBoundingClientRect().top + window.scrollY - headerH - gap;
       const maxY = getMaxScrollY();
-      const clampedTarget = Math.min(Math.max(0, rawTarget), maxY);
+      const clampedTarget = computeTargetScrollY(section, header, maxY);
 
       const startY = window.scrollY;
       const distance = clampedTarget - startY;
 
       if (Math.abs(distance) < 0.35) {
-        window.scrollTo(0, clampedTarget);
-        history.replaceState(null, '', hash);
+        finishScroll(hash);
         return;
       }
 
@@ -96,23 +110,22 @@ export function AnchorSmoothScroll() {
         prevTime = now;
 
         const maxYNow = getMaxScrollY();
-        const target = Math.min(clampedTarget, maxYNow);
+        const headerNow = document.querySelector('header');
+        const target = computeTargetScrollY(section, headerNow, maxYNow);
         const current = window.scrollY;
         const remaining = target - current;
         const absR = Math.abs(remaining);
 
-        // Debajo del umbral visual: posar sin salto perceptible
-        if (absR < 0.28) {
-          window.scrollTo(0, target);
-          history.replaceState(null, '', hash);
+        // Umbral bajo: el cierre exacto lo hace finishScroll (relectura DOM + redondeo)
+        if (absR < 0.35) {
           rafId = 0;
+          finishScroll(hash);
           return;
         }
 
         if (now - t0 > maxDuration) {
-          window.scrollTo(0, target);
-          history.replaceState(null, '', hash);
           rafId = 0;
+          finishScroll(hash);
           return;
         }
 
