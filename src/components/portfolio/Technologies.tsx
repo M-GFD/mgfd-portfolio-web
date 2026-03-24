@@ -113,7 +113,7 @@ export default function Technologies() {
   return (
     <section
       id="technologies"
-      className="flex flex-col gap-6 overflow-x-clip px-4 py-6 sm:gap-8 sm:px-6 sm:py-8 md:gap-10 md:py-10"
+      className="flex flex-col gap-6 overflow-x-clip px-4 pt-6 pb-3 sm:gap-8 sm:px-6 sm:pt-8 sm:pb-4 md:gap-10 md:pt-10 md:pb-5"
     >
       <div className="container mx-auto max-w-6xl px-0">
         <h2 className="text-center text-2xl font-bold text-black dark:text-white sm:text-3xl md:text-4xl lg:text-5xl">
