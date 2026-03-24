@@ -63,12 +63,49 @@ function resolveHashFromHref(href: string): string | null {
 export function AnchorSmoothScroll() {
   useEffect(() => {
     let rafId = 0;
+    let removeUserInterruptListeners: (() => void) | null = null;
 
     const cancelScroll = () => {
       if (rafId) {
         cancelAnimationFrame(rafId);
         rafId = 0;
       }
+      removeUserInterruptListeners?.();
+      removeUserInterruptListeners = null;
+    };
+
+    const attachUserInterruptListeners = () => {
+      const interrupt = () => {
+        if (rafId) cancelScroll();
+      };
+
+      const onKeyInterrupt = (e: KeyboardEvent) => {
+        if (!rafId) return;
+        const k = e.key;
+        if (
+          k === 'ArrowUp' ||
+          k === 'ArrowDown' ||
+          k === 'PageUp' ||
+          k === 'PageDown' ||
+          k === 'Home' ||
+          k === 'End' ||
+          k === ' '
+        ) {
+          cancelScroll();
+        }
+      };
+
+      window.addEventListener('wheel', interrupt, { passive: true });
+      window.addEventListener('touchstart', interrupt, { passive: true });
+      window.addEventListener('pointerdown', interrupt, { capture: true });
+      window.addEventListener('keydown', onKeyInterrupt);
+
+      removeUserInterruptListeners = () => {
+        window.removeEventListener('wheel', interrupt);
+        window.removeEventListener('touchstart', interrupt);
+        window.removeEventListener('pointerdown', interrupt, { capture: true });
+        window.removeEventListener('keydown', onKeyInterrupt);
+      };
     };
 
     const onClickCapture = (e: MouseEvent) => {
@@ -101,6 +138,8 @@ export function AnchorSmoothScroll() {
         return;
       }
 
+      attachUserInterruptListeners();
+
       let prevTime = performance.now();
       const t0 = prevTime;
       const maxDuration = 6500;
@@ -118,13 +157,13 @@ export function AnchorSmoothScroll() {
 
         // Umbral bajo: el cierre exacto lo hace finishScroll (relectura DOM + redondeo)
         if (absR < 0.35) {
-          rafId = 0;
+          cancelScroll();
           finishScroll(hash);
           return;
         }
 
         if (now - t0 > maxDuration) {
-          rafId = 0;
+          cancelScroll();
           finishScroll(hash);
           return;
         }
