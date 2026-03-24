@@ -3,10 +3,13 @@
 import { useEffect } from 'react';
 
 /**
- * ease-out muy suave: el tramo final frena de forma más gradual (menos “corte” al llegar).
+ * Como cierre suave de cajón: casi todo el recorrido con inercia y un tramo final
+ * muy largo y “flotante” (decelera de forma casi exponencial hasta posarse).
  */
-function easeOutQuint(t: number) {
-  return 1 - (1 - t) ** 5;
+function easeSoftClose(t: number) {
+  if (t >= 1) return 1;
+  // Expo ease-out; exponente bajo = menos brusco al inicio y más “desliz” al final
+  return 1 - 2 ** (-8 * t);
 }
 
 export function AnchorSmoothScroll() {
@@ -49,8 +52,8 @@ export function AnchorSmoothScroll() {
       }
 
       const duration = Math.min(
-        1550,
-        Math.max(560, Math.pow(Math.abs(distance), 0.58) * 0.92),
+        2400,
+        Math.max(720, Math.pow(Math.abs(distance), 0.52) * 1.08),
       );
 
       let startTime: number | null = null;
@@ -58,7 +61,7 @@ export function AnchorSmoothScroll() {
       const step = (now: number) => {
         if (startTime === null) startTime = now;
         const linear = Math.min(1, (now - startTime) / duration);
-        const eased = easeOutQuint(linear);
+        const eased = easeSoftClose(linear);
         window.scrollTo(0, startY + distance * eased);
         if (linear < 1) {
           requestAnimationFrame(step);
