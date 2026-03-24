@@ -155,7 +155,7 @@ function ProjectCoverMedia({
           <button
             type="button"
             onClick={openLightbox}
-            className="group absolute inset-0 z-[1] cursor-zoom-in rounded-none border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/80"
+            className="group absolute inset-0 z-[1] cursor-zoom-in rounded-none border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/50 dark:focus-visible:outline-white/80"
             aria-label={expandAriaLabel}
           />
           <img
@@ -207,7 +207,9 @@ function ProjectCoverMedia({
                 aria-label={`${i + 1} / ${count}`}
                 onClick={() => setIndex(i)}
                 className={`h-1.5 rounded-full transition-all ${
-                  i === index ? 'w-4 bg-white' : 'w-1.5 bg-white/35 hover:bg-white/55'
+                  i === index
+                    ? 'w-4 bg-neutral-900 dark:bg-white'
+                    : 'w-1.5 bg-neutral-900/30 hover:bg-neutral-900/50 dark:bg-white/35 dark:hover:bg-white/55'
                 }`}
               />
             ))}
@@ -241,7 +243,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
             key={project.id}
             className="overflow-hidden rounded-2xl border border-white/20 bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl dark:border-white/10 dark:bg-[#000000] dark:backdrop-blur-none"
           >
-            <div className="relative aspect-video bg-[#000000] p-4 md:p-5">
+            <div className="relative aspect-video bg-white dark:bg-[#000000] p-4 md:p-5">
               <ProjectCoverMedia
                 images={coverImages}
                 title={project.title}
