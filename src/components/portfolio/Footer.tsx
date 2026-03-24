@@ -12,7 +12,7 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 md:py-12">
         <div className="flex flex-col items-center justify-between gap-6 sm:gap-8 md:flex-row">
           {/* Logo */}
-          <div className="text-center md:text-left">
+          <div className="flex flex-col text-center md:text-left">
             <div className="mb-4">
               <img
                 src="images/_mgfd_logo.svg"
@@ -20,7 +20,7 @@ export default function Footer() {
                 className="h-10 w-auto dark:invert dark:brightness-0 dark:contrast-200"
               />
             </div>
-            <div className="flex gap-6 justify-center md:justify-start">
+            <div className="mb-6 flex gap-6 justify-center md:justify-start">
               <a
                 href="https://instagram.com/_mgfd_"
                 target="_blank"
@@ -55,6 +55,12 @@ export default function Footer() {
                 </svg>
               </a>
             </div>
+            <a
+              href="mailto:mgfd.design@gmail.com"
+              className="inline-flex w-full max-w-xs items-center justify-center self-center rounded-lg bg-black px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-neutral-800 sm:w-auto sm:max-w-none sm:px-8 sm:text-base dark:bg-white dark:text-black dark:hover:bg-neutral-200 md:self-start"
+            >
+              {t('footer.cta')}
+            </a>
           </div>
 
           {/* Copyright */}

@@ -10,7 +10,7 @@
   },
   "hero": {
     "subtitle": "Graphic Design, UX/UI & Vibe Coding.",
-    "cta": "Let's work together"
+    "cta": "View projects"
   },
   "about": {
     "title": "What about me?",
@@ -65,6 +65,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2026 mgfd design. All rights reserved."
+    "cta": "Let's work together",
+    "copyright": "© 2026 _mgfd_ design. All rights reserved."
   }
 }

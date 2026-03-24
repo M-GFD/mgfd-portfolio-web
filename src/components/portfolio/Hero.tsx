@@ -18,7 +18,7 @@ export default function Hero() {
           {t('hero.subtitle')}
         </p>
         <a
-          href="mailto:mgfd.design@gmail.com"
+          href="#works"
           className="inline-flex w-full max-w-xs items-center justify-center rounded-lg bg-black px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-neutral-800 sm:w-auto sm:max-w-none sm:px-8 sm:text-base dark:bg-white dark:text-black dark:hover:bg-neutral-200"
         >
           {t('hero.cta')}
