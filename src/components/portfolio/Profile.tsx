@@ -11,7 +11,7 @@ export default function Profile() {
     >
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col items-center gap-8 sm:gap-10 md:flex-row md:gap-12">
-          <div className="flex h-40 w-40 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFFFFF] ring-1 ring-black/[0.08] dark:bg-[#000000] dark:ring-white/12 sm:h-52 sm:w-52 md:h-72 md:w-72 lg:h-80 lg:w-80">
+          <div className="flex h-44 w-44 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFFFFF] ring-1 ring-black/[0.08] dark:bg-[#000000] dark:ring-white/12 sm:h-52 sm:w-52 md:h-72 md:w-72 lg:h-80 lg:w-80">
             <img
               src="/images/profile.png"
               alt="MGFD - Profile"
