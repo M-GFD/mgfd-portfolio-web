@@ -1,6 +1,7 @@
 'use client';
 
-import { ChevronRight, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { Project } from '@/types/portfolio';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -10,19 +11,96 @@ interface ProjectListProps {
   onSeeMore: (project: Project) => void;
 }
 
+function CardGalleryCarousel({
+  images,
+  title,
+  label,
+  prevLabel,
+  nextLabel,
+}: {
+  images: string[];
+  title: string;
+  label: string;
+  prevLabel: string;
+  nextLabel: string;
+}) {
+  const [index, setIndex] = useState(0);
+  const count = images.length;
+
+  const go = (delta: number) => {
+    setIndex((i) => (i + delta + count) % count);
+  };
+
+  return (
+    <div className="border-t border-neutral-200/80 px-4 pb-2 pt-3 dark:border-white/10">
+      <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">{label}</p>
+      <div className="overflow-hidden rounded-lg bg-[#000000]">
+        <div className="relative aspect-video p-2 md:p-3">
+          <img
+            src={images[index]}
+            alt={`${title} — ${label} ${index + 1}/${count}`}
+            className="h-full w-full object-contain object-center"
+          />
+          {count > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => go(-1)}
+                className="absolute left-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 dark:bg-white/20 dark:hover:bg-white/35"
+                aria-label={prevLabel}
+              >
+                <ChevronLeft className="h-5 w-5" aria-hidden />
+              </button>
+              <button
+                type="button"
+                onClick={() => go(1)}
+                className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 dark:bg-white/20 dark:hover:bg-white/35"
+                aria-label={nextLabel}
+              >
+                <ChevronRight className="h-5 w-5" aria-hidden />
+              </button>
+            </>
+          )}
+        </div>
+        {count > 1 && (
+          <div
+            className="flex flex-wrap justify-center gap-1.5 px-2 pb-2 pt-0.5"
+            role="tablist"
+            aria-label={label}
+          >
+            {images.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                role="tab"
+                aria-selected={i === index}
+                aria-label={`${i + 1} / ${count}`}
+                onClick={() => setIndex(i)}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === index ? 'w-4 bg-white' : 'w-1.5 bg-white/35 hover:bg-white/55'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ProjectList({ projects, loading, onSeeMore }: ProjectListProps) {
   const { t } = useLanguage();
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-20">
+      <div className="flex items-center justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-black dark:text-white" />
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
       {projects.map((project) => (
         <article
           key={project.id}
@@ -38,40 +116,27 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
           </div>
 
           {project.galleryImages && project.galleryImages.length > 0 && (
-            <div className="px-4 pt-3 pb-0">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('projects.gallery')}</p>
-              <button
-                type="button"
-                onClick={() => onSeeMore(project)}
-                className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-thin hover:opacity-90 transition-opacity"
-                aria-label={`${t('projects.galleryAria')} ${project.title}`}
-              >
-                {project.galleryImages.slice(0, 6).map((src, i) => (
-                  <span
-                    key={i}
-                    className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg border border-white/20 bg-gray-100/80 dark:bg-[#000000]"
-                  >
-                    <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
-                  </span>
-                ))}
-                {project.galleryImages.length > 6 && (
-                  <span className="flex-shrink-0 w-14 h-14 rounded-lg bg-black/10 dark:bg-white/10 flex items-center justify-center text-xs text-gray-600 dark:text-gray-400">
-                    +{project.galleryImages.length - 6}
-                  </span>
-                )}
-              </button>
-            </div>
+            <CardGalleryCarousel
+              images={project.galleryImages}
+              title={project.title}
+              label={t('projects.gallery')}
+              prevLabel={t('projects.previousAria')}
+              nextLabel={t('projects.nextAria')}
+            />
           )}
 
           <div className="p-6">
-            <h4 className="text-2xl font-bold text-black dark:text-white mb-2">{project.title}</h4>
-            <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mb-3">{project.subtitle}</p>
-            <p className="text-gray-600 dark:text-gray-300 mb-5 leading-relaxed">{project.description}</p>
+            <h4 className="mb-2 text-2xl font-bold text-black dark:text-white">{project.title}</h4>
+            <p className="mb-3 text-sm text-gray-500 dark:text-gray-400 md:text-base">{project.subtitle}</p>
+            <p className="mb-5 leading-relaxed text-gray-600 dark:text-gray-300">{project.description}</p>
 
             {project.tags && project.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-5">
+              <div className="mb-5 flex flex-wrap gap-2">
                 {project.tags.map((tag, index) => (
-                  <span key={index} className="px-3 py-1 bg-white/50 dark:bg-white/10 text-gray-700 dark:text-gray-300 rounded-full text-xs border border-white/20">
+                  <span
+                    key={index}
+                    className="rounded-full border border-white/20 bg-white/50 px-3 py-1 text-xs text-gray-700 dark:bg-white/10 dark:text-gray-300"
+                  >
                     {tag}
                   </span>
                 ))}
@@ -79,8 +144,9 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
             )}
 
             <button
+              type="button"
               onClick={() => onSeeMore(project)}
-              className="inline-flex items-center gap-2 bg-black/80 dark:bg-white/20 text-white px-5 py-2.5 rounded-lg hover:bg-black dark:hover:bg-white/30 transition-colors border border-white/20 backdrop-blur-sm"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-black/80 px-5 py-2.5 text-white backdrop-blur-sm transition-colors hover:bg-black dark:bg-white/20 dark:hover:bg-white/30"
             >
               {t('projects.seeMore')}
               <ChevronRight size={16} />
