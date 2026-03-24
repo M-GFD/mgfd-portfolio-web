@@ -24,6 +24,7 @@
   },
   "projects": {
     "sectionTitle": "Works / Projects",
+    "cta": "Let's work together",
     "seeMore": "See more",
     "gallery": "Gallery",
     "galleryAria": "View gallery for",
@@ -65,7 +66,6 @@
     }
   },
   "footer": {
-    "cta": "Let's work together",
     "copyright": "© 2026 _mgfd_ design. All rights reserved."
   }
 }

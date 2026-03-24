@@ -20,7 +20,7 @@ export default function Footer() {
                 className="h-10 w-auto dark:invert dark:brightness-0 dark:contrast-200"
               />
             </div>
-            <div className="mb-6 flex gap-6 justify-center md:justify-start">
+            <div className="flex gap-6 justify-center md:justify-start">
               <a
                 href="https://instagram.com/_mgfd_"
                 target="_blank"
@@ -55,12 +55,6 @@ export default function Footer() {
                 </svg>
               </a>
             </div>
-            <a
-              href="mailto:mgfd.design@gmail.com"
-              className="inline-flex w-full max-w-xs items-center justify-center self-center rounded-lg bg-black px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-neutral-800 sm:w-auto sm:max-w-none sm:px-8 sm:text-base dark:bg-white dark:text-black dark:hover:bg-neutral-200 md:self-start"
-            >
-              {t('footer.cta')}
-            </a>
           </div>
 
           {/* Copyright */}

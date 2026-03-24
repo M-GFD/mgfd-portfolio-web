@@ -41,6 +41,14 @@ export default function HomePage() {
               {t('projects.sectionTitle')}
             </h2>
             <ProjectList projects={projectsWithLocale} loading={false} />
+            <div className="mt-10 flex justify-center sm:mt-14">
+              <a
+                href="mailto:mgfd.design@gmail.com"
+                className="inline-flex w-full max-w-xs items-center justify-center rounded-lg bg-black px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-neutral-800 sm:w-auto sm:max-w-none sm:px-8 sm:text-base dark:bg-white dark:text-black dark:hover:bg-neutral-200"
+              >
+                {t('projects.cta')}
+              </a>
+            </div>
           </div>
         </section>
       </main>
