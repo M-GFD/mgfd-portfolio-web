@@ -112,7 +112,7 @@ export default function Technologies() {
   return (
     <section
       id="technologies"
-      className="mb-6 border-b border-gray-100 bg-white pb-0 pt-8 md:mb-8 md:pt-10"
+      className="mb-2 border-b border-gray-100 bg-white pb-0 pt-8 md:mb-3 md:pt-10"
     >
       <div className="container mx-auto px-6">
         <div className="mx-auto max-w-6xl">
