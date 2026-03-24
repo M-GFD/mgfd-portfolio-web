@@ -11,7 +11,7 @@ export default function Hero() {
           <img
             src="/images/title-image.svg"
             alt="portfolio_mgfd_design"
-            className="w-full h-auto object-contain"
+            className="h-auto w-full object-contain dark:invert dark:brightness-0 dark:contrast-200"
           />
         </div>
         <p className="mx-auto mb-8 max-w-2xl text-xl text-neutral-600 dark:text-neutral-400">
