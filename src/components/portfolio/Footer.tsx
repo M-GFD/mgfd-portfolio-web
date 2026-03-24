@@ -16,7 +16,7 @@ export default function Footer() {
             <div className="mb-4">
               <img
                 src="images/_mgfd_logo.svg"
-                alt="mgfd design portfolio"
+                alt="Mateo G. Fontana Dalmasso (MGFD) — portfolio web"
                 className="h-10 w-auto dark:invert dark:brightness-0 dark:contrast-200"
               />
             </div>

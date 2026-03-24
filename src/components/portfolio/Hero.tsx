@@ -10,7 +10,7 @@ export default function Hero() {
         <div className="relative mx-auto mb-5 w-full max-w-4xl sm:mb-6">
           <img
             src="/images/title-image.svg"
-            alt="portfolio_mgfd_design"
+            alt="Mateo G. Fontana Dalmasso (MGFD) — logotipo del portfolio"
             className="h-auto w-full object-contain dark:invert dark:brightness-0 dark:contrast-200"
           />
         </div>

@@ -3,17 +3,21 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { getSiteUrl } from "@/lib/site-url";
+import { getPortfolioJsonLd } from "@/lib/portfolio-json-ld";
 
 const siteUrl = getSiteUrl();
 
-const SITE_TITLE = "_mgfd_ portfolio";
-const SITE_DESCRIPTION = "Portfolio web Mateo G. Fontana Dalmasso (MGFD)";
+/** Título para resultados de búsqueda, pestaña y Open Graph (debe coincidir con el nombre deseado en Google). */
+const SITE_TITLE = "Portfolio web Mateo G. Fontana Dalmasso (MGFD)";
+/** Snippet: refuerza identidad y reduce confusiones con otras entidades (p. ej. nombres parecidos o finanzas). */
+const SITE_DESCRIPTION =
+  "Portfolio web Mateo G. Fontana Dalmasso (MGFD). Diseño gráfico, UX/UI y desarrollo digital. Autor: Mateo G. Fontana Dalmasso; marca personal MGFD.";
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
   title: {
     default: SITE_TITLE,
-    template: `%s · ${SITE_TITLE}`,
+    template: `%s · Mateo G. Fontana Dalmasso (MGFD)`,
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_TITLE,
@@ -65,6 +69,8 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const jsonLd = getPortfolioJsonLd(siteUrl);
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -78,6 +84,10 @@ export default function RootLayout({
         <link
           href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:ital,wght@0,100..900;1,100..900&display=swap"
           rel="stylesheet"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body className="font-sans antialiased bg-background text-foreground transition-colors duration-200">

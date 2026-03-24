@@ -38,7 +38,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           <a href="/" className="flex min-w-0 items-center">
             <img
               src="images/_mgfd_logo.svg"
-              alt="mgfd design portfolio"
+              alt="Mateo G. Fontana Dalmasso (MGFD) — portfolio web"
               className="h-7 w-auto sm:h-8 dark:invert dark:brightness-0 dark:contrast-200"
             />
           </a>

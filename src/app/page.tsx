@@ -29,6 +29,9 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col bg-[#FFFFFF] transition-colors dark:bg-[#000000]">
       <Header />
       <main className="flex flex-1 flex-col">
+        <h1 className="sr-only">
+          Portfolio web Mateo G. Fontana Dalmasso (MGFD)
+        </h1>
         <Hero />
         <Profile />
         <Technologies />
