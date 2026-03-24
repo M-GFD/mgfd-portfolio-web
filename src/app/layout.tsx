@@ -4,8 +4,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { AppProviders } from "@/components/providers/AppProviders";
 
 export const metadata: Metadata = {
-  title: "MGFD Design Portfolio",
+  title: "_mgfd_ portfolio",
   description: "Creating digital experiences that combine beautiful design with powerful functionality.",
+  icons: {
+    icon: [{ url: "/images/favicon.png", type: "image/png" }],
+  },
 };
 
 export const viewport: Viewport = {
