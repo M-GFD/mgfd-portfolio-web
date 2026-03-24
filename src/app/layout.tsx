@@ -7,8 +7,7 @@ import { getSiteUrl } from "@/lib/site-url";
 const siteUrl = getSiteUrl();
 
 const SITE_TITLE = "_mgfd_ portfolio";
-const SITE_DESCRIPTION =
-  "Portfolio de Mateo G. Fontana Dalmasso (_mgfd_): diseño gráfico, UX/UI y vibe coding. Proyectos digitales, branding y piezas multimedia.";
+const SITE_DESCRIPTION = "Portfolio web Mateo G. Fontana Dalmasso (MGFD)";
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
