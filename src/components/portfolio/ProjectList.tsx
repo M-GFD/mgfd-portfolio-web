@@ -26,7 +26,7 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
       {projects.map((project) => (
         <article
           key={project.id}
-          className="rounded-2xl border border-white/20 bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl dark:border-white/10 dark:bg-[#000000] dark:backdrop-blur-none"
+          className="overflow-hidden rounded-2xl border border-white/20 bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl dark:border-white/10 dark:bg-[#000000] dark:backdrop-blur-none"
         >
           <div className="relative aspect-video bg-[#000000]">
             <img
