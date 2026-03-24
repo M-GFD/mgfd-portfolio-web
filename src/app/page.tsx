@@ -34,10 +34,10 @@ export default function HomePage() {
         <Technologies />
         <section
           id="works"
-          className="bg-gradient-to-b from-neutral-50 to-white px-6 pb-20 pt-8 dark:from-neutral-950 dark:to-black md:pb-28 md:pt-10"
+          className="bg-gradient-to-b from-neutral-50 to-white px-4 pb-14 pt-6 dark:from-neutral-950 dark:to-black sm:px-6 sm:pb-20 sm:pt-8 md:pb-28 md:pt-10"
         >
           <div className="container mx-auto max-w-6xl">
-            <h2 className="mb-8 text-center text-4xl font-bold text-black dark:text-white md:mb-10 md:text-5xl">
+            <h2 className="mb-6 text-center text-2xl font-bold text-black dark:text-white sm:mb-8 sm:text-3xl md:mb-10 md:text-4xl lg:text-5xl">
               {t('projects.sectionTitle')}
             </h2>
             <ProjectList projects={projectsWithLocale} loading={false} />

@@ -7,10 +7,10 @@ export default function Footer() {
   return (
     <footer
       id="contact"
-      className="mt-8 border-t border-neutral-200 bg-neutral-50 dark:border-white/10 dark:bg-black md:mt-10"
+      className="mt-6 border-t border-neutral-200 bg-neutral-50 pb-[env(safe-area-inset-bottom)] dark:border-white/10 dark:bg-black sm:mt-8 md:mt-10"
     >
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 md:py-12">
+        <div className="flex flex-col items-center justify-between gap-6 sm:gap-8 md:flex-row">
           {/* Logo */}
           <div className="text-center md:text-left">
             <div className="mb-4">
@@ -58,7 +58,7 @@ export default function Footer() {
           </div>
 
           {/* Copyright */}
-          <div className="text-sm text-neutral-500 dark:text-neutral-400">
+          <div className="max-w-full text-center text-xs text-neutral-500 dark:text-neutral-400 md:text-right md:text-sm">
             {t('footer.copyright')}
           </div>
         </div>

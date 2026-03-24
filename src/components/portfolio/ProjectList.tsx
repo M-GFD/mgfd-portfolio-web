@@ -90,7 +90,7 @@ function ProjectCoverMedia({
     portalTarget &&
     createPortal(
       <div
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/92 p-4"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/92 p-2 pt-[max(0.5rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:p-4"
         role="dialog"
         aria-modal="true"
         aria-label={lightboxAriaLabel}
@@ -102,10 +102,10 @@ function ProjectCoverMedia({
             e.stopPropagation();
             closeLightboxAndSync();
           }}
-          className="absolute right-3 top-3 z-[102] rounded-full bg-white/15 p-2 text-white transition-colors hover:bg-white/25"
+          className="absolute right-[max(0.5rem,env(safe-area-inset-right))] top-[max(0.5rem,env(safe-area-inset-top))] z-[102] rounded-full bg-white/15 p-1.5 text-white transition-colors hover:bg-white/25 sm:right-3 sm:top-3 sm:p-2"
           aria-label={closeAriaLabel}
         >
-          <X className="h-6 w-6" aria-hidden />
+          <X className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden />
         </button>
         {count > 1 && (
           <>
@@ -115,10 +115,10 @@ function ProjectCoverMedia({
                 e.stopPropagation();
                 goLightbox(-1);
               }}
-              className="absolute left-2 top-1/2 z-[102] -translate-y-1/2 rounded-full bg-white/15 p-2 text-white transition-colors hover:bg-white/25 md:left-4"
+              className="absolute left-[max(0.25rem,env(safe-area-inset-left))] top-1/2 z-[102] -translate-y-1/2 rounded-full bg-white/15 p-1.5 text-white transition-colors hover:bg-white/25 sm:left-2 sm:p-2 md:left-4"
               aria-label={prevLabel}
             >
-              <ChevronLeft className="h-8 w-8" aria-hidden />
+              <ChevronLeft className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden />
             </button>
             <button
               type="button"
@@ -126,17 +126,17 @@ function ProjectCoverMedia({
                 e.stopPropagation();
                 goLightbox(1);
               }}
-              className="absolute right-2 top-1/2 z-[102] -translate-y-1/2 rounded-full bg-white/15 p-2 text-white transition-colors hover:bg-white/25 md:right-4"
+              className="absolute right-[max(0.25rem,env(safe-area-inset-right))] top-1/2 z-[102] -translate-y-1/2 rounded-full bg-white/15 p-1.5 text-white transition-colors hover:bg-white/25 sm:right-2 sm:p-2 md:right-4"
               aria-label={nextLabel}
             >
-              <ChevronRight className="h-8 w-8" aria-hidden />
+              <ChevronRight className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden />
             </button>
           </>
         )}
         <img
           src={images[lightboxIndex]}
           alt={count === 1 ? title : `${title} — ${lightboxIndex + 1}/${count}`}
-          className="max-h-[90vh] max-w-full object-contain"
+          className="max-h-[min(90vh,100dvh)] max-w-full object-contain sm:max-h-[90vh]"
           onClick={(e) => e.stopPropagation()}
         />
         {count > 1 && (
@@ -173,7 +173,7 @@ function ProjectCoverMedia({
                   e.stopPropagation();
                   go(-1);
                 }}
-                className="absolute left-0 top-1/2 z-[2] flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 dark:bg-white/20 dark:hover:bg-white/35"
+                className="absolute left-0 top-1/2 z-[2] flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 sm:h-8 sm:w-8 dark:bg-white/20 dark:hover:bg-white/35"
                 aria-label={prevLabel}
               >
                 <ChevronLeft className="h-5 w-5" aria-hidden />
@@ -184,7 +184,7 @@ function ProjectCoverMedia({
                   e.stopPropagation();
                   go(1);
                 }}
-                className="absolute right-0 top-1/2 z-[2] flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 dark:bg-white/20 dark:hover:bg-white/35"
+                className="absolute right-0 top-1/2 z-[2] flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 sm:h-8 sm:w-8 dark:bg-white/20 dark:hover:bg-white/35"
                 aria-label={nextLabel}
               >
                 <ChevronRight className="h-5 w-5" aria-hidden />
@@ -233,7 +233,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+    <div className="grid min-w-0 grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2">
       {projects.map((project) => {
         const extra = project.galleryImages ?? [];
         const coverImages = extra.length > 0 ? [project.image, ...extra] : [project.image];
@@ -241,9 +241,9 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
         return (
           <article
             key={project.id}
-            className="overflow-hidden rounded-2xl border border-white/20 bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl dark:border-white/10 dark:bg-[#000000] dark:backdrop-blur-none"
+            className="min-w-0 overflow-hidden rounded-xl border border-white/20 bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl sm:rounded-2xl dark:border-white/10 dark:bg-[#000000] dark:backdrop-blur-none"
           >
-            <div className="relative aspect-video bg-white dark:bg-[#000000] p-4 md:p-5">
+            <div className="relative aspect-video bg-white p-3 dark:bg-[#000000] sm:p-4 md:p-5">
               <ProjectCoverMedia
                 images={coverImages}
                 title={project.title}
@@ -256,10 +256,16 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
               />
             </div>
 
-            <div className="p-6">
-              <h4 className="mb-2 text-2xl font-bold text-black dark:text-white">{project.title}</h4>
-              <p className="mb-3 text-sm text-gray-500 dark:text-gray-400 md:text-base">{project.subtitle}</p>
-              <p className="mb-5 leading-relaxed text-gray-600 dark:text-gray-300">{project.description}</p>
+            <div className="p-4 sm:p-6">
+              <h4 className="mb-1.5 text-xl font-bold text-black dark:text-white sm:mb-2 sm:text-2xl">
+                {project.title}
+              </h4>
+              <p className="mb-2 text-xs text-gray-500 dark:text-gray-400 sm:mb-3 sm:text-sm md:text-base">
+                {project.subtitle}
+              </p>
+              <p className="mb-4 text-sm leading-relaxed text-gray-600 dark:text-gray-300 sm:mb-5 sm:text-base">
+                {project.description}
+              </p>
 
               {project.tags && project.tags.length > 0 && (
                 <div className="mb-5 flex flex-wrap gap-2">

@@ -8,9 +8,10 @@ import { useEffect, useRef } from 'react';
 const SPIN_SPEED_RAD_S = 0.525;
 /** Escala visual de cada ítem del carrusel respecto al diseño base */
 const ITEM_SCALE = 1.5;
-/** Altura del área 3D (base px / vw antes de ITEM_SCALE); más baja = menos “hueco” bajo el título */
-const CAROUSEL_VIEWPORT_H_PX = 280;
-const CAROUSEL_VIEWPORT_VW = 38;
+/** Altura del área 3D: clamp fluido para móvil y escritorio */
+const CAROUSEL_VIEWPORT_MIN_REM = 11;
+const CAROUSEL_VIEWPORT_PREFERRED_VW = 48;
+const CAROUSEL_VIEWPORT_MAX_REM = 26;
 
 function techImageSrc(tech: (typeof technologies)[number]) {
   return `/images/${tech.name.toLowerCase()}.${tech.imageExt ?? 'png'}`;
@@ -112,29 +113,29 @@ export default function Technologies() {
   return (
     <section
       id="technologies"
-      className="flex flex-col gap-8 border-b border-neutral-100 bg-white px-6 py-8 dark:border-white/10 dark:bg-black md:gap-10 md:py-10"
+      className="flex flex-col gap-6 overflow-x-clip border-b border-neutral-100 bg-white px-4 py-6 dark:border-white/10 dark:bg-black sm:gap-8 sm:px-6 sm:py-8 md:gap-10 md:py-10"
     >
-      <div className="container mx-auto max-w-6xl">
-        <h2 className="text-center text-4xl font-bold text-black dark:text-white md:text-5xl">
+      <div className="container mx-auto max-w-6xl px-0">
+        <h2 className="text-center text-2xl font-bold text-black dark:text-white sm:text-3xl md:text-4xl lg:text-5xl">
           {t('technologies.title')}
         </h2>
       </div>
 
       <div
         ref={containerRef}
-        className="relative w-full"
+        className="relative w-full max-w-full"
         style={{
           perspective: `min(${1100 * ITEM_SCALE}px, 100vw)`,
         }}
       >
         <div
-          className="relative mx-auto w-full overflow-visible"
+          className="relative mx-auto w-full max-w-full origin-[50%_32%] scale-[0.62] overflow-visible min-[400px]:scale-[0.72] min-[480px]:scale-[0.8] sm:origin-[50%_36%] sm:scale-[0.88] md:origin-center md:scale-100"
           style={{
-            height: `min(${CAROUSEL_VIEWPORT_H_PX * ITEM_SCALE}px, ${CAROUSEL_VIEWPORT_VW * ITEM_SCALE}vw)`,
+            height: `clamp(${CAROUSEL_VIEWPORT_MIN_REM * ITEM_SCALE}rem, ${CAROUSEL_VIEWPORT_PREFERRED_VW * ITEM_SCALE}vw, ${CAROUSEL_VIEWPORT_MAX_REM * ITEM_SCALE}rem)`,
           }}
         >
           <div
-            className="absolute left-1/2 top-[6.5rem] -translate-x-1/2 md:top-32"
+            className="absolute left-1/2 top-20 -translate-x-1/2 min-[400px]:top-24 sm:top-28 md:top-32"
             style={{
               width: 0,
               height: 0,

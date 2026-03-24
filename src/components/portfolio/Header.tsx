@@ -25,14 +25,14 @@ export default function Header({ onMenuToggle }: HeaderProps) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-200 bg-white/95 backdrop-blur-sm dark:border-white/10 dark:bg-black/90">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <div className="flex items-center">
-          <a href="/" className="flex items-center">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-200 bg-white/95 pt-[env(safe-area-inset-top)] backdrop-blur-sm dark:border-white/10 dark:bg-black/90">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-3 py-3 sm:px-5 sm:py-3.5 md:px-6 md:py-4">
+        <div className="flex min-w-0 flex-1 items-center pr-2">
+          <a href="/" className="flex min-w-0 items-center">
             <img
               src="images/_mgfd_logo.svg"
               alt="mgfd design portfolio"
-              className="h-8 w-auto dark:invert dark:brightness-0 dark:contrast-200"
+              className="h-7 w-auto sm:h-8 dark:invert dark:brightness-0 dark:contrast-200"
             />
           </a>
         </div>
@@ -89,7 +89,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           </div>
         </nav>
 
-        <div className="flex items-center gap-3 md:hidden">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3 md:hidden">
           <ThemeToggle />
           <button
             type="button"
@@ -103,7 +103,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
       </div>
 
       {mobileMenuOpen && (
-        <nav className="border-t border-neutral-100 px-6 py-4 dark:border-white/10 md:hidden">
+        <nav className="border-t border-neutral-100 px-3 py-3 sm:px-6 sm:py-4 dark:border-white/10 md:hidden">
           <a
             href="#about"
             className="block py-2 text-neutral-600 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white"

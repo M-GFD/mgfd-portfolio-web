@@ -117,11 +117,16 @@
   * {
     @apply border-border outline-ring/50;
   }
-  /* Tamaño base tipografía (87.5% ≈ +2 pt respecto a 75%) */
+  /* Móvil: 100% para legibilidad; desde md el ajuste fino anterior */
   html {
-    font-size: 87.5%;
+    font-size: 100%;
+  }
+  @media (min-width: 768px) {
+    html {
+      font-size: 87.5%;
+    }
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-hidden;
   }
 }
