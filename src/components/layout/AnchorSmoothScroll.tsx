@@ -3,11 +3,10 @@
 import { useEffect } from 'react';
 
 /**
- * ease-out fuerte: algo de avance al inicio, luego frena muy suave hasta parar.
- * (t=0 derivada alta → sensación de respuesta inmediata; final casi plano → llegada suave)
+ * ease-out muy suave: el tramo final frena de forma más gradual (menos “corte” al llegar).
  */
-function easeOutQuart(t: number) {
-  return 1 - (1 - t) ** 4;
+function easeOutQuint(t: number) {
+  return 1 - (1 - t) ** 5;
 }
 
 export function AnchorSmoothScroll() {
@@ -50,8 +49,8 @@ export function AnchorSmoothScroll() {
       }
 
       const duration = Math.min(
-        1100,
-        Math.max(420, Math.pow(Math.abs(distance), 0.62) * 0.72),
+        1550,
+        Math.max(560, Math.pow(Math.abs(distance), 0.58) * 0.92),
       );
 
       let startTime: number | null = null;
@@ -59,7 +58,7 @@ export function AnchorSmoothScroll() {
       const step = (now: number) => {
         if (startTime === null) startTime = now;
         const linear = Math.min(1, (now - startTime) / duration);
-        const eased = easeOutQuart(linear);
+        const eased = easeOutQuint(linear);
         window.scrollTo(0, startY + distance * eased);
         if (linear < 1) {
           requestAnimationFrame(step);
