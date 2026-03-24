@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { LanguageProvider } from "@/contexts/LanguageContext";
+import { AppProviders } from "@/components/providers/AppProviders";
 
 export const metadata: Metadata = {
   title: "MGFD Design Portfolio",
@@ -23,11 +23,11 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-sans antialiased bg-background text-foreground">
-        <LanguageProvider>
+      <body className="font-sans antialiased bg-background text-foreground transition-colors duration-200">
+        <AppProviders>
           {children}
           <Toaster />
-        </LanguageProvider>
+        </AppProviders>
       </body>
     </html>
   );

@@ -16,7 +16,7 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-black" />
+        <Loader2 className="h-8 w-8 animate-spin text-black dark:text-white" />
       </div>
     );
   }
@@ -26,9 +26,9 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
       {projects.map((project) => (
         <article
           key={project.id}
-          className="rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 bg-white/70 dark:bg-white/10 backdrop-blur-xl border border-white/20 dark:border-white/10"
+          className="rounded-2xl border border-white/20 bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl dark:border-white/10 dark:bg-neutral-950/80"
         >
-          <div className="relative aspect-video bg-gradient-to-br from-gray-100/80 to-gray-200/80">
+          <div className="relative aspect-video bg-gradient-to-br from-neutral-100/80 to-neutral-200/80 dark:from-neutral-900/80 dark:to-neutral-800/80">
             <img
               src={project.image}
               alt={project.title}

@@ -5,7 +5,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 export default function Footer() {
   const { t } = useLanguage();
   return (
-    <footer id="contact" className="mt-8 border-t border-gray-200 bg-gray-50 md:mt-10">
+    <footer
+      id="contact"
+      className="mt-8 border-t border-neutral-200 bg-neutral-50 dark:border-white/10 dark:bg-black md:mt-10"
+    >
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           {/* Logo */}
@@ -14,7 +17,7 @@ export default function Footer() {
               <img
                 src="images/_mgfd_logo.svg"
                 alt="mgfd design portfolio"
-                className="h-10 w-auto"
+                className="h-10 w-auto dark:invert dark:brightness-0 dark:contrast-200"
               />
             </div>
             <div className="flex gap-6 justify-center md:justify-start">
@@ -22,7 +25,7 @@ export default function Footer() {
                 href="https://instagram.com/_mgfd_"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-black transition-colors"
+                className="text-neutral-500 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white"
                 aria-label="Instagram"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -33,7 +36,7 @@ export default function Footer() {
                 href="https://linkedin.com/in/mateofontanad"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-black transition-colors"
+                className="text-neutral-500 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white"
                 aria-label="LinkedIn"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -44,7 +47,7 @@ export default function Footer() {
                 href="https://twitter.com/mgfd_"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-black transition-colors"
+                className="text-neutral-500 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white"
                 aria-label="X"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -55,7 +58,7 @@ export default function Footer() {
           </div>
 
           {/* Copyright */}
-          <div className="text-gray-500 text-sm">
+          <div className="text-sm text-neutral-500 dark:text-neutral-400">
             {t('footer.copyright')}
           </div>
         </div>

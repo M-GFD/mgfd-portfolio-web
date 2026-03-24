@@ -7,11 +7,11 @@ export default function Profile() {
   return (
     <section
       id="about"
-      className="mb-12 bg-gray-50 px-6 py-12 md:mb-16 md:py-16"
+      className="mb-12 bg-neutral-50 px-6 py-12 dark:bg-neutral-950 md:mb-16 md:py-16"
     >
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center gap-12">
-          <div className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+      <div className="mx-auto max-w-7xl">
+        <div className="flex flex-col items-center gap-12 md:flex-row">
+          <div className="flex h-64 w-64 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-900 md:h-80 md:w-80">
             <img
               src="/images/profile.png"
               alt="MGFD - Profile"
@@ -19,11 +19,11 @@ export default function Profile() {
             />
           </div>
           <div className="flex-1 text-justify md:text-left">
-            <h3 className="text-4xl font-bold text-black mb-4">{t('about.title')}</h3>
-            <p className="text-justify text-gray-600 mb-6">
+            <h3 className="mb-4 text-4xl font-bold text-black dark:text-white">{t('about.title')}</h3>
+            <p className="mb-6 text-justify text-neutral-600 dark:text-neutral-400">
               {t('about.p1')}
             </p>
-            <p className="text-justify text-gray-600">
+            <p className="text-justify text-neutral-600 dark:text-neutral-400">
               {t('about.p2')}
             </p>
           </div>

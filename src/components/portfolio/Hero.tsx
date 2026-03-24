@@ -14,12 +14,12 @@ export default function Hero() {
             className="w-full h-auto object-contain"
           />
         </div>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+        <p className="mx-auto mb-8 max-w-2xl text-xl text-neutral-600 dark:text-neutral-400">
           {t('hero.subtitle')}
         </p>
         <a
           href="mailto:mgfd.design@gmail.com"
-          className="inline-block px-8 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+          className="inline-block rounded-lg bg-black px-8 py-3 font-medium text-white transition-colors hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
         >
           {t('hero.cta')}
         </a>

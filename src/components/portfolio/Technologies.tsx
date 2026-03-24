@@ -35,7 +35,7 @@ function TechItem({ tech }: { tech: (typeof technologies)[number] }) {
         />
       </div>
       <h3
-        className="text-center font-semibold leading-tight text-black"
+        className="text-center font-semibold leading-tight text-black dark:text-neutral-100"
         style={{
           maxWidth: `${6.5 * ITEM_SCALE}rem`,
           fontSize: `${0.875 * ITEM_SCALE}rem`,
@@ -112,10 +112,10 @@ export default function Technologies() {
   return (
     <section
       id="technologies"
-      className="flex flex-col gap-8 border-b border-gray-100 bg-white px-6 py-8 md:gap-10 md:py-10"
+      className="flex flex-col gap-8 border-b border-neutral-100 bg-white px-6 py-8 dark:border-white/10 dark:bg-black md:gap-10 md:py-10"
     >
       <div className="container mx-auto max-w-6xl">
-        <h2 className="text-center text-4xl font-bold text-black md:text-5xl">
+        <h2 className="text-center text-4xl font-bold text-black dark:text-white md:text-5xl">
           {t('technologies.title')}
         </h2>
       </div>

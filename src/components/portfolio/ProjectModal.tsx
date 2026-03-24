@@ -44,7 +44,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
       onClick={onClose}
     >
       <div
-        className="rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-8 bg-white/75 dark:bg-gray-900/75 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl"
+        className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl border border-white/20 bg-white/90 p-8 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-neutral-950/95"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-start mb-6">
@@ -59,7 +59,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
         </div>
         <p className="text-xl text-gray-500 dark:text-gray-400 mb-6">{project.subtitle}</p>
 
-        <div className="relative aspect-video bg-gray-100/80 dark:bg-gray-800/50 rounded-xl overflow-hidden mb-6 border border-white/20">
+        <div className="relative mb-6 aspect-video overflow-hidden rounded-xl border border-white/20 bg-neutral-100/80 dark:bg-neutral-900/60">
           <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
         </div>
 

@@ -2,7 +2,9 @@
   "nav": {
     "about": "About",
     "contact": "Contact",
-    "works": "Works"
+    "works": "Works",
+    "themeToggle": "Switch between light and dark theme",
+    "themeHint": "Light or dark theme"
   },
   "hero": {
     "subtitle": "Graphic Design, UX/UI & Vibe Coding.",

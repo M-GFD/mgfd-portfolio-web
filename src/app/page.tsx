@@ -37,7 +37,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-white transition-colors dark:bg-black">
       <Header />
       <main className="flex flex-1 flex-col">
         <Hero />
@@ -45,10 +45,10 @@ export default function HomePage() {
         <Technologies />
         <section
           id="works"
-          className="bg-gradient-to-b from-gray-50 to-white px-6 pb-20 pt-8 md:pb-28 md:pt-10"
+          className="bg-gradient-to-b from-neutral-50 to-white px-6 pb-20 pt-8 dark:from-neutral-950 dark:to-black md:pb-28 md:pt-10"
         >
           <div className="container mx-auto max-w-6xl">
-            <h2 className="mb-8 text-center text-4xl font-bold text-black md:mb-10 md:text-5xl">
+            <h2 className="mb-8 text-center text-4xl font-bold text-black dark:text-white md:mb-10 md:text-5xl">
               {t('projects.sectionTitle')}
             </h2>
             <ProjectList onSeeMore={handleSeeMore} projects={projectsWithLocale} loading={false} />

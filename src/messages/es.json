@@ -2,7 +2,9 @@
   "nav": {
     "about": "Sobre mí",
     "contact": "Contacto",
-    "works": "Trabajos"
+    "works": "Trabajos",
+    "themeToggle": "Cambiar entre tema claro y oscuro",
+    "themeHint": "Tema claro u oscuro"
   },
   "hero": {
     "subtitle": "Diseño Gráfico, UX/UI y Vibe Coding.",
