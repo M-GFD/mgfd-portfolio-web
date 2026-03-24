@@ -1,19 +1,16 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import Header from '@/components/portfolio/Header';
 import Hero from '@/components/portfolio/Hero';
 import Profile from '@/components/portfolio/Profile';
 import Technologies from '@/components/portfolio/Technologies';
 import ProjectList from '@/components/portfolio/ProjectList';
-import ProjectModal from '@/components/portfolio/ProjectModal';
 import Footer from '@/components/portfolio/Footer';
-import { Project } from '@/types/portfolio';
 import { projects } from '@/data/projects';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function HomePage() {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { t } = useLanguage();
 
   const projectsWithLocale = useMemo(
@@ -27,14 +24,6 @@ export default function HomePage() {
       })),
     [t]
   );
-
-  const handleSeeMore = (project: Project) => {
-    setSelectedProject(project);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedProject(null);
-  };
 
   return (
     <div className="flex min-h-screen flex-col bg-white transition-colors dark:bg-black">
@@ -51,12 +40,11 @@ export default function HomePage() {
             <h2 className="mb-8 text-center text-4xl font-bold text-black dark:text-white md:mb-10 md:text-5xl">
               {t('projects.sectionTitle')}
             </h2>
-            <ProjectList onSeeMore={handleSeeMore} projects={projectsWithLocale} loading={false} />
+            <ProjectList projects={projectsWithLocale} loading={false} />
           </div>
         </section>
       </main>
       <Footer />
-      <ProjectModal project={selectedProject} onClose={handleCloseModal} />
     </div>
   );
 }

@@ -8,7 +8,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 interface ProjectListProps {
   projects: Project[];
   loading: boolean;
-  onSeeMore: (project: Project) => void;
 }
 
 /** Portada de la card: una imagen o carrusel (portada + galleryImages si existen). */
@@ -32,67 +31,62 @@ function ProjectCoverMedia({
     setIndex((i) => (i + delta + count) % count);
   };
 
-  if (count === 1) {
-    return (
-      <img
-        src={images[0]}
-        alt={title}
-        className="h-full w-full object-contain object-center"
-        loading="lazy"
-      />
-    );
-  }
-
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="relative min-h-0 flex-1">
         <img
           src={images[index]}
-          alt={`${title} — ${index + 1}/${count}`}
+          alt={count === 1 ? title : `${title} — ${index + 1}/${count}`}
           className="h-full w-full object-contain object-center"
           loading={index === 0 ? 'lazy' : 'eager'}
         />
-        <button
-          type="button"
-          onClick={() => go(-1)}
-          className="absolute left-0 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 dark:bg-white/20 dark:hover:bg-white/35"
-          aria-label={prevLabel}
-        >
-          <ChevronLeft className="h-5 w-5" aria-hidden />
-        </button>
-        <button
-          type="button"
-          onClick={() => go(1)}
-          className="absolute right-0 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 dark:bg-white/20 dark:hover:bg-white/35"
-          aria-label={nextLabel}
-        >
-          <ChevronRight className="h-5 w-5" aria-hidden />
-        </button>
+        {count > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={() => go(-1)}
+              className="absolute left-0 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 dark:bg-white/20 dark:hover:bg-white/35"
+              aria-label={prevLabel}
+            >
+              <ChevronLeft className="h-5 w-5" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={() => go(1)}
+              className="absolute right-0 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 dark:bg-white/20 dark:hover:bg-white/35"
+              aria-label={nextLabel}
+            >
+              <ChevronRight className="h-5 w-5" aria-hidden />
+            </button>
+          </>
+        )}
       </div>
-      <div
-        className="flex flex-shrink-0 flex-wrap justify-center gap-1.5 pt-2"
-        role="tablist"
-        aria-label={dotsAriaLabel}
-      >
-        {images.map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            role="tab"
-            aria-selected={i === index}
-            aria-label={`${i + 1} / ${count}`}
-            onClick={() => setIndex(i)}
-            className={`h-1.5 rounded-full transition-all ${
-              i === index ? 'w-4 bg-white' : 'w-1.5 bg-white/35 hover:bg-white/55'
-            }`}
-          />
-        ))}
-      </div>
+      {count > 1 && (
+        <div
+          className="flex flex-shrink-0 flex-wrap justify-center gap-1.5 pt-2"
+          role="tablist"
+          aria-label={dotsAriaLabel}
+        >
+          {images.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              role="tab"
+              aria-selected={i === index}
+              aria-label={`${i + 1} / ${count}`}
+              onClick={() => setIndex(i)}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? 'w-4 bg-white' : 'w-1.5 bg-white/35 hover:bg-white/55'
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-export default function ProjectList({ projects, loading, onSeeMore }: ProjectListProps) {
+export default function ProjectList({ projects, loading }: ProjectListProps) {
   const { t } = useLanguage();
 
   if (loading) {
@@ -141,15 +135,6 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
                   ))}
                 </div>
               )}
-
-              <button
-                type="button"
-                onClick={() => onSeeMore(project)}
-                className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-black/80 px-5 py-2.5 text-white backdrop-blur-sm transition-colors hover:bg-black dark:bg-white/20 dark:hover:bg-white/30"
-              >
-                {t('projects.seeMore')}
-                <ChevronRight size={16} />
-              </button>
             </div>
           </article>
         );
