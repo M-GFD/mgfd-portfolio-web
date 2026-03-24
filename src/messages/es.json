@@ -10,7 +10,7 @@
   },
   "hero": {
     "subtitle": "Diseño Gráfico, UX/UI y Vibe Coding.",
-    "cta": "Ver proyectos"
+    "cta": "Trabajos"
   },
   "about": {
     "title": "¿Qué hay de mí?",
@@ -20,10 +20,10 @@
     "p4": "Con años de experiencia en Diseño Gráfico, UX/UI y Vibe Coding, siempre busco transformar ideas en realidad de forma clara y eficaz, priorizando al usuario, con el tono adecuado para la comunicación."
   },
   "technologies": {
-    "title": "Tecnologías y herramientas"
+    "title": "Herramientas"
   },
   "projects": {
-    "sectionTitle": "Trabajos / Proyectos",
+    "sectionTitle": "Trabajos",
     "cta": "Trabajemos juntos",
     "seeMore": "Ver más",
     "gallery": "Galería",

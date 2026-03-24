@@ -10,7 +10,7 @@
   },
   "hero": {
     "subtitle": "Graphic Design, UX/UI & Vibe Coding.",
-    "cta": "View projects"
+    "cta": "Works"
   },
   "about": {
     "title": "What about me?",
@@ -20,10 +20,10 @@
     "p4": "With years of experience in Graphic Design, UX/UI and Vibe Coding, I always aim to turn ideas into reality in a clear, effective way, putting users first and with the right tone for communication."
   },
   "technologies": {
-    "title": "Technologies & Tools"
+    "title": "Tools"
   },
   "projects": {
-    "sectionTitle": "Works / Projects",
+    "sectionTitle": "Works",
     "cta": "Let's work together",
     "seeMore": "See more",
     "gallery": "Gallery",

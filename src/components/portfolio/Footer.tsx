@@ -58,7 +58,7 @@ export default function Footer() {
           </div>
 
           {/* Copyright */}
-          <div className="max-w-full text-center text-xs text-neutral-500 dark:text-neutral-400 md:text-right md:text-sm">
+          <div className="max-w-full whitespace-nowrap text-center text-[0.6rem] leading-tight tracking-tight text-neutral-500 dark:text-neutral-400 min-[400px]:text-[0.65rem] sm:whitespace-normal sm:text-xs sm:tracking-normal md:text-right md:text-sm">
             {t('footer.copyright')}
           </div>
         </div>
