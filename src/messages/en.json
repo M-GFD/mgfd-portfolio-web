@@ -30,7 +30,9 @@
     "next": "Next",
     "closeAria": "Close",
     "previousAria": "Previous",
-    "nextAria": "Next"
+    "nextAria": "Next",
+    "expandImageAria": "View image full size",
+    "lightboxAria": "Expanded image"
   },
   "projectsList": {
     "1": {

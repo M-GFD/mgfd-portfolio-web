@@ -30,7 +30,9 @@
     "next": "Siguiente",
     "closeAria": "Cerrar",
     "previousAria": "Anterior",
-    "nextAria": "Siguiente"
+    "nextAria": "Siguiente",
+    "expandImageAria": "Ver imagen a tamaño completo",
+    "lightboxAria": "Imagen ampliada"
   },
   "projectsList": {
     "1": {
