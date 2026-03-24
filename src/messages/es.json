@@ -4,7 +4,9 @@
     "contact": "Contacto",
     "works": "Trabajos",
     "themeToggle": "Cambiar entre tema claro y oscuro",
-    "themeHint": "Tema claro u oscuro"
+    "themeHint": "Tema claro u oscuro",
+    "themeLight": "Tema claro",
+    "themeDark": "Tema oscuro"
   },
   "hero": {
     "subtitle": "Diseño Gráfico, UX/UI y Vibe Coding.",

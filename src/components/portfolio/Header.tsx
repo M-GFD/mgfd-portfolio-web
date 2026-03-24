@@ -9,6 +9,13 @@ interface HeaderProps {
   onMenuToggle?: (isOpen: boolean) => void;
 }
 
+const localePillClass = (active: boolean) =>
+  `rounded px-2 py-1 text-sm font-medium transition-colors ${
+    active
+      ? 'bg-neutral-100 text-black dark:bg-white/15 dark:text-white'
+      : 'text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white'
+  }`;
+
 export default function Header({ onMenuToggle }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { locale, setLocale, t } = useLanguage();
@@ -63,11 +70,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
             <button
               type="button"
               onClick={() => setLocale('es')}
-              className={`rounded px-2 py-1 text-sm font-medium transition-colors ${
-                locale === 'es'
-                  ? 'bg-neutral-100 text-black dark:bg-white/15 dark:text-white'
-                  : 'text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white'
-              }`}
+              className={localePillClass(locale === 'es')}
               aria-pressed={locale === 'es'}
               aria-label="Español"
             >
@@ -76,11 +79,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
             <button
               type="button"
               onClick={() => setLocale('en')}
-              className={`rounded px-2 py-1 text-sm font-medium transition-colors ${
-                locale === 'en'
-                  ? 'bg-neutral-100 text-black dark:bg-white/15 dark:text-white'
-                  : 'text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white'
-              }`}
+              className={localePillClass(locale === 'en')}
               aria-pressed={locale === 'en'}
               aria-label="English"
             >
@@ -89,11 +88,31 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           </div>
         </nav>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3 md:hidden">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 md:hidden">
           <ThemeToggle />
+          <div className="flex items-center gap-1 border-l border-neutral-200 pl-1.5 dark:border-white/15 sm:pl-2">
+            <button
+              type="button"
+              onClick={() => setLocale('es')}
+              className={localePillClass(locale === 'es')}
+              aria-pressed={locale === 'es'}
+              aria-label="Español"
+            >
+              ES
+            </button>
+            <button
+              type="button"
+              onClick={() => setLocale('en')}
+              className={localePillClass(locale === 'en')}
+              aria-pressed={locale === 'en'}
+              aria-label="English"
+            >
+              EN
+            </button>
+          </div>
           <button
             type="button"
-            className="text-neutral-800 dark:text-neutral-200"
+            className="ml-0.5 text-neutral-800 dark:text-neutral-200"
             onClick={handleMenuToggle}
             aria-label="Toggle menu"
           >
@@ -125,39 +144,6 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           >
             {t('nav.works')}
           </a>
-          <div className="mt-3 flex flex-col gap-2 border-t border-neutral-100 pt-3 dark:border-white/10">
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">Idioma / Language</span>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setLocale('es');
-                  handleNavClick();
-                }}
-                className={`rounded px-3 py-1.5 text-sm font-medium ${
-                  locale === 'es'
-                    ? 'bg-neutral-100 text-black dark:bg-white/15 dark:text-white'
-                    : 'text-neutral-600 dark:text-neutral-400'
-                }`}
-              >
-                ES
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setLocale('en');
-                  handleNavClick();
-                }}
-                className={`rounded px-3 py-1.5 text-sm font-medium ${
-                  locale === 'en'
-                    ? 'bg-neutral-100 text-black dark:bg-white/15 dark:text-white'
-                    : 'text-neutral-600 dark:text-neutral-400'
-                }`}
-              >
-                EN
-              </button>
-            </div>
-          </div>
         </nav>
       )}
     </header>

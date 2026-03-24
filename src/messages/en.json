@@ -4,7 +4,9 @@
     "contact": "Contact",
     "works": "Works",
     "themeToggle": "Switch between light and dark theme",
-    "themeHint": "Light or dark theme"
+    "themeHint": "Light or dark theme",
+    "themeLight": "Light theme",
+    "themeDark": "Dark theme"
   },
   "hero": {
     "subtitle": "Graphic Design, UX/UI & Vibe Coding.",
