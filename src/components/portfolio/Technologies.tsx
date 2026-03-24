@@ -5,7 +5,7 @@ import { technologies } from '@/constants/technologies';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useEffect, useRef } from 'react';
 
-const SPIN_SPEED_RAD_S = 0.525;
+const SPIN_SPEED_RAD_S = 0.42;
 /** Escala visual de cada ítem del carrusel respecto al diseño base */
 const ITEM_SCALE = 1.5;
 /** Altura del área 3D (menor = menos hueco vacío bajo el carrusel hacia Works) */
