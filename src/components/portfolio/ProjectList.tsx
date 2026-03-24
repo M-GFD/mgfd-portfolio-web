@@ -28,11 +28,11 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
           key={project.id}
           className="overflow-hidden rounded-2xl border border-white/20 bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl dark:border-white/10 dark:bg-[#000000] dark:backdrop-blur-none"
         >
-          <div className="relative aspect-video bg-[#000000]">
+          <div className="relative aspect-video bg-[#000000] p-4 md:p-5">
             <img
               src={project.image}
               alt={project.title}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-contain object-center"
               loading="lazy"
             />
           </div>
