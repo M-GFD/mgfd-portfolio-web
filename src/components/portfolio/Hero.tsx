@@ -19,7 +19,7 @@ export default function Hero() {
         </p>
         <a
           href="#works"
-          className="inline-flex w-full max-w-xs items-center justify-center rounded-lg bg-black px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-neutral-800 sm:w-auto sm:max-w-none sm:px-8 sm:text-base dark:bg-white dark:text-black dark:hover:bg-neutral-200"
+          className="mx-auto inline-flex w-auto items-center justify-center rounded-lg bg-black px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800 sm:px-8 sm:py-3 sm:text-base dark:bg-white dark:text-black dark:hover:bg-neutral-200"
         >
           {t('hero.cta')}
         </a>
