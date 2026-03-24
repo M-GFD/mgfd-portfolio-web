@@ -9,8 +9,8 @@ const SPIN_SPEED_RAD_S = 0.525;
 /** Escala visual de cada ítem del carrusel respecto al diseño base */
 const ITEM_SCALE = 1.75;
 /** Altura del área 3D (base px / vw antes de ITEM_SCALE); más baja = menos “hueco” bajo el título */
-const CAROUSEL_VIEWPORT_H_PX = 340;
-const CAROUSEL_VIEWPORT_VW = 44;
+const CAROUSEL_VIEWPORT_H_PX = 280;
+const CAROUSEL_VIEWPORT_VW = 38;
 
 function techImageSrc(tech: (typeof technologies)[number]) {
   return `/images/${tech.name.toLowerCase()}.${tech.imageExt ?? 'png'}`;
@@ -124,7 +124,7 @@ export default function Technologies() {
 
       <div
         ref={containerRef}
-        className="relative w-full pt-5 pb-2 md:pt-6 md:pb-3"
+        className="relative w-full pt-5 pb-0 md:pt-6"
         style={{
           perspective: `min(${1100 * ITEM_SCALE}px, 100vw)`,
         }}
