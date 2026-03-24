@@ -22,12 +22,16 @@ export default function Profile() {
             <h3 className="mb-3 text-2xl font-bold text-black dark:text-white sm:mb-4 sm:text-3xl md:text-4xl">
               {t('about.title')}
             </h3>
-            <p className="mb-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400 sm:mb-6 sm:text-base">
-              {t('about.p1')}
-            </p>
-            <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400 sm:text-base">
-              {t('about.p2')}
-            </p>
+            {(['p1', 'p2', 'p3', 'p4'] as const).map((key, i) => (
+              <p
+                key={key}
+                className={`text-sm leading-relaxed text-neutral-600 dark:text-neutral-400 sm:text-base ${
+                  i < 3 ? 'mb-4 sm:mb-5' : ''
+                }`}
+              >
+                {t(`about.${key}`)}
+              </p>
+            ))}
           </div>
         </div>
       </div>
