@@ -11,16 +11,17 @@ interface ProjectListProps {
   onSeeMore: (project: Project) => void;
 }
 
-function CardGalleryCarousel({
+/** Portada de la card: una imagen o carrusel (portada + galleryImages si existen). */
+function ProjectCoverMedia({
   images,
   title,
-  label,
+  dotsAriaLabel,
   prevLabel,
   nextLabel,
 }: {
   images: string[];
   title: string;
-  label: string;
+  dotsAriaLabel: string;
   prevLabel: string;
   nextLabel: string;
 }) {
@@ -31,58 +32,61 @@ function CardGalleryCarousel({
     setIndex((i) => (i + delta + count) % count);
   };
 
+  if (count === 1) {
+    return (
+      <img
+        src={images[0]}
+        alt={title}
+        className="h-full w-full object-contain object-center"
+        loading="lazy"
+      />
+    );
+  }
+
   return (
-    <div className="border-t border-neutral-200/80 px-4 pb-2 pt-3 dark:border-white/10">
-      <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">{label}</p>
-      <div className="overflow-hidden rounded-lg bg-[#000000]">
-        <div className="relative aspect-video p-2 md:p-3">
-          <img
-            src={images[index]}
-            alt={`${title} — ${label} ${index + 1}/${count}`}
-            className="h-full w-full object-contain object-center"
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="relative min-h-0 flex-1">
+        <img
+          src={images[index]}
+          alt={`${title} — ${index + 1}/${count}`}
+          className="h-full w-full object-contain object-center"
+          loading={index === 0 ? 'lazy' : 'eager'}
+        />
+        <button
+          type="button"
+          onClick={() => go(-1)}
+          className="absolute left-0 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 dark:bg-white/20 dark:hover:bg-white/35"
+          aria-label={prevLabel}
+        >
+          <ChevronLeft className="h-5 w-5" aria-hidden />
+        </button>
+        <button
+          type="button"
+          onClick={() => go(1)}
+          className="absolute right-0 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 dark:bg-white/20 dark:hover:bg-white/35"
+          aria-label={nextLabel}
+        >
+          <ChevronRight className="h-5 w-5" aria-hidden />
+        </button>
+      </div>
+      <div
+        className="flex flex-shrink-0 flex-wrap justify-center gap-1.5 pt-2"
+        role="tablist"
+        aria-label={dotsAriaLabel}
+      >
+        {images.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            role="tab"
+            aria-selected={i === index}
+            aria-label={`${i + 1} / ${count}`}
+            onClick={() => setIndex(i)}
+            className={`h-1.5 rounded-full transition-all ${
+              i === index ? 'w-4 bg-white' : 'w-1.5 bg-white/35 hover:bg-white/55'
+            }`}
           />
-          {count > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={() => go(-1)}
-                className="absolute left-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 dark:bg-white/20 dark:hover:bg-white/35"
-                aria-label={prevLabel}
-              >
-                <ChevronLeft className="h-5 w-5" aria-hidden />
-              </button>
-              <button
-                type="button"
-                onClick={() => go(1)}
-                className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 dark:bg-white/20 dark:hover:bg-white/35"
-                aria-label={nextLabel}
-              >
-                <ChevronRight className="h-5 w-5" aria-hidden />
-              </button>
-            </>
-          )}
-        </div>
-        {count > 1 && (
-          <div
-            className="flex flex-wrap justify-center gap-1.5 px-2 pb-2 pt-0.5"
-            role="tablist"
-            aria-label={label}
-          >
-            {images.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                role="tab"
-                aria-selected={i === index}
-                aria-label={`${i + 1} / ${count}`}
-                onClick={() => setIndex(i)}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === index ? 'w-4 bg-white' : 'w-1.5 bg-white/35 hover:bg-white/55'
-                }`}
-              />
-            ))}
-          </div>
-        )}
+        ))}
       </div>
     </div>
   );
@@ -101,59 +105,55 @@ export default function ProjectList({ projects, loading, onSeeMore }: ProjectLis
 
   return (
     <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-      {projects.map((project) => (
-        <article
-          key={project.id}
-          className="overflow-hidden rounded-2xl border border-white/20 bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl dark:border-white/10 dark:bg-[#000000] dark:backdrop-blur-none"
-        >
-          <div className="relative aspect-video bg-[#000000] p-4 md:p-5">
-            <img
-              src={project.image}
-              alt={project.title}
-              className="h-full w-full object-contain object-center"
-              loading="lazy"
-            />
-          </div>
+      {projects.map((project) => {
+        const extra = project.galleryImages ?? [];
+        const coverImages = extra.length > 0 ? [project.image, ...extra] : [project.image];
 
-          {project.galleryImages && project.galleryImages.length > 0 && (
-            <CardGalleryCarousel
-              images={project.galleryImages}
-              title={project.title}
-              label={t('projects.gallery')}
-              prevLabel={t('projects.previousAria')}
-              nextLabel={t('projects.nextAria')}
-            />
-          )}
+        return (
+          <article
+            key={project.id}
+            className="overflow-hidden rounded-2xl border border-white/20 bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl dark:border-white/10 dark:bg-[#000000] dark:backdrop-blur-none"
+          >
+            <div className="relative aspect-video bg-[#000000] p-4 md:p-5">
+              <ProjectCoverMedia
+                images={coverImages}
+                title={project.title}
+                dotsAriaLabel={t('projects.gallery')}
+                prevLabel={t('projects.previousAria')}
+                nextLabel={t('projects.nextAria')}
+              />
+            </div>
 
-          <div className="p-6">
-            <h4 className="mb-2 text-2xl font-bold text-black dark:text-white">{project.title}</h4>
-            <p className="mb-3 text-sm text-gray-500 dark:text-gray-400 md:text-base">{project.subtitle}</p>
-            <p className="mb-5 leading-relaxed text-gray-600 dark:text-gray-300">{project.description}</p>
+            <div className="p-6">
+              <h4 className="mb-2 text-2xl font-bold text-black dark:text-white">{project.title}</h4>
+              <p className="mb-3 text-sm text-gray-500 dark:text-gray-400 md:text-base">{project.subtitle}</p>
+              <p className="mb-5 leading-relaxed text-gray-600 dark:text-gray-300">{project.description}</p>
 
-            {project.tags && project.tags.length > 0 && (
-              <div className="mb-5 flex flex-wrap gap-2">
-                {project.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="rounded-full border border-white/20 bg-white/50 px-3 py-1 text-xs text-gray-700 dark:bg-white/10 dark:text-gray-300"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
+              {project.tags && project.tags.length > 0 && (
+                <div className="mb-5 flex flex-wrap gap-2">
+                  {project.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="rounded-full border border-white/20 bg-white/50 px-3 py-1 text-xs text-gray-700 dark:bg-white/10 dark:text-gray-300"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
 
-            <button
-              type="button"
-              onClick={() => onSeeMore(project)}
-              className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-black/80 px-5 py-2.5 text-white backdrop-blur-sm transition-colors hover:bg-black dark:bg-white/20 dark:hover:bg-white/30"
-            >
-              {t('projects.seeMore')}
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        </article>
-      ))}
+              <button
+                type="button"
+                onClick={() => onSeeMore(project)}
+                className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-black/80 px-5 py-2.5 text-white backdrop-blur-sm transition-colors hover:bg-black dark:bg-white/20 dark:hover:bg-white/30"
+              >
+                {t('projects.seeMore')}
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 }

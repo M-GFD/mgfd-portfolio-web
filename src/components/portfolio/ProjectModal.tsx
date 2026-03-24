@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import { X, ChevronRight, ChevronLeft } from 'lucide-react';
+import { X, ChevronRight } from 'lucide-react';
 import { Project } from '@/types/portfolio';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -12,29 +11,6 @@ interface ProjectModalProps {
 
 export default function ProjectModal({ project, onClose }: ProjectModalProps) {
   const { t } = useLanguage();
-  const [galleryLightboxIndex, setGalleryLightboxIndex] = useState<number | null>(null);
-
-  const galleryImages = project?.galleryImages ?? [];
-  const totalGallery = galleryImages.length;
-
-  const closeLightbox = useCallback(() => setGalleryLightboxIndex(null), []);
-  const goPrev = useCallback(() => {
-    setGalleryLightboxIndex((i) => (i == null ? null : i === 0 ? totalGallery - 1 : i - 1));
-  }, [totalGallery]);
-  const goNext = useCallback(() => {
-    setGalleryLightboxIndex((i) => (i == null ? null : i === totalGallery - 1 ? 0 : i + 1));
-  }, [totalGallery]);
-
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (galleryLightboxIndex == null) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') goPrev();
-      if (e.key === 'ArrowRight') goNext();
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [galleryLightboxIndex, closeLightbox, goPrev, goNext]);
 
   if (!project) return null;
 
@@ -70,24 +46,6 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
             </p>
           ))}
         </div>
-
-        {galleryImages.length > 0 && (
-          <div className="mt-8">
-            <h4 className="text-lg font-semibold text-black dark:text-white mb-3">{t('projects.gallery')}</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {galleryImages.map((src, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setGalleryLightboxIndex(i)}
-                  className="relative aspect-video rounded-lg overflow-hidden border border-white/20 bg-gray-100/80 hover:opacity-90 transition-opacity"
-                >
-                  <img src={src} alt={`${project.title} galería ${i + 1}`} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {project.sectionImages && project.sectionImages.length > 0 &&
           project.sectionImages.map((section, idx) => (
@@ -143,50 +101,6 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
           <ChevronRight size={16} />
         </button>
       </div>
-
-      {galleryLightboxIndex !== null && totalGallery > 0 && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4"
-          onClick={closeLightbox}
-          aria-modal
-          role="dialog"
-          aria-label={t('projects.gallery')}
-        >
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); goPrev(); }}
-            className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
-            aria-label={t('projects.previousAria')}
-          >
-            <ChevronLeft size={28} />
-          </button>
-          <img
-            src={galleryImages[galleryLightboxIndex]}
-            alt={`${project.title} galería ${galleryLightboxIndex + 1}`}
-            className="max-w-full max-h-[85vh] object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); goNext(); }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
-            aria-label={t('projects.nextAria')}
-          >
-            <ChevronRight size={28} />
-          </button>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); closeLightbox(); }}
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
-            aria-label={t('projects.closeAria')}
-          >
-            <X size={24} />
-          </button>
-          <span className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 text-sm">
-            {galleryLightboxIndex + 1} / {totalGallery}
-          </span>
-        </div>
-      )}
     </div>
   );
 }
