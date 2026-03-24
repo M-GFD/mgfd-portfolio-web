@@ -13,7 +13,21 @@ import esMessages from '@/messages/es.json';
 import enMessages from '@/messages/en.json';
 
 const LOCALE_KEY = 'mgfd-locale';
+
 export type Locale = 'es' | 'en';
+
+/** Idioma del navegador cuando no hay preferencia guardada. */
+function detectBrowserLocale(): Locale {
+  if (typeof window === 'undefined') return 'es';
+  const list =
+    navigator.languages?.length > 0 ? navigator.languages : [navigator.language];
+  for (const tag of list) {
+    const base = tag.toLowerCase().split('-')[0];
+    if (base === 'es') return 'es';
+    if (base === 'en') return 'en';
+  }
+  return 'es';
+}
 
 type Messages = Record<string, unknown>;
 
@@ -52,7 +66,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const stored = localStorage.getItem(LOCALE_KEY) as Locale | null;
-    if (stored === 'es' || stored === 'en') setLocaleState(stored);
+    if (stored === 'es' || stored === 'en') {
+      setLocaleState(stored);
+    } else {
+      const detected = detectBrowserLocale();
+      setLocaleState(detected);
+      document.documentElement.lang = detected;
+      localStorage.setItem(LOCALE_KEY, detected);
+    }
     setMounted(true);
   }, []);
 
