@@ -34,7 +34,7 @@ export default function HomePage() {
         <Technologies />
         <section
           id="works"
-          className="px-4 pb-14 pt-3 sm:px-6 sm:pb-20 sm:pt-4 md:pb-28 md:pt-5"
+          className="-mt-14 px-4 pb-14 pt-0 sm:-mt-16 sm:px-6 sm:pb-20 md:-mt-20 md:pb-28"
         >
           <div className="container mx-auto max-w-6xl">
             <h2 className="mb-6 text-center text-2xl font-bold text-black dark:text-white sm:mb-8 sm:text-3xl md:mb-10 md:text-4xl lg:text-5xl">

@@ -8,10 +8,10 @@ import { useEffect, useRef } from 'react';
 const SPIN_SPEED_RAD_S = 0.525;
 /** Escala visual de cada ítem del carrusel respecto al diseño base */
 const ITEM_SCALE = 1.5;
-/** Altura del área 3D: clamp fluido para móvil y escritorio */
-const CAROUSEL_VIEWPORT_MIN_REM = 11;
-const CAROUSEL_VIEWPORT_PREFERRED_VW = 48;
-const CAROUSEL_VIEWPORT_MAX_REM = 26;
+/** Altura del área 3D (menor = menos hueco vacío bajo el carrusel hacia Works) */
+const CAROUSEL_VIEWPORT_MIN_REM = 8.5;
+const CAROUSEL_VIEWPORT_PREFERRED_VW = 38;
+const CAROUSEL_VIEWPORT_MAX_REM = 19;
 
 function techImageSrc(tech: (typeof technologies)[number]) {
   return `/images/${tech.name.toLowerCase()}.${tech.imageExt ?? 'png'}`;
@@ -113,7 +113,7 @@ export default function Technologies() {
   return (
     <section
       id="technologies"
-      className="flex flex-col gap-6 overflow-x-clip px-4 pt-6 pb-2 sm:gap-8 sm:px-6 sm:pt-8 sm:pb-2 md:gap-10 md:pt-10 md:pb-3"
+      className="flex flex-col gap-6 overflow-x-clip px-4 pt-6 pb-0 sm:gap-8 sm:px-6 sm:pt-8 sm:pb-0 md:gap-10 md:pt-10 md:pb-0"
     >
       <div className="container mx-auto max-w-6xl px-0">
         <h2 className="text-center text-2xl font-bold text-black dark:text-white sm:text-3xl md:text-4xl lg:text-5xl">
