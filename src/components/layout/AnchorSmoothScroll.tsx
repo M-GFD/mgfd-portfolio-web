@@ -10,19 +10,19 @@ function getMaxScrollY(): number {
 }
 
 /**
- * Cierre tipo cajón amortiguado: expo ease-out + tramo final fundido hacia 1
- * para que en pasos discretos (rAF) no quede un “saltito” al llegar.
+ * λ adaptativo: respuesta clara con mucho recorrido, y amortiguación muy suave
+ * al acercarse al destino (velocidad → 0 sin “último fotograma” brusco).
  */
-function easeSoftClose(t: number) {
-  if (t >= 1) return 1;
-  const k = 7.5;
-  const expo = 1 - 2 ** (-k * t);
-  const blendStart = 0.86;
-  if (t <= blendStart) return expo;
-  const u = (t - blendStart) / (1 - blendStart);
-  const e0 = 1 - 2 ** (-k * blendStart);
-  // Último ~14% del tiempo: transición suave hasta 1 (sin asintota infinita)
-  return e0 + (1 - e0) * (1 - (1 - u) ** 2.2);
+function lambdaForRemaining(absRemaining: number): number {
+  if (absRemaining > 520) return 3.5;
+  if (absRemaining > 280) return 2.9;
+  if (absRemaining > 140) return 2.25;
+  if (absRemaining > 72) return 1.75;
+  if (absRemaining > 36) return 1.35;
+  if (absRemaining > 18) return 1.05;
+  if (absRemaining > 9) return 0.82;
+  if (absRemaining > 4) return 0.62;
+  return 0.48;
 }
 
 function resolveHashFromHref(href: string): string | null {
@@ -42,6 +42,15 @@ function resolveHashFromHref(href: string): string | null {
 
 export function AnchorSmoothScroll() {
   useEffect(() => {
+    let rafId = 0;
+
+    const cancelScroll = () => {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+    };
+
     const onClickCapture = (e: MouseEvent) => {
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
 
@@ -58,6 +67,7 @@ export function AnchorSmoothScroll() {
       if (!section) return;
 
       e.preventDefault();
+      cancelScroll();
 
       const header = document.querySelector('header');
       const headerH = header?.getBoundingClientRect().height ?? 0;
@@ -71,50 +81,58 @@ export function AnchorSmoothScroll() {
       const startY = window.scrollY;
       const distance = clampedTarget - startY;
 
-      if (Math.abs(distance) < 1) {
+      if (Math.abs(distance) < 0.35) {
         window.scrollTo(0, clampedTarget);
         history.replaceState(null, '', hash);
         return;
       }
 
-      const duration = Math.min(
-        2600,
-        Math.max(760, Math.pow(Math.abs(distance), 0.5) * 1.12),
-      );
-
-      let startTime: number | null = null;
-      let lastY = startY;
+      let prevTime = performance.now();
+      const t0 = prevTime;
+      const maxDuration = 6500;
 
       const step = (now: number) => {
-        if (startTime === null) startTime = now;
-        const elapsed = now - startTime;
-        const linear = Math.min(1, elapsed / duration);
-        const eased = easeSoftClose(linear);
+        const dt = Math.min((now - prevTime) / 1000, 0.05);
+        prevTime = now;
 
-        let y = startY + distance * eased;
-        if (linear >= 1) {
-          y = clampedTarget;
-        }
-        y = Math.min(Math.max(0, y), maxY);
+        const maxYNow = getMaxScrollY();
+        const target = Math.min(clampedTarget, maxYNow);
+        const current = window.scrollY;
+        const remaining = target - current;
+        const absR = Math.abs(remaining);
 
-        window.scrollTo(0, y);
-        lastY = y;
-
-        if (linear < 1) {
-          requestAnimationFrame(step);
-        } else {
-          if (Math.abs(lastY - clampedTarget) > 0.5) {
-            window.scrollTo(0, clampedTarget);
-          }
+        // Debajo del umbral visual: posar sin salto perceptible
+        if (absR < 0.28) {
+          window.scrollTo(0, target);
           history.replaceState(null, '', hash);
+          rafId = 0;
+          return;
         }
+
+        if (now - t0 > maxDuration) {
+          window.scrollTo(0, target);
+          history.replaceState(null, '', hash);
+          rafId = 0;
+          return;
+        }
+
+        const lambda = lambdaForRemaining(absR);
+        const alpha = 1 - Math.exp(-lambda * dt);
+        let next = current + remaining * alpha;
+        next = Math.min(Math.max(0, next), maxYNow);
+
+        window.scrollTo(0, next);
+        rafId = requestAnimationFrame(step);
       };
 
-      requestAnimationFrame(step);
+      rafId = requestAnimationFrame(step);
     };
 
     document.addEventListener('click', onClickCapture, true);
-    return () => document.removeEventListener('click', onClickCapture, true);
+    return () => {
+      cancelScroll();
+      document.removeEventListener('click', onClickCapture, true);
+    };
   }, []);
 
   return null;
