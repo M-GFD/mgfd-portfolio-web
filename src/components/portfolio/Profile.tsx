@@ -5,7 +5,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 export default function Profile() {
   const { t } = useLanguage();
   return (
-    <section id="about" className="bg-gray-50 px-6 py-12 md:py-16">
+    <section
+      id="about"
+      className="mb-12 bg-gray-50 px-6 py-12 md:mb-16 md:py-16"
+    >
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-center gap-12">
           <div className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
