@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react';
 
 const SPIN_SPEED_RAD_S = 0.525;
 /** Escala visual de cada ítem del carrusel respecto al diseño base */
-const ITEM_SCALE = 1.75;
+const ITEM_SCALE = 1.5;
 /** Altura del área 3D (base px / vw antes de ITEM_SCALE); más baja = menos “hueco” bajo el título */
 const CAROUSEL_VIEWPORT_H_PX = 280;
 const CAROUSEL_VIEWPORT_VW = 38;
@@ -112,19 +112,17 @@ export default function Technologies() {
   return (
     <section
       id="technologies"
-      className="mb-2 border-b border-gray-100 bg-white pb-0 pt-8 md:mb-3 md:pt-10"
+      className="flex flex-col gap-8 border-b border-gray-100 bg-white px-6 py-8 md:gap-10 md:py-10"
     >
-      <div className="container mx-auto px-6">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="mb-0 text-center text-4xl font-bold text-black md:text-5xl">
-            {t('technologies.title')}
-          </h2>
-        </div>
+      <div className="container mx-auto max-w-6xl">
+        <h2 className="text-center text-4xl font-bold text-black md:text-5xl">
+          {t('technologies.title')}
+        </h2>
       </div>
 
       <div
         ref={containerRef}
-        className="relative w-full pt-5 pb-0 md:pt-6"
+        className="relative w-full"
         style={{
           perspective: `min(${1100 * ITEM_SCALE}px, 100vw)`,
         }}
