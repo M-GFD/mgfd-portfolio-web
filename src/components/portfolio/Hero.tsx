@@ -14,7 +14,7 @@ export default function Hero() {
             className="h-auto w-full object-contain dark:invert dark:brightness-0 dark:contrast-200"
           />
         </div>
-        <p className="mx-auto mb-6 max-w-2xl px-1 text-base leading-relaxed text-neutral-600 dark:text-neutral-400 sm:mb-8 sm:text-lg md:text-xl">
+        <p className="mx-auto mb-6 max-w-2xl px-1 text-[calc(1rem-3pt)] leading-snug tracking-tight text-neutral-600 dark:text-neutral-400 sm:mb-8 sm:text-lg sm:leading-relaxed sm:tracking-normal md:text-xl">
           {t('hero.subtitle')}
         </p>
         <a
