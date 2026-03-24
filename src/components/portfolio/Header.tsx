@@ -32,7 +32,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-200 bg-white/95 pt-[env(safe-area-inset-top)] backdrop-blur-sm dark:border-white/10 dark:bg-black/90">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-black/[0.08] bg-[#FFFFFF] pt-[env(safe-area-inset-top)] dark:border-white/10 dark:bg-[#000000]">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-3 py-3 sm:px-5 sm:py-3.5 md:px-6 md:py-4">
         <div className="flex min-w-0 flex-1 items-center pr-2">
           <a href="/" className="flex min-w-0 items-center">
