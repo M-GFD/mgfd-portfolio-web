@@ -6,7 +6,6 @@ export interface Project {
   fullDescription: string;
   image: string;
   technologies?: string[];
-  tags?: string[];
   reversed: boolean;
   createdAt?: string;
   /** Imágenes por sección para mostrar en el modal (ej. Sistema multi-corte) */

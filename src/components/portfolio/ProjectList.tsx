@@ -263,22 +263,9 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
               <p className="mb-2 text-xs text-gray-500 dark:text-gray-400 sm:mb-3 sm:text-sm md:text-base">
                 {project.subtitle}
               </p>
-              <p className="mb-4 text-sm leading-relaxed text-gray-600 dark:text-gray-300 sm:mb-5 sm:text-base">
+              <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300 sm:text-base">
                 {project.description}
               </p>
-
-              {project.tags && project.tags.length > 0 && (
-                <div className="mb-5 flex flex-wrap gap-2">
-                  {project.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="rounded-full border border-white/20 bg-white/50 px-3 py-1 text-xs text-gray-700 dark:bg-white/10 dark:text-gray-300"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
           </article>
         );

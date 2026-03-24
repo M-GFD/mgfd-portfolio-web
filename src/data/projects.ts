@@ -19,7 +19,6 @@ Desarrollo de piezas promocionales para social media y YouTube con foco en CTR y
 Diseño de presentaciones institucionales: quiénes somos, portfolio, partners y clientes, con estilos visuales, retícula y componentes reutilizables para propuestas comerciales.`,
     image: `/images/project-01.png?${IMG_V}`,
     technologies: ['Photoshop', 'Illustrator', 'Figma', 'PowerPoint'],
-    tags: ['Sports', 'Decks', 'Wilson System', 'OTT', 'Social Media', 'Branding'],
     reversed: false,
     galleryImages: [
       `/images/1190_asset_01.png?${IMG_V}`,
@@ -50,7 +49,6 @@ Diseño del home y esquema completo de la web app: vistas de registro, login, ma
 Diseño de app mobile para usuarios finales con monitoreo en tiempo real del estado del cilindro, vistas en light y dark mode, componentes de estado, indicadores de consumo y acciones de recarga/pedido.`,
     image: `/images/project-02.png?${IMG_V}`,
     technologies: ['Figma', 'Design System', 'UX Research', 'Mobile UI'],
-    tags: ['UX/UI', 'SaaS', 'Web App', 'Mobile App', 'IoT'],
     reversed: true,
   },
   {
@@ -64,7 +62,6 @@ Diseño de app mobile para usuarios finales con monitoreo en tiempo real del est
 Participación en campañas visuales, piezas para redes y mejoras iterativas de comunicación gráfica orientada a negocio.`,
     image: `/images/project-03.png?${IMG_V}`,
     technologies: ['Photoshop', 'Illustrator', 'Social Design'],
-    tags: ['Graphic Design', 'Branding', 'Agency'],
     reversed: false,
   },
   {
@@ -76,7 +73,6 @@ Participación en campañas visuales, piezas para redes y mejoras iterativas de 
     fullDescription: `Agencia de soluciones audiovisuales. Diseño gráfico. Diseño UX/UI. Diseño audiovisual con IA.`,
     image: `/images/project-04.png?${IMG_V}`,
     technologies: [],
-    tags: ['Audiovisual', 'Graphic Design', 'UX/UI', 'IA'],
     reversed: true,
   },
 ];
