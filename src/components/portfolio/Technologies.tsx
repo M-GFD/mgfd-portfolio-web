@@ -18,32 +18,19 @@ function techImageSrc(tech: (typeof technologies)[number]) {
 }
 
 function TechItem({ tech }: { tech: (typeof technologies)[number] }) {
+  const side = `${3 * ITEM_SCALE}rem`;
   return (
     <div
-      className="pointer-events-none flex flex-col items-center"
-      style={{ width: `${7 * ITEM_SCALE}rem`, gap: `${0.75 * ITEM_SCALE}rem` }}
+      className="pointer-events-none flex items-center justify-center"
+      style={{ width: side, height: side }}
     >
-      <div
-        className="relative flex flex-shrink-0 items-center justify-center"
-        style={{ width: `${3 * ITEM_SCALE}rem`, height: `${3 * ITEM_SCALE}rem` }}
-      >
-        <Image
-          src={techImageSrc(tech)}
-          alt={tech.name}
-          width={Math.round(48 * ITEM_SCALE)}
-          height={Math.round(48 * ITEM_SCALE)}
-          className="h-full w-full object-contain"
-        />
-      </div>
-      <h3
-        className="text-center font-semibold leading-tight text-black dark:text-neutral-100"
-        style={{
-          maxWidth: `${6.5 * ITEM_SCALE}rem`,
-          fontSize: `${0.875 * ITEM_SCALE}rem`,
-        }}
-      >
-        {tech.name}
-      </h3>
+      <Image
+        src={techImageSrc(tech)}
+        alt={tech.name}
+        width={Math.round(48 * ITEM_SCALE)}
+        height={Math.round(48 * ITEM_SCALE)}
+        className="h-full w-full object-contain"
+      />
     </div>
   );
 }
@@ -113,7 +100,7 @@ export default function Technologies() {
   return (
     <section
       id="technologies"
-      className="flex flex-col gap-6 overflow-x-clip px-4 pt-6 pb-0 sm:gap-8 sm:px-6 sm:pt-8 sm:pb-0 md:gap-10 md:pt-10 md:pb-0"
+      className="flex flex-col gap-6 overflow-x-clip px-4 pt-6 pb-0 sm:gap-8 sm:px-6 sm:pt-8 md:gap-10 md:pt-10"
     >
       <div className="container mx-auto max-w-6xl px-0">
         <h2 className="text-center text-2xl font-bold text-black dark:text-white sm:text-3xl md:text-4xl lg:text-5xl">
@@ -150,7 +137,7 @@ export default function Technologies() {
                 }}
                 className="absolute left-1/2 top-1/2"
                 style={{
-                  width: `${7 * ITEM_SCALE}rem`,
+                  width: `${3 * ITEM_SCALE}rem`,
                   transformStyle: 'preserve-3d',
                   willChange: 'transform, opacity',
                 }}
