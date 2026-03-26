@@ -146,9 +146,9 @@ export default function Technologies() {
     };
   }, [n]);
 
-  /** Móvil: menos alto y menos ancho visual; md+: valores anteriores */
+  /** Móvil: compacto pero legible; md+: altura amplia para el anillo 3D */
   const carouselHeightClass =
-    'max-md:h-[clamp(9.375rem,39vw,18rem)] md:h-[clamp(12.75rem,57vw,28.5rem)]';
+    'max-md:h-[clamp(11rem,50vw,22rem)] md:h-[clamp(12.75rem,57vw,28.5rem)]';
 
   return (
     <section
@@ -163,13 +163,13 @@ export default function Technologies() {
 
       <div
         ref={containerRef}
-        className="relative mx-auto w-full max-w-full max-md:max-w-[min(100%,18.5rem)] md:max-w-full"
+        className="relative mx-auto w-full max-w-full max-md:max-w-[min(100%,22.5rem)] md:max-w-full"
         style={{
           perspective: `min(${1100 * ITEM_SCALE}px, 100vw)`,
         }}
       >
         <div
-          className={`relative mx-auto w-full max-w-full origin-[50%_32%] scale-[0.50] cursor-grab select-none overflow-visible active:cursor-grabbing min-[400px]:scale-[0.64] min-[480px]:scale-[0.76] sm:origin-[50%_36%] sm:scale-[0.88] md:origin-center md:scale-100 ${carouselHeightClass}`}
+          className={`relative mx-auto w-full max-w-full origin-[50%_32%] scale-[0.58] cursor-grab select-none overflow-visible active:cursor-grabbing min-[400px]:scale-[0.68] min-[480px]:scale-[0.80] sm:origin-[50%_36%] sm:scale-[0.88] md:origin-center md:scale-100 ${carouselHeightClass}`}
           style={{ touchAction: 'none' }}
           onPointerDown={(e) => {
             e.currentTarget.setPointerCapture(e.pointerId);
@@ -222,7 +222,7 @@ export default function Technologies() {
           </div>
 
           <p
-            className="pointer-events-none absolute bottom-1 left-0 right-0 text-center text-sm font-semibold text-black transition-opacity ease-in-out dark:text-white sm:bottom-2 sm:text-base md:text-lg"
+            className="pointer-events-none absolute bottom-2 left-0 right-0 text-center text-sm font-semibold text-black transition-opacity ease-in-out dark:text-white sm:text-base md:bottom-auto md:top-[41%] md:text-lg md:leading-tight"
             style={{
               transitionDuration: `${FADE_MS}ms`,
               opacity: nameOpacity,
