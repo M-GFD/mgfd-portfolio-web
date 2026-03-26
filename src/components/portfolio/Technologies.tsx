@@ -19,7 +19,7 @@ const CAROUSEL_VIEWPORT_PREFERRED_VW = 38;
 const CAROUSEL_VIEWPORT_MAX_REM = 19;
 
 const FADE_MS = 1000;
-const SPOTLIGHT_MS = 7_000;
+const SPOTLIGHT_MS = 5_000;
 
 const ORDERED_DROPDOWN_TECH: Technology[] = SELECTABLE_TECH_ORDER.map((name) => {
   const tech = technologies.find((t) => t.name === name);
