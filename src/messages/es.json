@@ -21,8 +21,7 @@
   },
   "technologies": {
     "title": "Herramientas",
-    "selectLabel": "Elige una herramienta",
-    "selectPlaceholder": "—"
+    "selectLabel": "Elige una herramienta"
   },
   "projects": {
     "sectionTitle": "Trabajos",
