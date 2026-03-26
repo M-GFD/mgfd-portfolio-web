@@ -7,14 +7,10 @@ import type { Technology } from '@/types/portfolio';
 import { useEffect, useRef, useState } from 'react';
 
 const SPIN_SPEED_RAD_S = 0.42;
-/** Pixels horizontales → radianes al arrastrar */
-const DRAG_RAD_PER_PX = 0.0075;
+/** Pixels horizontales → radianes al arrastrar (menor = giro más suave) */
+const DRAG_RAD_PER_PX = 0.0032;
 /** Escala visual de cada ítem del carrusel respecto al diseño base */
 const ITEM_SCALE = 1.5;
-/** Altura del área 3D */
-const CAROUSEL_VIEWPORT_MIN_REM = 8.5;
-const CAROUSEL_VIEWPORT_PREFERRED_VW = 38;
-const CAROUSEL_VIEWPORT_MAX_REM = 19;
 
 const FADE_MS = 1000;
 
@@ -150,7 +146,9 @@ export default function Technologies() {
     };
   }, [n]);
 
-  const viewportHeight = `clamp(${CAROUSEL_VIEWPORT_MIN_REM * ITEM_SCALE}rem, ${CAROUSEL_VIEWPORT_PREFERRED_VW * ITEM_SCALE}vw, ${CAROUSEL_VIEWPORT_MAX_REM * ITEM_SCALE}rem)`;
+  /** Móvil: menos alto y menos ancho visual; md+: valores anteriores */
+  const carouselHeightClass =
+    'max-md:h-[clamp(9.375rem,39vw,18rem)] md:h-[clamp(12.75rem,57vw,28.5rem)]';
 
   return (
     <section
@@ -165,14 +163,14 @@ export default function Technologies() {
 
       <div
         ref={containerRef}
-        className="relative w-full max-w-full"
+        className="relative mx-auto w-full max-w-full max-md:max-w-[min(100%,18.5rem)] md:max-w-full"
         style={{
           perspective: `min(${1100 * ITEM_SCALE}px, 100vw)`,
         }}
       >
         <div
-          className="relative mx-auto w-full max-w-full origin-[50%_32%] scale-[0.62] overflow-visible min-[400px]:scale-[0.72] min-[480px]:scale-[0.8] sm:origin-[50%_36%] sm:scale-[0.88] md:origin-center md:scale-100"
-          style={{ height: viewportHeight, touchAction: 'none' }}
+          className={`relative mx-auto w-full max-w-full origin-[50%_32%] scale-[0.50] overflow-visible min-[400px]:scale-[0.64] min-[480px]:scale-[0.76] sm:origin-[50%_36%] sm:scale-[0.88] md:origin-center md:scale-100 ${carouselHeightClass}`}
+          style={{ touchAction: 'none' }}
           onPointerDown={(e) => {
             e.currentTarget.setPointerCapture(e.pointerId);
             isDraggingRef.current = true;
