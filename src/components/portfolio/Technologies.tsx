@@ -153,7 +153,7 @@ export default function Technologies() {
   return (
     <section
       id="technologies"
-      className="flex flex-col gap-6 overflow-x-clip px-4 pt-6 pb-0 sm:gap-8 sm:px-6 sm:pt-8 md:gap-10 md:pt-10"
+      className="relative z-10 flex flex-col gap-6 overflow-x-clip px-4 pt-6 pb-0 sm:gap-8 sm:px-6 sm:pt-8 md:gap-10 md:pt-10"
     >
       <div className="container mx-auto max-w-6xl px-0">
         <h2 className="text-center text-2xl font-bold text-black dark:text-white sm:text-3xl md:text-4xl lg:text-5xl">
@@ -169,7 +169,7 @@ export default function Technologies() {
         }}
       >
         <div
-          className={`relative mx-auto w-full max-w-full origin-[50%_32%] scale-[0.50] overflow-visible min-[400px]:scale-[0.64] min-[480px]:scale-[0.76] sm:origin-[50%_36%] sm:scale-[0.88] md:origin-center md:scale-100 ${carouselHeightClass}`}
+          className={`relative mx-auto w-full max-w-full origin-[50%_32%] scale-[0.50] cursor-grab select-none overflow-visible active:cursor-grabbing min-[400px]:scale-[0.64] min-[480px]:scale-[0.76] sm:origin-[50%_36%] sm:scale-[0.88] md:origin-center md:scale-100 ${carouselHeightClass}`}
           style={{ touchAction: 'none' }}
           onPointerDown={(e) => {
             e.currentTarget.setPointerCapture(e.pointerId);
@@ -194,7 +194,6 @@ export default function Technologies() {
             }
             isDraggingRef.current = false;
           }}
-          className="cursor-grab active:cursor-grabbing select-none"
         >
           <div
             className="absolute left-1/2 top-20 -translate-x-1/2 min-[400px]:top-24 sm:top-28 md:top-32"
