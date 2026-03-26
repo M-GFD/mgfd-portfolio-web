@@ -20,7 +20,9 @@
     "p4": "With years of experience in Graphic Design, UX/UI and Vibe Coding, I always aim to turn ideas into reality in a clear, effective way, putting users first and with the right tone for communication."
   },
   "technologies": {
-    "title": "Tools"
+    "title": "Tools",
+    "selectLabel": "Choose a tool",
+    "selectPlaceholder": "—"
   },
   "projects": {
     "sectionTitle": "Works",

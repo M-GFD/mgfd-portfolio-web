@@ -1,9 +1,14 @@
 'use client';
 
 import Image from 'next/image';
-import { technologies } from '@/constants/technologies';
+import {
+  SELECTABLE_TECH_ORDER,
+  technologies,
+} from '@/constants/technologies';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useEffect, useRef } from 'react';
+import { cn } from '@/lib/utils';
+import type { Technology } from '@/types/portfolio';
+import { useEffect, useRef, useState } from 'react';
 
 const SPIN_SPEED_RAD_S = 0.42;
 /** Escala visual de cada ítem del carrusel respecto al diseño base */
@@ -13,11 +18,22 @@ const CAROUSEL_VIEWPORT_MIN_REM = 8.5;
 const CAROUSEL_VIEWPORT_PREFERRED_VW = 38;
 const CAROUSEL_VIEWPORT_MAX_REM = 19;
 
-function techImageSrc(tech: (typeof technologies)[number]) {
+const FADE_MS = 1000;
+const SPOTLIGHT_MS = 15_000;
+
+const ORDERED_DROPDOWN_TECH: Technology[] = SELECTABLE_TECH_ORDER.map((name) => {
+  const tech = technologies.find((t) => t.name === name);
+  if (!tech) {
+    throw new Error(`Technology "${name}" falta en constants/technologies`);
+  }
+  return tech;
+});
+
+function techImageSrc(tech: Technology) {
   return `/images/${tech.name.toLowerCase()}.${tech.imageExt ?? 'png'}`;
 }
 
-function TechItem({ tech }: { tech: (typeof technologies)[number] }) {
+function TechItem({ tech }: { tech: Technology }) {
   const side = `${3 * ITEM_SCALE}rem`;
   return (
     <div
@@ -45,6 +61,8 @@ export default function Technologies() {
 
   const spinRef = useRef(0);
   const radiusPxRef = useRef(260 * ITEM_SCALE);
+  const [spotlight, setSpotlight] = useState<Technology | null>(null);
+  const spotlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -65,6 +83,28 @@ export default function Technologies() {
   }, []);
 
   useEffect(() => {
+    if (spotlightTimerRef.current) {
+      clearTimeout(spotlightTimerRef.current);
+      spotlightTimerRef.current = null;
+    }
+    if (!spotlight) return;
+
+    spotlightTimerRef.current = setTimeout(() => {
+      setSpotlight(null);
+      spotlightTimerRef.current = null;
+    }, SPOTLIGHT_MS);
+
+    return () => {
+      if (spotlightTimerRef.current) {
+        clearTimeout(spotlightTimerRef.current);
+        spotlightTimerRef.current = null;
+      }
+    };
+  }, [spotlight]);
+
+  useEffect(() => {
+    if (spotlight) return;
+
     let raf = 0;
     let last = performance.now();
 
@@ -95,7 +135,9 @@ export default function Technologies() {
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [n]);
+  }, [n, spotlight]);
+
+  const viewportHeight = `clamp(${CAROUSEL_VIEWPORT_MIN_REM * ITEM_SCALE}rem, ${CAROUSEL_VIEWPORT_PREFERRED_VW * ITEM_SCALE}vw, ${CAROUSEL_VIEWPORT_MAX_REM * ITEM_SCALE}rem)`;
 
   return (
     <section
@@ -117,36 +159,88 @@ export default function Technologies() {
       >
         <div
           className="relative mx-auto w-full max-w-full origin-[50%_32%] scale-[0.62] overflow-visible min-[400px]:scale-[0.72] min-[480px]:scale-[0.8] sm:origin-[50%_36%] sm:scale-[0.88] md:origin-center md:scale-100"
-          style={{
-            height: `clamp(${CAROUSEL_VIEWPORT_MIN_REM * ITEM_SCALE}rem, ${CAROUSEL_VIEWPORT_PREFERRED_VW * ITEM_SCALE}vw, ${CAROUSEL_VIEWPORT_MAX_REM * ITEM_SCALE}rem)`,
-          }}
+          style={{ height: viewportHeight }}
         >
           <div
-            className="absolute left-1/2 top-20 -translate-x-1/2 min-[400px]:top-24 sm:top-28 md:top-32"
-            style={{
-              width: 0,
-              height: 0,
-              transformStyle: 'preserve-3d',
-            }}
+            className={cn(
+              'absolute inset-0 transition-opacity ease-in-out',
+              spotlight ? 'pointer-events-none opacity-0' : 'opacity-100',
+            )}
+            style={{ transitionDuration: `${FADE_MS}ms` }}
           >
-            {technologies.map((tech, i) => (
-              <div
-                key={tech.name}
-                ref={(el) => {
-                  itemRefs.current[i] = el;
-                }}
-                className="absolute left-1/2 top-1/2"
-                style={{
-                  width: `${3 * ITEM_SCALE}rem`,
-                  transformStyle: 'preserve-3d',
-                  willChange: 'transform, opacity',
-                }}
-              >
-                <TechItem tech={tech} />
-              </div>
-            ))}
+            <div
+              className="absolute left-1/2 top-20 -translate-x-1/2 min-[400px]:top-24 sm:top-28 md:top-32"
+              style={{
+                width: 0,
+                height: 0,
+                transformStyle: 'preserve-3d',
+              }}
+            >
+              {technologies.map((tech, i) => (
+                <div
+                  key={tech.name}
+                  ref={(el) => {
+                    itemRefs.current[i] = el;
+                  }}
+                  className="absolute left-1/2 top-1/2"
+                  style={{
+                    width: `${3 * ITEM_SCALE}rem`,
+                    transformStyle: 'preserve-3d',
+                    willChange: 'transform, opacity',
+                  }}
+                >
+                  <TechItem tech={tech} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div
+            className={cn(
+              'absolute inset-0 flex items-center justify-center transition-opacity ease-in-out',
+              spotlight ? 'opacity-100' : 'pointer-events-none opacity-0',
+            )}
+            style={{ transitionDuration: `${FADE_MS}ms` }}
+            aria-hidden={!spotlight}
+          >
+            {spotlight ? (
+              <Image
+                src={techImageSrc(spotlight)}
+                alt={spotlight.name}
+                width={192}
+                height={192}
+                className="h-28 w-28 object-contain sm:h-36 sm:w-36 md:h-44 md:w-44"
+                priority
+              />
+            ) : null}
           </div>
         </div>
+      </div>
+
+      <div className="container mx-auto flex max-w-6xl flex-col items-center gap-2 px-0 sm:flex-row sm:justify-center sm:gap-3">
+        <label
+          htmlFor="technologies-select"
+          className="text-center text-sm font-medium text-black dark:text-white sm:min-w-0 sm:text-right"
+        >
+          {t('technologies.selectLabel')}
+        </label>
+        <select
+          id="technologies-select"
+          value={spotlight?.name ?? ''}
+          onChange={(e) => {
+            const name = e.target.value;
+            const tech = ORDERED_DROPDOWN_TECH.find((x) => x.name === name);
+            if (tech) setSpotlight(tech);
+          }}
+          className="w-full max-w-xs rounded-lg border border-black/[0.12] bg-[#FFFFFF] px-3 py-2.5 text-sm text-black shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/40 dark:border-white/15 dark:bg-[#000000] dark:text-white dark:focus-visible:outline-white/50 sm:w-auto sm:min-w-[14rem]"
+        >
+          <option value="">{t('technologies.selectPlaceholder')}</option>
+          {ORDERED_DROPDOWN_TECH.map((tech) => (
+            <option key={tech.name} value={tech.name}>
+              {tech.name}
+            </option>
+          ))}
+        </select>
       </div>
     </section>
   );
