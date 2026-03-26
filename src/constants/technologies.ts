@@ -1,17 +1,5 @@
 import { Technology } from '@/types/portfolio';
 
-/** Orden del menú desplegable bajo el carrusel (debe coincidir con archivos en `public/images/`). */
-export const SELECTABLE_TECH_ORDER = [
-  'Photoshop',
-  'Illustrator',
-  'Figma',
-  'Kling',
-  'Gemini',
-  'Antigravity',
-  'Cursor',
-  'Slack',
-] as const;
-
 export const technologies: Technology[] = [
   {
     name: 'Figma',
