@@ -162,7 +162,9 @@ export default function Technologies() {
           }}
           className="w-full max-w-[min(100%,18rem)] rounded-md border border-black/[0.12] bg-[#FFFFFF] px-2 py-1.5 text-xs text-black shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/40 dark:border-white/15 dark:bg-[#000000] dark:text-white dark:focus-visible:outline-white/50 sm:w-auto sm:max-w-none sm:min-w-[15rem] sm:rounded-lg sm:px-3 sm:py-2.5 sm:text-sm md:min-w-[19rem] md:px-4 md:py-3 md:text-base lg:min-w-[21rem]"
         >
-          <option value="">{t('technologies.selectLabel')}</option>
+          <option value="" hidden>
+            {t('technologies.selectLabel')}
+          </option>
           {ORDERED_DROPDOWN_TECH.map((tech) => (
             <option key={tech.name} value={tech.name}>
               {tech.name}
