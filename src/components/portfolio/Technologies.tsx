@@ -19,7 +19,7 @@ const CAROUSEL_VIEWPORT_PREFERRED_VW = 38;
 const CAROUSEL_VIEWPORT_MAX_REM = 19;
 
 const FADE_MS = 1000;
-const SPOTLIGHT_MS = 15_000;
+const SPOTLIGHT_MS = 7_000;
 
 const ORDERED_DROPDOWN_TECH: Technology[] = SELECTABLE_TECH_ORDER.map((name) => {
   const tech = technologies.find((t) => t.name === name);
@@ -150,6 +150,32 @@ export default function Technologies() {
         </h2>
       </div>
 
+      <div className="container mx-auto flex max-w-6xl flex-col items-center gap-1.5 px-0 sm:flex-row sm:justify-center sm:gap-3 md:gap-4">
+        <label
+          htmlFor="technologies-select"
+          className="text-center text-xs font-medium text-black dark:text-white sm:min-w-0 sm:text-right md:text-base"
+        >
+          {t('technologies.selectLabel')}
+        </label>
+        <select
+          id="technologies-select"
+          value={spotlight?.name ?? ''}
+          onChange={(e) => {
+            const name = e.target.value;
+            const tech = ORDERED_DROPDOWN_TECH.find((x) => x.name === name);
+            if (tech) setSpotlight(tech);
+          }}
+          className="w-full max-w-[11.5rem] rounded-md border border-black/[0.12] bg-[#FFFFFF] px-2 py-1.5 text-xs text-black shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/40 dark:border-white/15 dark:bg-[#000000] dark:text-white dark:focus-visible:outline-white/50 sm:w-auto sm:max-w-none sm:min-w-[13rem] sm:rounded-lg sm:px-3 sm:py-2.5 sm:text-sm md:min-w-[17rem] md:px-4 md:py-3 md:text-base lg:min-w-[19rem]"
+        >
+          <option value="">{t('technologies.selectPlaceholder')}</option>
+          {ORDERED_DROPDOWN_TECH.map((tech) => (
+            <option key={tech.name} value={tech.name}>
+              {tech.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div
         ref={containerRef}
         className="relative w-full max-w-full"
@@ -215,32 +241,6 @@ export default function Technologies() {
             ) : null}
           </div>
         </div>
-      </div>
-
-      <div className="container mx-auto flex max-w-6xl flex-col items-center gap-2 px-0 sm:flex-row sm:justify-center sm:gap-3">
-        <label
-          htmlFor="technologies-select"
-          className="text-center text-sm font-medium text-black dark:text-white sm:min-w-0 sm:text-right"
-        >
-          {t('technologies.selectLabel')}
-        </label>
-        <select
-          id="technologies-select"
-          value={spotlight?.name ?? ''}
-          onChange={(e) => {
-            const name = e.target.value;
-            const tech = ORDERED_DROPDOWN_TECH.find((x) => x.name === name);
-            if (tech) setSpotlight(tech);
-          }}
-          className="w-full max-w-xs rounded-lg border border-black/[0.12] bg-[#FFFFFF] px-3 py-2.5 text-sm text-black shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/40 dark:border-white/15 dark:bg-[#000000] dark:text-white dark:focus-visible:outline-white/50 sm:w-auto sm:min-w-[14rem]"
-        >
-          <option value="">{t('technologies.selectPlaceholder')}</option>
-          {ORDERED_DROPDOWN_TECH.map((tech) => (
-            <option key={tech.name} value={tech.name}>
-              {tech.name}
-            </option>
-          ))}
-        </select>
       </div>
     </section>
   );
