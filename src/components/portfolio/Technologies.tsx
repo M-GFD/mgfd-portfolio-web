@@ -222,7 +222,7 @@ export default function Technologies() {
           </div>
 
           <p
-            className="pointer-events-none absolute bottom-2 left-0 right-0 text-center text-sm font-semibold text-black transition-opacity ease-in-out dark:text-white sm:text-base md:bottom-auto md:top-[41%] md:text-lg md:leading-tight"
+            className="pointer-events-none absolute bottom-2 left-0 right-0 text-center text-[0.9375rem] font-semibold leading-snug text-black transition-opacity ease-in-out dark:text-white sm:text-base sm:leading-normal md:bottom-auto md:top-[41%] md:text-lg md:leading-tight"
             style={{
               transitionDuration: `${FADE_MS}ms`,
               opacity: nameOpacity,
