@@ -1,7 +1,7 @@
 import { Project } from '@/types/portfolio';
 
 // Bump when you replace image files (same names) so the browser loads the new versions
-const IMG_V = 'v=3';
+const IMG_V = 'v=4';
 
 export const projects: Project[] = [
   {
