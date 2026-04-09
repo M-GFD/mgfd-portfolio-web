@@ -50,6 +50,7 @@ Diseño de app mobile para usuarios finales con monitoreo en tiempo real del est
     image: `/images/project-02.png?${IMG_V}`,
     technologies: ['Figma', 'Design System', 'UX Research', 'Mobile UI'],
     reversed: true,
+    galleryImages: [`/images/novogas_desktop.png?${IMG_V}`, `/images/novogas_mobile.png?${IMG_V}`],
   },
   {
     id: 3,
