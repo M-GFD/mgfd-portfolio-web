@@ -18,7 +18,9 @@ export default function ThemeToggle() {
   const { t } = useLanguage();
 
   useEffect(() => {
-    setMounted(true);
+    queueMicrotask(() => {
+      setMounted(true);
+    });
   }, []);
 
   if (!mounted) {

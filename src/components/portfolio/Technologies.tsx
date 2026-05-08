@@ -65,7 +65,9 @@ export default function Technologies() {
   const lastFrontIdxRef = useRef(getFrontIndex(0, n));
   const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [displayName, setDisplayName] = useState(() => technologies[lastFrontIdxRef.current].name);
+  const [displayName, setDisplayName] = useState(
+    () => technologies[getFrontIndex(0, n)].name,
+  );
   const [nameOpacity, setNameOpacity] = useState(1);
 
   useEffect(() => {

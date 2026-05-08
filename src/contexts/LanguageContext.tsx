@@ -65,16 +65,18 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(LOCALE_KEY) as Locale | null;
-    if (stored === 'es' || stored === 'en') {
-      setLocaleState(stored);
-    } else {
-      const detected = detectBrowserLocale();
-      setLocaleState(detected);
-      document.documentElement.lang = detected;
-      localStorage.setItem(LOCALE_KEY, detected);
-    }
-    setMounted(true);
+    queueMicrotask(() => {
+      const stored = localStorage.getItem(LOCALE_KEY) as Locale | null;
+      if (stored === 'es' || stored === 'en') {
+        setLocaleState(stored);
+      } else {
+        const detected = detectBrowserLocale();
+        setLocaleState(detected);
+        document.documentElement.lang = detected;
+        localStorage.setItem(LOCALE_KEY, detected);
+      }
+      setMounted(true);
+    });
   }, []);
 
   const setLocale = useCallback((next: Locale) => {

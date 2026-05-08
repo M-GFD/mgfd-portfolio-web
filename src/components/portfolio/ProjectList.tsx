@@ -40,7 +40,9 @@ function ProjectCoverMedia({
   const count = images.length;
 
   useEffect(() => {
-    setPortalTarget(document.body);
+    queueMicrotask(() => {
+      setPortalTarget(document.body);
+    });
   }, []);
 
   const go = (delta: number) => {

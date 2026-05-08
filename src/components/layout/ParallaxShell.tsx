@@ -45,9 +45,12 @@ function useReducedMotionPreference() {
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     const sync = () => setReducedMotion(mq.matches);
-    sync();
+    const mqRafId = requestAnimationFrame(sync);
     mq.addEventListener('change', sync);
-    return () => mq.removeEventListener('change', sync);
+    return () => {
+      cancelAnimationFrame(mqRafId);
+      mq.removeEventListener('change', sync);
+    };
   }, []);
 
   return reducedMotion;
@@ -63,9 +66,14 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    onScroll();
+    const scrollRafId = requestAnimationFrame(() => {
+      setScrollY(window.scrollY);
+    });
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      cancelAnimationFrame(scrollRafId);
+      window.removeEventListener('scroll', onScroll);
+    };
   }, [onScroll]);
 
   const value = useMemo(
