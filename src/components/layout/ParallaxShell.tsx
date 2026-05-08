@@ -22,16 +22,17 @@ type DepthScrollRegistry = {
 
 const DepthRegistryContext = createContext<DepthScrollRegistry | null>(null);
 
-/** Progreso 0 = emerge al frente; 1 = hundido hacia el video (solo eje Z vía CSS). */
-function computeZProgress(rect: DOMRect): number {
-  const vh = typeof window !== 'undefined' ? window.innerHeight || 1 : 1;
-  if (rect.height < 12) return 0;
-
-  const focalY = vh * 0.41;
-  const anchorY = rect.top + rect.height * 0.36;
-  const spread = Math.max(vh * 0.42, 1);
-  const raw = Math.abs(anchorY - focalY) / spread;
-  return Math.min(Math.max(raw, 0), 1);
+/**
+ * Una sola progresión por scroll para todo el bloque principal (todas las secciones a la vez).
+ * 0 = adelante; 1 = hundido máximo en Z hacia el video.
+ */
+function computeGlobalScrollProgress(scrollY: number): number {
+  if (typeof document === 'undefined') return 0;
+  const doc = document.documentElement;
+  const maxY = Math.max(1, doc.scrollHeight - window.innerHeight);
+  const raw = scrollY / maxY;
+  const clamped = Math.min(Math.max(raw, 0), 1);
+  return Math.pow(clamped, 0.92);
 }
 
 function formatProgress(value: number): string {
@@ -68,7 +69,7 @@ export function ParallaxPerspectiveStage({
   );
 }
 
-/** Fondo GIF + overlay + RAF que actualiza --z-progress por rect. */
+/** Fondo GIF + overlay + RAF: un solo --z-progress global según scroll. */
 export function ParallaxRoot({ children }: { children: ReactNode }) {
   const reducedMotion = useReducedMotionPreference();
   const sectionElsRef = useRef(new Set<HTMLElement>());
@@ -83,8 +84,7 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
       return;
     }
     for (const el of sectionElsRef.current) {
-      const rect = el.getBoundingClientRect();
-      const p = computeZProgress(rect);
+      const p = computeGlobalScrollProgress(window.scrollY);
       el.style.setProperty('--z-progress', formatProgress(p));
     }
   }, [reducedMotion]);
@@ -172,9 +172,10 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
 }
 
 /**
- * Área principal con profundidad: scale hasta 0.85, fade y translateZ desde --z-progress.
+ * Sobre único para todo el contenido con profundidad (hero + sobre + obra).
+ * Un solo elemento registrado ⇒ mismas máscaras scale/opacidad/Z.
  */
-export function DepthSection({
+export function DepthEnvelope({
   children,
   className,
 }: {
@@ -196,3 +197,6 @@ export function DepthSection({
     </div>
   );
 }
+
+/** @deprecated Usar DepthEnvelope */
+export const DepthSection = DepthEnvelope;

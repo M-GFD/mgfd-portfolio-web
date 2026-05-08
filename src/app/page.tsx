@@ -8,7 +8,7 @@ import Technologies from '@/components/portfolio/Technologies';
 import ProjectList from '@/components/portfolio/ProjectList';
 import Footer from '@/components/portfolio/Footer';
 import {
-  DepthSection,
+  DepthEnvelope,
   ParallaxPerspectiveStage,
   ParallaxRoot,
 } from '@/components/layout/ParallaxShell';
@@ -39,14 +39,10 @@ export default function HomePage() {
             <h1 className="sr-only">
               Portfolio web Mateo G. Fontana Dalmasso (MGFD)
             </h1>
-            <DepthSection className="min-w-0">
+            <DepthEnvelope className="flex min-h-0 min-w-0 flex-1 flex-col">
               <Hero />
-            </DepthSection>
-            <DepthSection className="min-w-0">
               <Profile />
               <Technologies />
-            </DepthSection>
-            <DepthSection className="min-w-0">
               <section
                 id="works"
                 className="px-4 pb-14 pt-6 sm:px-6 sm:pb-20 sm:pt-8 md:pb-28 md:pt-10"
@@ -66,7 +62,7 @@ export default function HomePage() {
                   </div>
                 </div>
               </section>
-            </DepthSection>
+            </DepthEnvelope>
           </main>
         </ParallaxPerspectiveStage>
         <Footer />
