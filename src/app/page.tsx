@@ -46,7 +46,7 @@ export default function HomePage() {
               id="works"
               className="px-4 pb-14 pt-6 sm:px-6 sm:pb-20 sm:pt-8 md:pb-28 md:pt-10"
             >
-              <div className="container mx-auto max-w-6xl">
+              <div className="w-full">
                 <h2 className="mb-6 text-center text-2xl font-bold text-white sm:mb-8 sm:text-3xl md:mb-10 md:text-4xl lg:text-5xl">
                   {t('projects.sectionTitle')}
                 </h2>

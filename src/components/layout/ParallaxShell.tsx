@@ -14,9 +14,6 @@ import { cn } from '@/lib/utils';
 
 const PARALLAX_BG_GIF = `/images/${encodeURIComponent('red lines moves.gif')}`;
 
-/** Fondo casi estable; apenas se mueve con el scroll. */
-const BG_SCROLL_FACTOR = 0.02;
-
 export type ParallaxDepth = 'near' | 'mid' | 'far';
 
 /** Factores sutiles translateY(scroll): capa “cerca” se desplaza un poco más. */
@@ -93,24 +90,15 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
     [scrollY, reducedMotion]
   );
 
-  const bgOffset =
-    reducedMotion ? 0 : scrollY * BG_SCROLL_FACTOR;
-
   return (
     <ParallaxContext.Provider value={value}>
       <div className="relative min-h-screen overflow-x-clip">
         <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={
-              reducedMotion || bgOffset === 0
-                ? { backgroundImage: `url("${PARALLAX_BG_GIF}")` }
-                : {
-                    backgroundImage: `url("${PARALLAX_BG_GIF}")`,
-                    transform: `translate3d(0, ${bgOffset}px, 0)`,
-                    willChange: 'transform',
-                  }
-            }
+            style={{
+              backgroundImage: `url("${PARALLAX_BG_GIF}")`,
+            }}
           />
           <div
             className="absolute inset-0 bg-zinc-950/54 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
