@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -12,35 +13,29 @@ import {
 } from 'react';
 import { cn } from '@/lib/utils';
 
-export type ParallaxDepth = 'deep' | 'mid' | 'shallow' | 'front';
-
-/** Mayor ratio → esa capa retrocede más en profundidad al bajar scroll. */
-const TRANSLATE_Z_MULT: Record<ParallaxDepth, number> = {
-  front: 0.62,
-  shallow: 0.82,
-  mid: 1,
-  deep: 1.22,
-};
-
-const Z_PER_SCROLL = 0.11;
-/** Límite de “profundidad” para no desaparecer todo el contenido en scroll largos. */
-const MAX_SINK_Z = 460;
-
 const PARALLAX_BG_GIF = `/images/${encodeURIComponent('red lines moves.gif')}`;
 
-type ParallaxContextValue = {
-  scrollY: number;
+type DepthScrollRegistry = {
+  registerSection: (el: HTMLElement) => () => void;
   reducedMotion: boolean;
 };
 
-const ParallaxContext = createContext<ParallaxContextValue | null>(null);
+const DepthRegistryContext = createContext<DepthScrollRegistry | null>(null);
 
-export function useParallax() {
-  const ctx = useContext(ParallaxContext);
-  if (!ctx) {
-    throw new Error('useParallax must be used within ParallaxRoot');
-  }
-  return ctx;
+/** Progreso 0 = emerge al frente; 1 = hundido hacia el video (solo eje Z vía CSS). */
+function computeZProgress(rect: DOMRect): number {
+  const vh = typeof window !== 'undefined' ? window.innerHeight || 1 : 1;
+  if (rect.height < 12) return 0;
+
+  const focalY = vh * 0.41;
+  const anchorY = rect.top + rect.height * 0.36;
+  const spread = Math.max(vh * 0.42, 1);
+  const raw = Math.abs(anchorY - focalY) / spread;
+  return Math.min(Math.max(raw, 0), 1);
+}
+
+function formatProgress(value: number): string {
+  return value.toFixed(4);
 }
 
 function useReducedMotionPreference() {
@@ -60,7 +55,7 @@ function useReducedMotionPreference() {
   return reducedMotion;
 }
 
-/** Escenario con perspectiva: el contenido retrocede (translateZ) al bajar scroll. Mantener fuera al header si es `fixed`. */
+/** Perspectiva 1200px; Header/Footer deben estar fuera. */
 export function ParallaxPerspectiveStage({
   children,
   className,
@@ -69,50 +64,96 @@ export function ParallaxPerspectiveStage({
   className?: string;
 }) {
   return (
-    <div
-      className={cn(className)}
-      style={{
-        perspective: '1400px',
-        perspectiveOrigin: '50% 18%',
-        transformStyle: 'preserve-3d',
-      }}
-    >
-      {children}
-    </div>
+    <div className={cn('depth-perspective-shell', className)}>{children}</div>
   );
 }
 
-/** Contenedor principal: GIF + overlay + proveedor de scroll. */
+/** Fondo GIF + overlay + RAF que actualiza --z-progress por rect. */
 export function ParallaxRoot({ children }: { children: ReactNode }) {
-  const [scrollY, setScrollY] = useState(0);
   const reducedMotion = useReducedMotionPreference();
-  const scrollRafRef = useRef<number | null>(null);
+  const sectionElsRef = useRef(new Set<HTMLElement>());
+  const rafIdRef = useRef(0);
+  const flushDepthCssRef = useRef<() => void>(() => {});
 
-  const scheduleScrollRead = useCallback(() => {
-    if (scrollRafRef.current != null) return;
-    scrollRafRef.current = requestAnimationFrame(() => {
-      scrollRafRef.current = null;
-      setScrollY(window.scrollY);
+  const flushDepthCss = useCallback(() => {
+    if (reducedMotion) {
+      for (const el of sectionElsRef.current) {
+        el.style.removeProperty('--z-progress');
+      }
+      return;
+    }
+    for (const el of sectionElsRef.current) {
+      const rect = el.getBoundingClientRect();
+      const p = computeZProgress(rect);
+      el.style.setProperty('--z-progress', formatProgress(p));
+    }
+  }, [reducedMotion]);
+
+  useLayoutEffect(() => {
+    flushDepthCssRef.current = flushDepthCss;
+  }, [flushDepthCss]);
+
+  const scheduleFlush = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    if (rafIdRef.current !== 0) return;
+    rafIdRef.current = requestAnimationFrame(() => {
+      rafIdRef.current = 0;
+      flushDepthCssRef.current();
     });
   }, []);
 
-  useEffect(() => {
-    scheduleScrollRead();
-    window.addEventListener('scroll', scheduleScrollRead, { passive: true });
+  const registerSection = useCallback((el: HTMLElement) => {
+    sectionElsRef.current.add(el);
+    requestAnimationFrame(() => {
+      flushDepthCssRef.current();
+    });
     return () => {
-      if (scrollRafRef.current != null) cancelAnimationFrame(scrollRafRef.current);
-      scrollRafRef.current = null;
-      window.removeEventListener('scroll', scheduleScrollRead);
+      sectionElsRef.current.delete(el);
+      el.style.removeProperty('--z-progress');
+      scheduleFlush();
     };
-  }, [scheduleScrollRead]);
+  }, [scheduleFlush]);
 
-  const value = useMemo(
-    () => ({ scrollY, reducedMotion }),
-    [scrollY, reducedMotion]
+  useEffect(() => {
+    flushDepthCssRef.current();
+    scheduleFlush();
+  }, [reducedMotion, scheduleFlush]);
+
+  useEffect(() => {
+    flushDepthCssRef.current();
+    window.addEventListener('scroll', scheduleFlush, { passive: true });
+    window.addEventListener('resize', scheduleFlush);
+
+    const vv = window.visualViewport;
+    vv?.addEventListener('resize', scheduleFlush);
+
+    let ro: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(() => {
+        scheduleFlush();
+      });
+      if (document.body) ro.observe(document.body);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', scheduleFlush);
+      window.removeEventListener('resize', scheduleFlush);
+      vv?.removeEventListener('resize', scheduleFlush);
+      ro?.disconnect();
+      if (rafIdRef.current !== 0) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = 0;
+      }
+    };
+  }, [scheduleFlush]);
+
+  const value = useMemo<DepthScrollRegistry>(
+    () => ({ registerSection, reducedMotion }),
+    [registerSection, reducedMotion]
   );
 
   return (
-    <ParallaxContext.Provider value={value}>
+    <DepthRegistryContext.Provider value={value}>
       <div className="relative min-h-screen overflow-x-clip">
         <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
           <div
@@ -126,35 +167,31 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
         </div>
         {children}
       </div>
-    </ParallaxContext.Provider>
+    </DepthRegistryContext.Provider>
   );
 }
 
-/** Retroceso/profundidad al bajar scroll; subiendo vuelve hacia la cámara. */
-export function ParallaxLayer({
-  depth,
+/**
+ * Área principal con profundidad: scale hasta 0.85, fade y translateZ desde --z-progress.
+ */
+export function DepthSection({
   children,
   className,
 }: {
-  depth: ParallaxDepth;
   children: ReactNode;
   className?: string;
 }) {
-  const { scrollY, reducedMotion } = useParallax();
-  const mult = TRANSLATE_Z_MULT[depth];
+  const ref = useRef<HTMLDivElement>(null);
+  const ctx = useContext(DepthRegistryContext);
 
-  let transform: string | undefined;
-  if (!reducedMotion) {
-    const raw = scrollY * Z_PER_SCROLL * mult;
-    const z = -Math.min(raw, MAX_SINK_Z);
-    transform = `translateZ(${z}px)`;
-  }
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || !ctx) return undefined;
+    return ctx.registerSection(el);
+  }, [ctx]);
 
   return (
-    <div
-      className={cn('[transform-style:preserve-3d]', className)}
-      style={transform ? { transform, transformStyle: 'preserve-3d' } : undefined}
-    >
+    <div ref={ref} className={cn('depth-section-layer', className)}>
       {children}
     </div>
   );
