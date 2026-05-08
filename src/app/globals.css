@@ -134,8 +134,7 @@
 
 @layer components {
   /**
-   * Vidrio muy difuminado ultra-realista: sin borde ni líneas tipo stroke;
-   * profundidad solo con penumbra suave y saturate para efecto físico tras el vidrio.
+   * Vidrio densamente borroso sin stroke: suficiente diffuse para aislar texto del GIF detrás.
    */
   .glass-card {
     min-width: 0;
@@ -143,13 +142,13 @@
     border-radius: 0.75rem;
     border: none;
     outline: none;
-    background-color: rgb(255 255 255 / 0.045);
+    background-color: rgb(255 255 255 / 0.08);
     box-shadow:
       0 4px 24px rgb(0 0 0 / 0.25),
       0 16px 48px rgb(0 0 0 / 0.38);
-    /* blur() no acepta % en CSS — 100px ≈ nivel “100 %” solicitado para frosted pesado */
-    backdrop-filter: blur(100px) saturate(178%);
-    -webkit-backdrop-filter: blur(100px) saturate(178%);
+    /* Frosto extremo para que el GIF de fondo no compita con texto / UI */
+    backdrop-filter: blur(150px) saturate(172%);
+    -webkit-backdrop-filter: blur(150px) saturate(172%);
     transition: background-color 0.35s ease, box-shadow 0.35s ease;
   }
   @media (min-width: 640px) {
@@ -160,18 +159,18 @@
   .glass-card:hover {
     border: none;
     outline: none;
-    background-color: rgb(255 255 255 / 0.065);
+    background-color: rgb(255 255 255 / 0.1);
     box-shadow:
       0 6px 28px rgb(0 0 0 / 0.3),
       0 22px 56px rgb(0 0 0 / 0.42);
-    backdrop-filter: blur(100px) saturate(188%);
-    -webkit-backdrop-filter: blur(100px) saturate(188%);
+    backdrop-filter: blur(150px) saturate(180%);
+    -webkit-backdrop-filter: blur(150px) saturate(180%);
   }
   /** Zona multimedia: amortigua el glitch detrás sin rayar límites tipo stroke */
   .glass-card__media {
     border-bottom: none;
-    background-color: rgb(8 8 12 / 0.22);
-    backdrop-filter: blur(60px);
-    -webkit-backdrop-filter: blur(60px);
+    background-color: rgb(8 8 12 / 0.38);
+    backdrop-filter: blur(120px) saturate(160%);
+    -webkit-backdrop-filter: blur(120px) saturate(160%);
   }
 }
