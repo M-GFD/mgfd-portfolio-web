@@ -9,6 +9,7 @@ import ProjectList from '@/components/portfolio/ProjectList';
 import Footer from '@/components/portfolio/Footer';
 import {
   ParallaxLayer,
+  ParallaxPerspectiveStage,
   ParallaxRoot,
 } from '@/components/layout/ParallaxShell';
 import { projects } from '@/data/projects';
@@ -31,9 +32,9 @@ export default function HomePage() {
 
   return (
     <ParallaxRoot>
-      <div className="relative z-0 flex min-h-screen flex-col bg-transparent">
-        <Header />
-        <main className="relative z-0 flex flex-1 flex-col">
+      <Header />
+      <ParallaxPerspectiveStage className="relative z-0 flex min-h-screen flex-col bg-transparent">
+        <main className="relative z-0 flex flex-1 flex-col [transform-style:preserve-3d]">
           <h1 className="sr-only">
             Portfolio web Mateo G. Fontana Dalmasso (MGFD)
           </h1>
@@ -69,7 +70,7 @@ export default function HomePage() {
         <ParallaxLayer depth="deep">
           <Footer />
         </ParallaxLayer>
-      </div>
+      </ParallaxPerspectiveStage>
     </ParallaxRoot>
   );
 }

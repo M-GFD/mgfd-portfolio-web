@@ -10,18 +10,21 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-
-/** Velocidades bajas para limitar cortes entre secciones por el transform fuera del flujo visual. */
-const BG_SCROLL_FACTOR = 0.016;
+import { cn } from '@/lib/utils';
 
 export type ParallaxDepth = 'deep' | 'mid' | 'shallow' | 'front';
 
-const DEPTH_FACTOR: Record<ParallaxDepth, number> = {
-  deep: 0.032,
-  mid: 0.046,
-  shallow: 0.058,
-  front: 0.072,
+/** Mayor ratio → esa capa retrocede más en profundidad al bajar scroll. */
+const TRANSLATE_Z_MULT: Record<ParallaxDepth, number> = {
+  front: 0.62,
+  shallow: 0.82,
+  mid: 1,
+  deep: 1.22,
 };
+
+const Z_PER_SCROLL = 0.11;
+/** Límite de “profundidad” para no desaparecer todo el contenido en scroll largos. */
+const MAX_SINK_Z = 460;
 
 const PARALLAX_BG_GIF = `/images/${encodeURIComponent('red lines moves.gif')}`;
 
@@ -57,7 +60,29 @@ function useReducedMotionPreference() {
   return reducedMotion;
 }
 
-/** Contenedor principal: GIF fijo casi quieto + overlay para legibilidad + proveedor de scroll. */
+/** Escenario con perspectiva: el contenido retrocede (translateZ) al bajar scroll. Mantener fuera al header si es `fixed`. */
+export function ParallaxPerspectiveStage({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(className)}
+      style={{
+        perspective: '1400px',
+        perspectiveOrigin: '50% 18%',
+        transformStyle: 'preserve-3d',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** Contenedor principal: GIF + overlay + proveedor de scroll. */
 export function ParallaxRoot({ children }: { children: ReactNode }) {
   const [scrollY, setScrollY] = useState(0);
   const reducedMotion = useReducedMotionPreference();
@@ -86,23 +111,10 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
     [scrollY, reducedMotion]
   );
 
-  const bgOffset = reducedMotion ? 0 : scrollY * BG_SCROLL_FACTOR;
-
   return (
     <ParallaxContext.Provider value={value}>
       <div className="relative min-h-screen overflow-x-clip">
-        <div
-          aria-hidden
-          className="pointer-events-none fixed inset-0 -z-10"
-          style={
-            reducedMotion
-              ? undefined
-              : {
-                  transform: `translate3d(0, ${bgOffset}px, 0)`,
-                  willChange: 'transform',
-                }
-          }
-        >
+        <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url("${PARALLAX_BG_GIF}")` }}
@@ -118,7 +130,7 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
   );
 }
 
-/** Capa de contenido con desplazamiento vertical ligado al scroll (profundidades distintas). */
+/** Retroceso/profundidad al bajar scroll; subiendo vuelve hacia la cámara. */
 export function ParallaxLayer({
   depth,
   children,
@@ -129,17 +141,19 @@ export function ParallaxLayer({
   className?: string;
 }) {
   const { scrollY, reducedMotion } = useParallax();
-  const factor = DEPTH_FACTOR[depth];
-  const offset = reducedMotion ? 0 : scrollY * factor;
+  const mult = TRANSLATE_Z_MULT[depth];
+
+  let transform: string | undefined;
+  if (!reducedMotion) {
+    const raw = scrollY * Z_PER_SCROLL * mult;
+    const z = -Math.min(raw, MAX_SINK_Z);
+    transform = `translateZ(${z}px)`;
+  }
 
   return (
     <div
-      className={className}
-      style={
-        reducedMotion
-          ? undefined
-          : { transform: `translate3d(0, ${offset}px, 0)` }
-      }
+      className={cn('[transform-style:preserve-3d]', className)}
+      style={transform ? { transform, transformStyle: 'preserve-3d' } : undefined}
     >
       {children}
     </div>
