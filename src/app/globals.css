@@ -134,22 +134,22 @@
 
 @layer components {
   /**
-   * Vidrio densamente borroso sin stroke: suficiente diffuse para aislar texto del GIF detrás.
+   * Vidrio alineado al Header: zinc translúcido + blur-md (sin frosto extremo previo).
    */
   .glass-card {
     min-width: 0;
     overflow: hidden;
     border-radius: 0.75rem;
-    border: none;
+    border: 1px solid rgb(255 255 255 / 0.12);
     outline: none;
-    background-color: rgb(255 255 255 / 0.08);
-    box-shadow:
-      0 4px 24px rgb(0 0 0 / 0.25),
-      0 16px 48px rgb(0 0 0 / 0.38);
-    /* Frosto extremo para que el GIF de fondo no compita con texto / UI */
-    backdrop-filter: blur(150px) saturate(172%);
-    -webkit-backdrop-filter: blur(150px) saturate(172%);
-    transition: background-color 0.35s ease, box-shadow 0.35s ease;
+    background-color: rgb(24 24 27 / 0.86);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition:
+      background-color 0.25s ease,
+      box-shadow 0.25s ease,
+      backdrop-filter 0.25s ease;
   }
   @media (min-width: 640px) {
     .glass-card {
@@ -157,20 +157,16 @@
     }
   }
   .glass-card:hover {
-    border: none;
     outline: none;
-    background-color: rgb(255 255 255 / 0.1);
-    box-shadow:
-      0 6px 28px rgb(0 0 0 / 0.3),
-      0 22px 56px rgb(0 0 0 / 0.42);
-    backdrop-filter: blur(150px) saturate(180%);
-    -webkit-backdrop-filter: blur(150px) saturate(180%);
+    background-color: rgb(24 24 27 / 0.92);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
   }
-  /** Zona multimedia: amortigua el glitch detrás sin rayar límites tipo stroke */
   .glass-card__media {
-    border-bottom: none;
-    background-color: rgb(8 8 12 / 0.38);
-    backdrop-filter: blur(120px) saturate(160%);
-    -webkit-backdrop-filter: blur(120px) saturate(160%);
+    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+    background-color: rgb(0 0 0 / 0.38);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 }
