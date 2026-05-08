@@ -22,17 +22,35 @@ type DepthScrollRegistry = {
 
 const DepthRegistryContext = createContext<DepthScrollRegistry | null>(null);
 
+function clamp(n: number, lo: number, hi: number): number {
+  return Math.min(Math.max(n, lo), hi);
+}
+
 /**
- * Una sola progresión por scroll para todo el bloque principal (todas las secciones a la vez).
- * 0 = adelante; 1 = hundido máximo en Z hacia el video.
+ * Una sola progresión para todo el DepthEnvelope:
+ * — al frente (p=0) mientras emerge por debajo / el borde superior no ha llegado al margen superior.
+ * — hundimiento (p↑) cuando rect.top corta la banda superior del viewport por scroll ascendente del contenido.
  */
-function computeGlobalScrollProgress(scrollY: number): number {
-  if (typeof document === 'undefined') return 0;
-  const doc = document.documentElement;
-  const maxY = Math.max(1, doc.scrollHeight - window.innerHeight);
-  const raw = scrollY / maxY;
-  const clamped = Math.min(Math.max(raw, 0), 1);
-  return Math.pow(clamped, 0.92);
+function computeEnvelopeDepthProgress(rect: DOMRect): number {
+  const vh = Math.max(window.innerHeight || 1, 1);
+  if (rect.height < 24) return 0;
+
+  const topInset = Math.max(16, vh * 0.04);
+
+  if (rect.top > topInset) {
+    return 0;
+  }
+
+  const span = Math.max(vh * 0.78, 1);
+  let p = Math.pow(clamp((topInset - rect.top) / span, 0, 1), 0.9);
+
+  const lowerBand = vh * 0.62;
+  if (rect.bottom > lowerBand) {
+    const emerg = clamp((rect.bottom - lowerBand) / (vh * 0.38), 0, 1);
+    p *= 1 - 0.62 * emerg;
+  }
+
+  return clamp(p, 0, 1);
 }
 
 function formatProgress(value: number): string {
@@ -69,7 +87,7 @@ export function ParallaxPerspectiveStage({
   );
 }
 
-/** Fondo GIF + overlay + RAF: un solo --z-progress global según scroll. */
+/** Fondo GIF + overlay + RAF: rect del sobre único → --z-progress (margen superior). */
 export function ParallaxRoot({ children }: { children: ReactNode }) {
   const reducedMotion = useReducedMotionPreference();
   const sectionElsRef = useRef(new Set<HTMLElement>());
@@ -84,7 +102,8 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
       return;
     }
     for (const el of sectionElsRef.current) {
-      const p = computeGlobalScrollProgress(window.scrollY);
+      const rect = el.getBoundingClientRect();
+      const p = computeEnvelopeDepthProgress(rect);
       el.style.setProperty('--z-progress', formatProgress(p));
     }
   }, [reducedMotion]);
