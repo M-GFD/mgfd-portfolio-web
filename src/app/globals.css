@@ -120,6 +120,7 @@
   /* Móvil: 100% para legibilidad; desde md el ajuste fino anterior */
   html {
     font-size: 100%;
+    scrollbar-gutter: stable;
   }
   @media (min-width: 768px) {
     html {
@@ -127,6 +128,6 @@
     }
   }
   body {
-    @apply bg-background text-foreground overflow-x-hidden;
+    @apply bg-background text-foreground overflow-x-clip;
   }
 }

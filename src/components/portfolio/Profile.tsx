@@ -11,7 +11,7 @@ export default function Profile() {
     >
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col items-center gap-8 sm:gap-10 md:flex-row md:gap-12">
-          <div className="flex h-44 w-44 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFFFFF] ring-1 ring-black/[0.08] dark:bg-[#000000] dark:ring-white/12 sm:h-52 sm:w-52 md:h-72 md:w-72 lg:h-80 lg:w-80">
+          <div className="flex h-44 w-44 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-black ring-1 ring-white/12 sm:h-52 sm:w-52 md:h-72 md:w-72 lg:h-80 lg:w-80">
             <img
               src="/images/profile.png"
               alt="MGFD - Profile"
@@ -19,13 +19,13 @@ export default function Profile() {
             />
           </div>
           <div className="min-w-0 flex-1 text-left sm:text-justify md:text-left">
-            <h3 className="mb-3 text-2xl font-bold text-black dark:text-white sm:mb-4 sm:text-3xl md:text-4xl">
+            <h3 className="mb-3 text-2xl font-bold text-white sm:mb-4 sm:text-3xl md:text-4xl">
               {t('about.title')}
             </h3>
             {(['p1', 'p2', 'p3', 'p4'] as const).map((key, i) => (
               <p
                 key={key}
-                className={`text-sm leading-relaxed text-neutral-600 dark:text-neutral-400 sm:text-base ${
+                className={`text-sm leading-relaxed text-neutral-400 sm:text-base ${
                   i < 3 ? 'mb-4 sm:mb-5' : ''
                 }`}
               >

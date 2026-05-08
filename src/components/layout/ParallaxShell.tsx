@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -60,21 +61,25 @@ function useReducedMotionPreference() {
 export function ParallaxRoot({ children }: { children: ReactNode }) {
   const [scrollY, setScrollY] = useState(0);
   const reducedMotion = useReducedMotionPreference();
+  const scrollRafRef = useRef<number | null>(null);
 
-  const onScroll = useCallback(() => {
-    setScrollY(window.scrollY);
+  const scheduleScrollRead = useCallback(() => {
+    if (scrollRafRef.current != null) return;
+    scrollRafRef.current = requestAnimationFrame(() => {
+      scrollRafRef.current = null;
+      setScrollY(window.scrollY);
+    });
   }, []);
 
   useEffect(() => {
-    const scrollRafId = requestAnimationFrame(() => {
-      setScrollY(window.scrollY);
-    });
-    window.addEventListener('scroll', onScroll, { passive: true });
+    scheduleScrollRead();
+    window.addEventListener('scroll', scheduleScrollRead, { passive: true });
     return () => {
-      cancelAnimationFrame(scrollRafId);
-      window.removeEventListener('scroll', onScroll);
+      if (scrollRafRef.current != null) cancelAnimationFrame(scrollRafRef.current);
+      scrollRafRef.current = null;
+      window.removeEventListener('scroll', scheduleScrollRead);
     };
-  }, [onScroll]);
+  }, [scheduleScrollRead]);
 
   const value = useMemo(
     () => ({ scrollY, reducedMotion }),
@@ -85,7 +90,7 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
 
   return (
     <ParallaxContext.Provider value={value}>
-      <div className="relative min-h-screen overflow-x-hidden">
+      <div className="relative min-h-screen overflow-x-clip">
         <div
           aria-hidden
           className="pointer-events-none fixed inset-0 -z-10"
@@ -103,7 +108,7 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
             style={{ backgroundImage: `url("${NO_SIGNAL_BG}")` }}
           />
           <div
-            className="absolute inset-0 bg-white/55 shadow-[inset_0_1px_0_rgba(0,0,0,0.04)] dark:bg-zinc-950/60 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+            className="absolute inset-0 bg-zinc-950/68 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
             aria-hidden
           />
         </div>
@@ -133,10 +138,7 @@ export function ParallaxLayer({
       style={
         reducedMotion
           ? undefined
-          : {
-              transform: `translate3d(0, ${offset}px, 0)`,
-              willChange: 'transform',
-            }
+          : { transform: `translate3d(0, ${offset}px, 0)` }
       }
     >
       {children}

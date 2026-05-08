@@ -157,7 +157,7 @@ function ProjectCoverMedia({
           <button
             type="button"
             onClick={openLightbox}
-            className="group absolute inset-0 z-[1] cursor-zoom-in rounded-none border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/50 dark:focus-visible:outline-white/80"
+            className="group absolute inset-0 z-[1] cursor-zoom-in rounded-none border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/80"
             aria-label={expandAriaLabel}
           />
           <img
@@ -175,7 +175,7 @@ function ProjectCoverMedia({
                   e.stopPropagation();
                   go(-1);
                 }}
-                className="absolute left-0 top-1/2 z-[2] flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 sm:h-8 sm:w-8 dark:bg-white/20 dark:hover:bg-white/35"
+                className="absolute left-0 top-1/2 z-[2] flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/35 sm:h-8 sm:w-8"
                 aria-label={prevLabel}
               >
                 <ChevronLeft className="h-5 w-5" aria-hidden />
@@ -186,7 +186,7 @@ function ProjectCoverMedia({
                   e.stopPropagation();
                   go(1);
                 }}
-                className="absolute right-0 top-1/2 z-[2] flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 sm:h-8 sm:w-8 dark:bg-white/20 dark:hover:bg-white/35"
+                className="absolute right-0 top-1/2 z-[2] flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/35 sm:h-8 sm:w-8"
                 aria-label={nextLabel}
               >
                 <ChevronRight className="h-5 w-5" aria-hidden />
@@ -210,8 +210,8 @@ function ProjectCoverMedia({
                 onClick={() => setIndex(i)}
                 className={`h-1.5 rounded-full transition-all ${
                   i === index
-                    ? 'w-4 bg-neutral-900 dark:bg-white'
-                    : 'w-1.5 bg-neutral-900/30 hover:bg-neutral-900/50 dark:bg-white/35 dark:hover:bg-white/55'
+                    ? 'w-4 bg-white'
+                    : 'w-1.5 bg-white/35 hover:bg-white/55'
                 }`}
               />
             ))}
@@ -229,7 +229,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-black dark:text-white" />
+        <Loader2 className="h-8 w-8 animate-spin text-white" />
       </div>
     );
   }
@@ -243,9 +243,9 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
         return (
           <article
             key={project.id}
-            className="min-w-0 overflow-hidden rounded-xl border border-white/20 bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl sm:rounded-2xl dark:border-white/10 dark:bg-[#000000] dark:backdrop-blur-none"
+            className="min-w-0 overflow-hidden rounded-xl border border-white/10 bg-black shadow-lg backdrop-blur-none transition-all duration-300 hover:shadow-xl sm:rounded-2xl"
           >
-            <div className="relative aspect-video bg-white p-3 dark:bg-[#000000] sm:p-4 md:p-5">
+            <div className="relative aspect-video bg-black p-3 sm:p-4 md:p-5">
               <ProjectCoverMedia
                 images={coverImages}
                 title={project.title}
@@ -259,13 +259,13 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
             </div>
 
             <div className="p-4 sm:p-6">
-              <h4 className="mb-1.5 text-xl font-bold text-black dark:text-white sm:mb-2 sm:text-2xl">
+              <h4 className="mb-1.5 text-xl font-bold text-white sm:mb-2 sm:text-2xl">
                 {project.title}
               </h4>
-              <p className="mb-2 text-xs text-gray-500 dark:text-gray-400 sm:mb-3 sm:text-sm md:text-base">
+              <p className="mb-2 text-xs text-gray-400 sm:mb-3 sm:text-sm md:text-base">
                 {project.subtitle}
               </p>
-              <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300 sm:text-base">
+              <p className="text-sm leading-relaxed text-gray-300 sm:text-base">
                 {project.description}
               </p>
             </div>

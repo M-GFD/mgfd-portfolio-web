@@ -158,7 +158,7 @@ export default function Technologies() {
       className="relative z-10 flex flex-col gap-6 overflow-x-clip px-4 pt-6 pb-0 sm:gap-8 sm:px-6 sm:pt-8 md:gap-10 md:pt-10"
     >
       <div className="container mx-auto max-w-6xl px-0">
-        <h2 className="text-center text-2xl font-bold text-black dark:text-white sm:text-3xl md:text-4xl lg:text-5xl">
+        <h2 className="text-center text-2xl font-bold text-white sm:text-3xl md:text-4xl lg:text-5xl">
           {t('technologies.title')}
         </h2>
       </div>
@@ -224,7 +224,7 @@ export default function Technologies() {
           </div>
 
           <p
-            className="pointer-events-none absolute bottom-2 left-0 right-0 text-center text-[0.9375rem] font-semibold leading-snug text-black transition-opacity ease-in-out dark:text-white sm:text-base sm:leading-normal md:bottom-auto md:top-[41%] md:text-lg md:leading-tight"
+            className="pointer-events-none absolute bottom-2 left-0 right-0 text-center text-[0.9375rem] font-semibold leading-snug text-white transition-opacity ease-in-out sm:text-base sm:leading-normal md:bottom-auto md:top-[41%] md:text-lg md:leading-tight"
             style={{
               transitionDuration: `${FADE_MS}ms`,
               opacity: nameOpacity,

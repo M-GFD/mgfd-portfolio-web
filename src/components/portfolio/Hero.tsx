@@ -11,15 +11,15 @@ export default function Hero() {
           <img
             src="/images/title-image.svg"
             alt="Mateo G. Fontana Dalmasso (MGFD) — logotipo del portfolio"
-            className="h-auto w-full object-contain dark:invert dark:brightness-0 dark:contrast-200"
+            className="h-auto w-full object-contain invert brightness-0 contrast-200"
           />
         </div>
-        <p className="mx-auto mb-6 max-w-2xl px-1 text-[calc(1rem-3pt)] leading-snug tracking-tight text-neutral-600 [text-shadow:0_1px_2px_rgba(255,255,255,0.9)] dark:text-neutral-300 dark:[text-shadow:0_1px_3px_rgba(0,0,0,0.75)] sm:mb-8 sm:text-lg sm:leading-relaxed sm:tracking-normal md:text-xl">
+        <p className="mx-auto mb-6 max-w-2xl px-1 text-[calc(1rem-3pt)] leading-snug tracking-tight text-neutral-300 [text-shadow:0_1px_3px_rgba(0,0,0,0.75)] sm:mb-8 sm:text-lg sm:leading-relaxed sm:tracking-normal md:text-xl">
           {t('hero.subtitle')}
         </p>
         <a
           href="#works"
-          className="mx-auto inline-flex w-auto items-center justify-center rounded-lg bg-black px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800 sm:px-8 sm:py-3 sm:text-base dark:bg-white dark:text-black dark:hover:bg-neutral-200"
+          className="mx-auto inline-flex w-auto items-center justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black shadow-sm shadow-black/30 transition-colors hover:bg-neutral-200 sm:px-8 sm:py-3 sm:text-base"
         >
           {t('hero.cta')}
         </a>

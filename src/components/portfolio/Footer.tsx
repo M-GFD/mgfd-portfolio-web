@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer
       id="contact"
-      className="mt-6 border-t border-black/[0.08] bg-white/88 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.08)] backdrop-blur-md dark:border-white/10 dark:bg-zinc-950/88 dark:shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.45)] sm:mt-8 md:mt-10"
+      className="mt-6 border-t border-white/10 bg-zinc-950/90 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.45)] backdrop-blur-md sm:mt-8 md:mt-10"
     >
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 md:py-12">
         <div className="flex flex-col items-center justify-between gap-6 sm:gap-8 md:flex-row">
@@ -17,7 +17,7 @@ export default function Footer() {
               <img
                 src="images/_mgfd_logo.svg"
                 alt="Mateo G. Fontana Dalmasso (MGFD) — portfolio web"
-                className="h-10 w-auto dark:invert dark:brightness-0 dark:contrast-200"
+                className="h-10 w-auto invert brightness-0 contrast-200"
               />
             </div>
             <div className="flex gap-6 justify-center md:justify-start">
@@ -25,7 +25,7 @@ export default function Footer() {
                 href="https://instagram.com/_mgfd_"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-neutral-500 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white"
+                className="text-neutral-400 transition-colors hover:text-white"
                 aria-label="Instagram"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -36,7 +36,7 @@ export default function Footer() {
                 href="https://linkedin.com/in/mateofontanad"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-neutral-500 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white"
+                className="text-neutral-400 transition-colors hover:text-white"
                 aria-label="LinkedIn"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -47,7 +47,7 @@ export default function Footer() {
                 href="https://twitter.com/mgfd_"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-neutral-500 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white"
+                className="text-neutral-400 transition-colors hover:text-white"
                 aria-label="X"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -58,7 +58,7 @@ export default function Footer() {
           </div>
 
           {/* Copyright */}
-          <div className="max-w-full whitespace-nowrap text-center text-[0.6rem] leading-tight tracking-tight text-neutral-500 dark:text-neutral-400 min-[400px]:text-[0.65rem] sm:whitespace-normal sm:text-xs sm:tracking-normal md:text-right md:text-sm">
+          <div className="max-w-full whitespace-nowrap text-center text-[0.6rem] leading-tight tracking-tight text-neutral-400 min-[400px]:text-[0.65rem] sm:whitespace-normal sm:text-xs sm:tracking-normal md:text-right md:text-sm">
             {t('footer.copyright')}
           </div>
         </div>
