@@ -157,7 +157,7 @@ export default function Technologies() {
       id="technologies"
       className="relative z-10 flex flex-col gap-6 overflow-x-clip px-4 pt-6 pb-0 sm:gap-8 sm:px-6 sm:pt-8 md:gap-10 md:pt-10"
     >
-      <div className="w-full px-0">
+      <div className="container mx-auto max-w-6xl px-0">
         <h2 className="text-center text-2xl font-bold text-white sm:text-3xl md:text-4xl lg:text-5xl">
           {t('technologies.title')}
         </h2>
@@ -165,7 +165,7 @@ export default function Technologies() {
 
       <div
         ref={containerRef}
-        className="relative mx-auto w-full max-w-none"
+        className="relative mx-auto w-full max-w-full max-md:max-w-[min(100%,22.5rem)] md:max-w-full"
         style={{
           perspective: `min(${1100 * ITEM_SCALE}px, 100vw)`,
         }}

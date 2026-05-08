@@ -6,15 +6,15 @@ export default function Hero() {
   const { t } = useLanguage();
   return (
     <section className="mb-10 px-4 pb-0 pt-[calc(5.5rem+env(safe-area-inset-top))] sm:mb-12 sm:px-6 sm:pt-28 md:mb-16 md:pt-28">
-      <div className="w-full text-center">
-        <div className="relative mx-auto mb-5 w-full max-w-none sm:mb-6">
+      <div className="mx-auto max-w-7xl text-center">
+        <div className="relative mx-auto mb-5 w-full max-w-4xl sm:mb-6">
           <img
             src="/images/title-image.svg"
             alt="Mateo G. Fontana Dalmasso (MGFD) — logotipo del portfolio"
             className="h-auto w-full object-contain invert brightness-0 contrast-200"
           />
         </div>
-        <p className="mx-auto mb-6 w-full max-w-none px-1 text-[calc(1rem-3pt)] leading-snug tracking-tight text-neutral-300 [text-shadow:0_1px_3px_rgba(0,0,0,0.75)] sm:mb-8 sm:text-lg sm:leading-relaxed sm:tracking-normal md:text-xl">
+        <p className="mx-auto mb-6 max-w-2xl px-1 text-[calc(1rem-3pt)] leading-snug tracking-tight text-neutral-300 [text-shadow:0_1px_3px_rgba(0,0,0,0.75)] sm:mb-8 sm:text-lg sm:leading-relaxed sm:tracking-normal md:text-xl">
           {t('hero.subtitle')}
         </p>
         <a
