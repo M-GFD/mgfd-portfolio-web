@@ -90,7 +90,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-sans antialiased bg-background text-foreground transition-colors duration-200">
+      <body className="font-sans antialiased bg-transparent text-foreground transition-colors duration-200">
         <AppProviders>
           {children}
           <Toaster />
