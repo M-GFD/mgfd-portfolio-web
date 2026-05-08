@@ -108,7 +108,7 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
             style={{ backgroundImage: `url("${PARALLAX_BG_GIF}")` }}
           />
           <div
-            className="absolute inset-0 bg-zinc-950/68 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+            className="absolute inset-0 bg-zinc-950/54 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
             aria-hidden
           />
         </div>
