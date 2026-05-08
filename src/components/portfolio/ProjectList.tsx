@@ -243,9 +243,9 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
         return (
           <article
             key={project.id}
-            className="min-w-0 overflow-hidden rounded-xl border border-white/10 bg-black shadow-lg backdrop-blur-none transition-all duration-300 hover:shadow-xl sm:rounded-2xl"
+            className="glass-card"
           >
-            <div className="relative aspect-video bg-black p-3 sm:p-4 md:p-5">
+            <div className="glass-card__media relative aspect-video p-3 sm:p-4 md:p-5">
               <ProjectCoverMedia
                 images={coverImages}
                 title={project.title}
@@ -262,10 +262,10 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
               <h4 className="mb-1.5 text-xl font-bold text-white sm:mb-2 sm:text-2xl">
                 {project.title}
               </h4>
-              <p className="mb-2 text-xs text-gray-400 sm:mb-3 sm:text-sm md:text-base">
+              <p className="mb-2 text-xs text-neutral-400 sm:mb-3 sm:text-sm md:text-base">
                 {project.subtitle}
               </p>
-              <p className="text-sm leading-relaxed text-gray-300 sm:text-base">
+              <p className="text-sm leading-relaxed text-neutral-300 sm:text-base">
                 {project.description}
               </p>
             </div>
