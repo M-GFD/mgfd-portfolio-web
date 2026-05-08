@@ -23,7 +23,7 @@ const DEPTH_FACTOR: Record<ParallaxDepth, number> = {
   front: 0.072,
 };
 
-const NO_SIGNAL_BG = `/images/${encodeURIComponent('no signal bg.gif')}`;
+const PARALLAX_BG_GIF = `/images/${encodeURIComponent('red lines moves.gif')}`;
 
 type ParallaxContextValue = {
   scrollY: number;
@@ -105,7 +105,7 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
         >
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url("${NO_SIGNAL_BG}")` }}
+            style={{ backgroundImage: `url("${PARALLAX_BG_GIF}")` }}
           />
           <div
             className="absolute inset-0 bg-zinc-950/68 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
