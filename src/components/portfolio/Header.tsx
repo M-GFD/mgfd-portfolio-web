@@ -59,7 +59,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-transparent pt-[env(safe-area-inset-top)]">
+    <header className="fixed top-0 left-0 right-0 z-[120] bg-transparent pt-[env(safe-area-inset-top)]">
       <div className="flex w-full items-center justify-between px-3 py-3 sm:px-5 sm:py-3.5 md:px-6 md:py-4">
         <div className="flex min-w-0 flex-1 items-center pr-2">
           <a href="/" className="flex min-w-0 items-center">

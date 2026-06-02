@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useExperience } from '@/contexts/ExperienceContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -28,6 +28,7 @@ export function ExperienceGate() {
   } = useExperience();
 
   const [reducedMotion, setReducedMotion] = useState(false);
+  const didEnterRef = useRef(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -49,18 +50,23 @@ export function ExperienceGate() {
     return () => window.clearTimeout(timer);
   }, [isFadingOut, reducedMotion, onGateFadeComplete]);
 
+  const runEnter = useCallback(() => {
+    if (didEnterRef.current || isFadingOut) return;
+    didEnterRef.current = true;
+    enterExperience();
+  }, [enterExperience, isFadingOut]);
+
   if (!showGate) return null;
 
-  const fadeClass = reducedMotion
-    ? 'opacity-0'
-    : cn(
-        'transition-opacity ease-out',
-        isFadingOut ? 'opacity-0 pointer-events-none' : 'opacity-100',
-      );
+  const fadeClass = cn(
+    !reducedMotion && 'transition-opacity ease-out',
+    isFadingOut ? 'pointer-events-none opacity-0' : 'opacity-100',
+  );
 
-  const fadeStyle = reducedMotion
-    ? undefined
-    : { transitionDuration: `${FADE_MS}ms` };
+  const fadeStyle =
+    isFadingOut && !reducedMotion
+      ? { transitionDuration: `${FADE_MS}ms` }
+      : undefined;
 
   return (
     <div
@@ -111,8 +117,13 @@ export function ExperienceGate() {
 
         <button
           type="button"
-          onPointerDown={primeMedia}
-          onClick={enterExperience}
+          onPointerDown={(e) => {
+            primeMedia();
+            if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+              runEnter();
+            }
+          }}
+          onClick={runEnter}
           disabled={isFadingOut}
           className="inline-flex w-full max-w-xs touch-manipulation items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-medium text-black shadow-sm shadow-black/40 transition-colors hover:bg-neutral-200 disabled:opacity-60 sm:text-base"
         >

@@ -39,21 +39,22 @@ const ExperienceContext = createContext<ExperienceContextValue | null>(null);
 function startAudioPlayback(audio: HTMLAudioElement) {
   audio.loop = true;
   audio.volume = PORTFOLIO_LOOP_VOLUME;
+  audio.muted = false;
 
-  const playAttempt = audio.play();
-  if (playAttempt === undefined) return;
-
-  playAttempt.catch(() => {
-    if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
-      void audio.play().catch(() => undefined);
-      return;
+  const attempt = () => {
+    const playAttempt = audio.play();
+    if (playAttempt !== undefined) {
+      playAttempt.catch(() => undefined);
     }
-    const onReady = () => {
-      void audio.play().catch(() => undefined);
-    };
-    audio.addEventListener('canplaythrough', onReady, { once: true });
-    audio.load();
-  });
+  };
+
+  if (audio.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+    attempt();
+    return;
+  }
+
+  attempt();
+  audio.addEventListener('canplay', attempt, { once: true });
 }
 
 export function ExperienceProvider({ children }: { children: ReactNode }) {
