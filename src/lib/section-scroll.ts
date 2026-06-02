@@ -124,6 +124,15 @@ function isGateOpen(): boolean {
   return document.querySelector('[data-experience-gate]') != null;
 }
 
+/** Debajo de la última sección con snap (p. ej. footer libre). */
+function isPastLastSnapSection(): boolean {
+  const sections = getSections();
+  if (!sections.length) return false;
+  const last = sections[sections.length - 1];
+  const lastBottom = last.offsetTop + last.offsetHeight;
+  return window.scrollY + getHeaderOffset() > lastBottom - EDGE_THRESHOLD_PX;
+}
+
 function shouldAllowNativeScroll(
   section: HTMLElement,
   direction: 1 | -1,
@@ -162,7 +171,7 @@ function resetWheelAccum() {
 }
 
 export function handleWheelIntent(deltaY: number): boolean {
-  if (animating || isGateOpen()) return false;
+  if (animating || isGateOpen() || isPastLastSnapSection()) return false;
 
   wheelAccum += deltaY;
   if (wheelResetTimer) clearTimeout(wheelResetTimer);
@@ -191,7 +200,7 @@ export function handleWheelIntent(deltaY: number): boolean {
 }
 
 export async function snapToNearestSection(): Promise<void> {
-  if (animating || isGateOpen()) return;
+  if (animating || isGateOpen() || isPastLastSnapSection()) return;
 
   const sections = getSections();
   if (sections.length === 0) return;
