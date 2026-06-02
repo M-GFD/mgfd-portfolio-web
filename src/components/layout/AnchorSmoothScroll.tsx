@@ -2,49 +2,6 @@
 
 import { useEffect } from 'react';
 
-function getMaxScrollY(): number {
-  const el = document.documentElement;
-  const body = document.body;
-  const height = Math.max(el.scrollHeight, el.offsetHeight, body.scrollHeight, body.offsetHeight);
-  return Math.max(0, height - window.innerHeight);
-}
-
-/** ScrollY para alinear el borde superior del ancla justo bajo el header (sin hueco extra). */
-function computeTargetScrollY(section: Element, header: Element | null, maxY: number): number {
-  const headerH = header?.getBoundingClientRect().height ?? 0;
-  const raw = section.getBoundingClientRect().top + window.scrollY - headerH;
-  return Math.min(Math.max(0, raw), maxY);
-}
-
-function finishScroll(hash: string) {
-  const section = document.querySelector(hash);
-  if (!section) {
-    history.replaceState(null, '', hash);
-    return;
-  }
-  const headerEl = document.querySelector('header');
-  const maxY = getMaxScrollY();
-  const y = Math.round(computeTargetScrollY(section, headerEl, maxY));
-  window.scrollTo(0, y);
-  history.replaceState(null, '', hash);
-}
-
-/**
- * λ adaptativo: respuesta clara con mucho recorrido, y amortiguación muy suave
- * al acercarse al destino (velocidad → 0 sin “último fotograma” brusco).
- */
-function lambdaForRemaining(absRemaining: number): number {
-  if (absRemaining > 520) return 3.5;
-  if (absRemaining > 280) return 2.9;
-  if (absRemaining > 140) return 2.25;
-  if (absRemaining > 72) return 1.75;
-  if (absRemaining > 36) return 1.35;
-  if (absRemaining > 18) return 1.05;
-  if (absRemaining > 9) return 0.82;
-  if (absRemaining > 4) return 0.62;
-  return 0.48;
-}
-
 function resolveHashFromHref(href: string): string | null {
   const trimmed = href.trim();
   if (trimmed.startsWith('#')) {
@@ -60,54 +17,26 @@ function resolveHashFromHref(href: string): string | null {
   }
 }
 
+function scrollToSection(hash: string) {
+  const section = document.querySelector(hash);
+  if (!section) {
+    history.replaceState(null, '', hash);
+    return;
+  }
+
+  const reducedMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)',
+  ).matches;
+
+  section.scrollIntoView({
+    behavior: reducedMotion ? 'instant' : 'smooth',
+    block: 'start',
+  });
+  history.replaceState(null, '', hash);
+}
+
 export function AnchorSmoothScroll() {
   useEffect(() => {
-    let rafId = 0;
-    let removeUserInterruptListeners: (() => void) | null = null;
-
-    const cancelScroll = () => {
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-        rafId = 0;
-      }
-      removeUserInterruptListeners?.();
-      removeUserInterruptListeners = null;
-    };
-
-    const attachUserInterruptListeners = () => {
-      const interrupt = () => {
-        if (rafId) cancelScroll();
-      };
-
-      const onKeyInterrupt = (e: KeyboardEvent) => {
-        if (!rafId) return;
-        const k = e.key;
-        if (
-          k === 'ArrowUp' ||
-          k === 'ArrowDown' ||
-          k === 'PageUp' ||
-          k === 'PageDown' ||
-          k === 'Home' ||
-          k === 'End' ||
-          k === ' '
-        ) {
-          cancelScroll();
-        }
-      };
-
-      window.addEventListener('wheel', interrupt, { passive: true });
-      window.addEventListener('touchstart', interrupt, { passive: true });
-      window.addEventListener('pointerdown', interrupt, { capture: true });
-      window.addEventListener('keydown', onKeyInterrupt);
-
-      removeUserInterruptListeners = () => {
-        window.removeEventListener('wheel', interrupt);
-        window.removeEventListener('touchstart', interrupt);
-        window.removeEventListener('pointerdown', interrupt, { capture: true });
-        window.removeEventListener('keydown', onKeyInterrupt);
-      };
-    };
-
     const onClickCapture = (e: MouseEvent) => {
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
 
@@ -120,71 +49,14 @@ export function AnchorSmoothScroll() {
       const hash = resolveHashFromHref(href);
       if (!hash) return;
 
-      const section = document.querySelector(hash);
-      if (!section) return;
+      if (!document.querySelector(hash)) return;
 
       e.preventDefault();
-      cancelScroll();
-
-      const header = document.querySelector('header');
-      const maxY = getMaxScrollY();
-      const clampedTarget = computeTargetScrollY(section, header, maxY);
-
-      const startY = window.scrollY;
-      const distance = clampedTarget - startY;
-
-      if (Math.abs(distance) < 0.35) {
-        finishScroll(hash);
-        return;
-      }
-
-      attachUserInterruptListeners();
-
-      let prevTime = performance.now();
-      const t0 = prevTime;
-      const maxDuration = 6500;
-
-      const step = (now: number) => {
-        const dt = Math.min((now - prevTime) / 1000, 0.05);
-        prevTime = now;
-
-        const maxYNow = getMaxScrollY();
-        const headerNow = document.querySelector('header');
-        const target = computeTargetScrollY(section, headerNow, maxYNow);
-        const current = window.scrollY;
-        const remaining = target - current;
-        const absR = Math.abs(remaining);
-
-        // Umbral bajo: el cierre exacto lo hace finishScroll (relectura DOM + redondeo)
-        if (absR < 0.35) {
-          cancelScroll();
-          finishScroll(hash);
-          return;
-        }
-
-        if (now - t0 > maxDuration) {
-          cancelScroll();
-          finishScroll(hash);
-          return;
-        }
-
-        const lambda = lambdaForRemaining(absR);
-        const alpha = 1 - Math.exp(-lambda * dt);
-        let next = current + remaining * alpha;
-        next = Math.min(Math.max(0, next), maxYNow);
-
-        window.scrollTo(0, next);
-        rafId = requestAnimationFrame(step);
-      };
-
-      rafId = requestAnimationFrame(step);
+      scrollToSection(hash);
     };
 
     document.addEventListener('click', onClickCapture, true);
-    return () => {
-      cancelScroll();
-      document.removeEventListener('click', onClickCapture, true);
-    };
+    return () => document.removeEventListener('click', onClickCapture, true);
   }, []);
 
   return null;

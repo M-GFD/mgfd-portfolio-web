@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer
       id="contact"
-      className="mt-6 border-none bg-zinc-950/86 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.45)] backdrop-blur-[10px] transition-[backdrop-filter] duration-300 ease-out hover:backdrop-blur-[12px] sm:mt-8 md:mt-10"
+      className="snap-section flex min-h-dvh flex-col justify-center border-none bg-zinc-950/86 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.45)] backdrop-blur-[10px] transition-[backdrop-filter] duration-300 ease-out hover:backdrop-blur-[12px]"
     >
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 md:py-12">
         <div className="flex flex-col items-center justify-between gap-6 sm:gap-8 md:flex-row">

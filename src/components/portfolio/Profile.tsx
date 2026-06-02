@@ -7,7 +7,7 @@ export default function Profile() {
   return (
     <section
       id="about"
-      className="mb-10 px-4 py-10 sm:mb-12 sm:px-6 sm:py-12 md:mb-16 md:py-16"
+      className="snap-section flex min-h-dvh items-center px-4 py-10 sm:px-6 sm:py-12 md:py-16"
     >
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col items-center gap-8 sm:gap-10 md:flex-row md:items-start md:gap-12">

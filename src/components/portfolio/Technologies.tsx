@@ -155,7 +155,7 @@ export default function Technologies() {
   return (
     <section
       id="technologies"
-      className="relative z-10 flex flex-col gap-6 overflow-x-clip px-4 pt-6 pb-0 sm:gap-8 sm:px-6 sm:pt-8 md:gap-10 md:pt-10"
+      className="snap-section relative z-10 flex min-h-dvh flex-col justify-center gap-6 overflow-x-clip px-4 py-10 sm:gap-8 sm:px-6 sm:py-12 md:gap-10 md:py-16"
     >
       <div className="container mx-auto max-w-6xl px-0">
         <h2 className="text-center text-2xl font-bold text-white sm:text-3xl md:text-4xl lg:text-5xl">

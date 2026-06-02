@@ -5,7 +5,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 export default function Hero() {
   const { t } = useLanguage();
   return (
-    <section className="flex min-h-dvh flex-col pt-[calc(5.5rem+env(safe-area-inset-top))]">
+    <section
+      id="hero"
+      className="snap-section flex min-h-dvh flex-col pt-[calc(5.5rem+env(safe-area-inset-top))]"
+    >
       {/* Primera vista: sólo SVG + tagline + CTA, centrados; el resto de la página queda tras scroll */}
       <div className="flex flex-1 flex-col items-center justify-center px-4 pb-14 sm:px-6 md:pb-16">
         <div className="mx-auto w-full max-w-7xl text-center">
