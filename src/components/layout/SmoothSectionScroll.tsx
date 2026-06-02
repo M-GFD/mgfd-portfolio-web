@@ -53,7 +53,7 @@ export function SmoothSectionScroll() {
       if (scrollEndTimer) clearTimeout(scrollEndTimer);
       scrollEndTimer = setTimeout(() => {
         void snapToNearestSection();
-      }, 260);
+      }, 160);
     };
 
     window.addEventListener('wheel', onWheel, { passive: false });

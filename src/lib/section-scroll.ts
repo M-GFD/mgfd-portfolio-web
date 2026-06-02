@@ -1,22 +1,16 @@
 export const SECTION_SELECTOR = '.snap-section';
 
-const DEFAULT_DURATION_MS = 1280;
-const SNAP_DURATION_MS = 980;
+const DEFAULT_DURATION_MS = 1100;
 const EDGE_THRESHOLD_PX = 12;
-const WHEEL_ACCUM_THRESHOLD = 40;
+const WHEEL_ACCUM_THRESHOLD = 36;
 const SWIPE_THRESHOLD_PX = 52;
 
 let animating = false;
 let wheelAccum = 0;
 let wheelResetTimer: ReturnType<typeof setTimeout> | null = null;
 
-/** Curva suave tipo editorial (más premium que snap brusco). */
-function easeInOutCubic(t: number): number {
-  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
-}
-
-function setScrollingState(active: boolean) {
-  document.documentElement.classList.toggle('is-section-scrolling', active);
+function easeInOutQuint(t: number): number {
+  return t < 0.5 ? 16 * t ** 5 : 1 - (-2 * t + 2) ** 5 / 2;
 }
 
 export function isSectionScrollLocked(): boolean {
@@ -90,21 +84,19 @@ export function animateScrollTo(
   }
 
   animating = true;
-  setScrollingState(true);
 
   return new Promise((resolve) => {
     const start = performance.now();
 
     const step = (now: number) => {
       const t = Math.min(1, (now - start) / durationMs);
-      const eased = easeInOutCubic(t);
+      const eased = easeInOutQuint(t);
       window.scrollTo(0, startY + distance * eased);
 
       if (t < 1) {
         requestAnimationFrame(step);
       } else {
         animating = false;
-        setScrollingState(false);
         resolve();
       }
     };
@@ -227,19 +219,18 @@ export async function snapToNearestSection(): Promise<void> {
     if (distFromTop > 72 && distFromBottom > 72) return;
 
     if (distFromTop <= distFromBottom) {
-      await animateScrollTo(targetTop, SNAP_DURATION_MS);
+      await animateScrollTo(targetTop, 780);
     }
     return;
   }
 
-  if (Math.abs(window.scrollY - targetTop) > 52) {
-    await animateScrollTo(targetTop, SNAP_DURATION_MS);
+  if (Math.abs(window.scrollY - targetTop) > 28) {
+    await animateScrollTo(targetTop, 780);
   }
 }
 
 export function handleSwipeIntent(deltaY: number): void {
   if (Math.abs(deltaY) < SWIPE_THRESHOLD_PX) return;
-  if (isPastLastSnapSection()) return;
   const direction: 1 | -1 = deltaY > 0 ? 1 : -1;
   void navigateSection(direction);
 }
