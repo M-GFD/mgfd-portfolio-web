@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Menu, Volume2, VolumeX, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useExperience } from '@/contexts/ExperienceContext';
+import { AudioWaveIndicator } from '@/components/portfolio/AudioWaveIndicator';
 
 interface HeaderProps {
   onMenuToggle?: (isOpen: boolean) => void;
@@ -16,26 +17,29 @@ const localePillClass = (active: boolean) =>
       : 'text-neutral-400 hover:text-white'
   }`;
 
-function MusicToggleButton() {
+function MusicControls() {
   const { t } = useLanguage();
   const { hasEntered, musicEnabled, isPlaying, togglePlayback } = useExperience();
 
   if (!hasEntered || !musicEnabled) return null;
 
   return (
-    <button
-      type="button"
-      onClick={() => void togglePlayback()}
-      className="text-neutral-400 transition-colors hover:text-white"
-      aria-label={isPlaying ? t('experience.pauseMusic') : t('experience.playMusic')}
-      aria-pressed={isPlaying}
-    >
-      {isPlaying ? (
-        <Volume2 className="h-5 w-5" aria-hidden />
-      ) : (
-        <VolumeX className="h-5 w-5" aria-hidden />
-      )}
-    </button>
+    <div className="flex items-center gap-1.5">
+      <button
+        type="button"
+        onClick={() => void togglePlayback()}
+        className="text-neutral-400 transition-colors hover:text-white"
+        aria-label={isPlaying ? t('experience.pauseMusic') : t('experience.playMusic')}
+        aria-pressed={isPlaying}
+      >
+        {isPlaying ? (
+          <Volume2 className="h-5 w-5" aria-hidden />
+        ) : (
+          <VolumeX className="h-5 w-5" aria-hidden />
+        )}
+      </button>
+      <AudioWaveIndicator active={isPlaying} />
+    </div>
   );
 }
 
@@ -87,7 +91,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
             {t('nav.works')}
           </a>
           <div className="flex items-center gap-3 border-l border-white/15 pl-6">
-            <MusicToggleButton />
+            <MusicControls />
             <div className="flex items-center gap-1">
               <button
                 type="button"
@@ -112,7 +116,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
         </nav>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 md:hidden">
-          <MusicToggleButton />
+          <MusicControls />
           <div className="flex items-center gap-1 pl-1 sm:pl-2">
             <button
               type="button"
