@@ -15,6 +15,7 @@ import {
   PORTFOLIO_LOOP_SRC,
   PORTFOLIO_LOOP_VOLUME,
 } from '@/lib/experience-audio';
+import { dispatchExperienceEnter } from '@/lib/background-media';
 
 type ExperienceContextValue = {
   /** Gate ya superado (localStorage o tras fade). */
@@ -63,15 +64,28 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(EXPERIENCE_ENTERED_KEY, 'true');
     localStorage.setItem(EXPERIENCE_MUSIC_KEY, String(musicEnabled));
     setIsFadingOut(true);
+    dispatchExperienceEnter();
 
     const audio = audioRef.current;
     if (musicEnabled && audio) {
       audio.loop = true;
       audio.volume = PORTFOLIO_LOOP_VOLUME;
-      void audio.play().then(
-        () => setIsPlaying(true),
-        () => setIsPlaying(false),
-      );
+      const playAttempt = audio.play();
+      if (playAttempt !== undefined) {
+        playAttempt.then(
+          () => setIsPlaying(true),
+          () => {
+            const onReady = () => {
+              void audio.play().then(
+                () => setIsPlaying(true),
+                () => setIsPlaying(false),
+              );
+            };
+            audio.addEventListener('canplay', onReady, { once: true });
+            audio.load();
+          },
+        );
+      }
     }
   }, [musicEnabled]);
 
@@ -150,7 +164,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
         audioRef,
       }}
     >
-      <audio ref={audioRef} src={PORTFOLIO_LOOP_SRC} preload="none" loop />
+      <audio ref={audioRef} src={PORTFOLIO_LOOP_SRC} preload="auto" loop />
       {children}
     </ExperienceContext.Provider>
   );
