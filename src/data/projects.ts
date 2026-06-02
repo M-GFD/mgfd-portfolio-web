@@ -5,6 +5,19 @@ const IMG_V = 'v=4';
 
 export const projects: Project[] = [
   {
+    id: 5,
+    title: 'Federación Entrerriana de Golf (FEG)',
+    subtitle: 'Diseño y desarrollo web',
+    description:
+      'Portal web integral para llevar el Golf de Entre Ríos, Argentina, a un nuevo nivel de objetivos y comunicación clara y útil.',
+    fullDescription:
+      'Portal web integral para llevar el Golf de Entre Ríos, Argentina, a un nuevo nivel de objetivos y comunicación clara y útil.',
+    image: '/images/LOGO_FEG.png',
+    technologies: [],
+    reversed: false,
+    websiteUrl: 'https://feg.ar/',
+  },
+  {
     id: 1,
     title: '1190 Sports',
     subtitle: 'Deck design, Sistema multi-corte, social media, OTT y presentaciones corporativas',
@@ -64,16 +77,5 @@ Participación en campañas visuales, piezas para redes y mejoras iterativas de 
     image: `/images/project-03.png?${IMG_V}`,
     technologies: ['Photoshop', 'Illustrator', 'Social Design'],
     reversed: false,
-  },
-  {
-    id: 4,
-    title: 'Temps Studio',
-    subtitle: 'Soluciones audiovisuales y diseño',
-    description:
-      'Agencia de soluciones audiovisuales. Diseño gráfico. Diseño UX/UI. Diseño audiovisual con IA.',
-    fullDescription: `Agencia de soluciones audiovisuales. Diseño gráfico. Diseño UX/UI. Diseño audiovisual con IA.`,
-    image: `/images/project-04.png?${IMG_V}`,
-    technologies: [],
-    reversed: true,
   },
 ];

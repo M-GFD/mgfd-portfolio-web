@@ -12,6 +12,8 @@ export interface Project {
   sectionImages?: { sectionTitle: string; images: string[] }[];
   /** Galería de imágenes de la card (se muestran en mini galería / modal) */
   galleryImages?: string[];
+  /** Enlace al sitio del proyecto */
+  websiteUrl?: string;
 }
 
 export interface Technology {

@@ -39,6 +39,12 @@
     "lightboxAria": "Expanded image"
   },
   "projectsList": {
+    "5": {
+      "title": "Entre Ríos Golf Federation (FEG)",
+      "subtitle": "Web design and development",
+      "description": "Comprehensive web portal to take Entre Ríos Golf, Argentina, to a new level of goals and clear, useful communication.",
+      "fullDescription": "Comprehensive web portal to take Entre Ríos Golf, Argentina, to a new level of goals and clear, useful communication."
+    },
     "1": {
       "title": "1190 Sports",
       "subtitle": "Deck design, Multi-cut system, social media, OTT and corporate presentations",
@@ -56,12 +62,6 @@
       "subtitle": "Graphic Designer — Branding & visual campaigns",
       "description": "Over 2 years creating visual pieces for startups and entrepreneurs with a focus on quality and art direction.",
       "fullDescription": "Experience at POLI Studio working on color grading, creative proposals and design review for multiple clients.\n\nInvolvement in visual campaigns, social pieces and iterative improvements to business-oriented graphic communication."
-    },
-    "4": {
-      "title": "Temps Studio",
-      "subtitle": "Audiovisual solutions and design",
-      "description": "Agency for audiovisual solutions. Graphic design. UX/UI design. AI-powered audiovisual design.",
-      "fullDescription": "Agency for audiovisual solutions. Graphic design. UX/UI design. AI-powered audiovisual design."
     }
   },
   "footer": {

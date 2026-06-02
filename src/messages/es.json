@@ -39,6 +39,12 @@
     "lightboxAria": "Imagen ampliada"
   },
   "projectsList": {
+    "5": {
+      "title": "Federación Entrerriana de Golf (FEG)",
+      "subtitle": "Diseño y desarrollo web",
+      "description": "Portal web integral para llevar el Golf de Entre Ríos, Argentina, a un nuevo nivel de objetivos y comunicación clara y útil.",
+      "fullDescription": "Portal web integral para llevar el Golf de Entre Ríos, Argentina, a un nuevo nivel de objetivos y comunicación clara y útil."
+    },
     "1": {
       "title": "1190 Sports",
       "subtitle": "Diseño de decks, Sistema multi-corte, redes sociales, OTT y presentaciones corporativas",
@@ -56,12 +62,6 @@
       "subtitle": "Graphic Designer — Branding y campañas visuales",
       "description": "Más de 2 años creando piezas visuales para startups y emprendedores con foco en calidad y dirección de arte.",
       "fullDescription": "Experiencia en POLI Studio trabajando en corrección de color, propuestas creativas y revisión de diseños para múltiples clientes.\n\nParticipación en campañas visuales, piezas para redes y mejoras iterativas de comunicación gráfica orientada a negocio."
-    },
-    "4": {
-      "title": "Temps Studio",
-      "subtitle": "Soluciones audiovisuales y diseño",
-      "description": "Agencia de soluciones audiovisuales. Diseño gráfico. Diseño UX/UI. Diseño audiovisual con IA.",
-      "fullDescription": "Agencia de soluciones audiovisuales. Diseño gráfico. Diseño UX/UI. Diseño audiovisual con IA."
     }
   },
   "footer": {

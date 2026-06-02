@@ -268,6 +268,16 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
               <p className="text-sm leading-relaxed text-neutral-300 sm:text-base">
                 {project.description}
               </p>
+              {project.websiteUrl && (
+                <a
+                  href={project.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-block text-sm text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-neutral-200 hover:decoration-white/70 sm:mt-4 sm:text-base"
+                >
+                  {project.websiteUrl}
+                </a>
+              )}
             </div>
           </article>
         );
