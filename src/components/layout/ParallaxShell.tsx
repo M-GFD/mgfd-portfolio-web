@@ -12,7 +12,7 @@ import {
 } from 'react';
 import { cn } from '@/lib/utils';
 
-const PARALLAX_BG_GIF = `/images/${encodeURIComponent('red lines moves.gif')}`;
+const PARALLAX_BG_VIDEO = '/images/portfolio_vid_bg.webm';
 
 export type ParallaxDepth = 'near' | 'mid' | 'far';
 
@@ -59,6 +59,7 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
   const [scrollY, setScrollY] = useState(0);
   const reducedMotion = useReducedMotionPreference();
   const scrollRafRef = useRef<number | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const scheduleScrollRead = useCallback(() => {
     if (scrollRafRef.current != null) return;
@@ -85,6 +86,18 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
     };
   }, [scheduleScrollRead]);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (reducedMotion) {
+      video.pause();
+      return;
+    }
+
+    void video.play().catch(() => {});
+  }, [reducedMotion]);
+
   const value = useMemo(
     () => ({ scrollY, reducedMotion }),
     [scrollY, reducedMotion]
@@ -94,11 +107,15 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
     <ParallaxContext.Provider value={value}>
       <div className="relative min-h-screen overflow-x-clip">
         <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url("${PARALLAX_BG_GIF}")`,
-            }}
+          <video
+            ref={videoRef}
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            src={PARALLAX_BG_VIDEO}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
           />
           <div
             className="absolute inset-0 bg-zinc-950/54 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
