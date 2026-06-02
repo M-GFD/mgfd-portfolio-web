@@ -2,7 +2,9 @@
 
 import { ThemeProvider } from 'next-themes';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { ExperienceProvider } from '@/contexts/ExperienceContext';
 import { AnchorSmoothScroll } from '@/components/layout/AnchorSmoothScroll';
+import { ExperienceGate } from '@/components/layout/ExperienceGate';
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -15,8 +17,11 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       storageKey="mgfd-theme"
     >
       <LanguageProvider>
-        <AnchorSmoothScroll />
-        {children}
+        <ExperienceProvider>
+          <AnchorSmoothScroll />
+          {children}
+          <ExperienceGate />
+        </ExperienceProvider>
       </LanguageProvider>
     </ThemeProvider>
   );

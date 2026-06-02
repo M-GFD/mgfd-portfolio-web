@@ -66,5 +66,14 @@
   },
   "footer": {
     "copyright": "© 2026 _mgfd_ design. All rights reserved."
+  },
+  "experience": {
+    "title": "Choose your experience",
+    "musicLabel": "Background audio",
+    "withMusic": "With music",
+    "withoutMusic": "Without music",
+    "enter": "Enter",
+    "playMusic": "Play background music",
+    "pauseMusic": "Pause background music"
   }
 }

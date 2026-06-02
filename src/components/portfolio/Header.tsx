@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, Volume2, VolumeX, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useExperience } from '@/contexts/ExperienceContext';
 
 interface HeaderProps {
   onMenuToggle?: (isOpen: boolean) => void;
@@ -14,6 +15,29 @@ const localePillClass = (active: boolean) =>
       ? 'bg-white/15 text-white'
       : 'text-neutral-400 hover:text-white'
   }`;
+
+function MusicToggleButton() {
+  const { t } = useLanguage();
+  const { hasEntered, musicEnabled, isPlaying, togglePlayback } = useExperience();
+
+  if (!hasEntered || !musicEnabled) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={() => void togglePlayback()}
+      className="text-neutral-400 transition-colors hover:text-white"
+      aria-label={isPlaying ? t('experience.pauseMusic') : t('experience.playMusic')}
+      aria-pressed={isPlaying}
+    >
+      {isPlaying ? (
+        <Volume2 className="h-5 w-5" aria-hidden />
+      ) : (
+        <VolumeX className="h-5 w-5" aria-hidden />
+      )}
+    </button>
+  );
+}
 
 export default function Header({ onMenuToggle }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -62,29 +86,33 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           >
             {t('nav.works')}
           </a>
-          <div className="flex items-center gap-1 border-l border-white/15 pl-6">
-            <button
-              type="button"
-              onClick={() => setLocale('es')}
-              className={localePillClass(locale === 'es')}
-              aria-pressed={locale === 'es'}
-              aria-label="Español"
-            >
-              ES
-            </button>
-            <button
-              type="button"
-              onClick={() => setLocale('en')}
-              className={localePillClass(locale === 'en')}
-              aria-pressed={locale === 'en'}
-              aria-label="English"
-            >
-              EN
-            </button>
+          <div className="flex items-center gap-3 border-l border-white/15 pl-6">
+            <MusicToggleButton />
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setLocale('es')}
+                className={localePillClass(locale === 'es')}
+                aria-pressed={locale === 'es'}
+                aria-label="Español"
+              >
+                ES
+              </button>
+              <button
+                type="button"
+                onClick={() => setLocale('en')}
+                className={localePillClass(locale === 'en')}
+                aria-pressed={locale === 'en'}
+                aria-label="English"
+              >
+                EN
+              </button>
+            </div>
           </div>
         </nav>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 md:hidden">
+          <MusicToggleButton />
           <div className="flex items-center gap-1 pl-1 sm:pl-2">
             <button
               type="button"
