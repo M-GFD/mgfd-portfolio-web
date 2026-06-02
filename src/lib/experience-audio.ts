@@ -1,9 +1,7 @@
 /**
- * Loop de fondo del portfolio.
- * Colocá el archivo en: public/audio/portfolio-loop.mp3
- * (opcional: public/audio/portfolio-loop.ogg como fallback en el componente de audio).
+ * Loop de fondo del portfolio (public/audio/).
  */
-export const PORTFOLIO_LOOP_SRC = '/audio/portfolio-loop.mp3';
+export const PORTFOLIO_LOOP_SRC = '/audio/psilocybine-green-meadow.mp3';
 
 /** Volumen base (0–1). Ajustá según el master del archivo. */
 export const PORTFOLIO_LOOP_VOLUME = 0.45;
