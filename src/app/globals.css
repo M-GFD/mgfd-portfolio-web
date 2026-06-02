@@ -121,13 +121,7 @@
   html {
     font-size: 100%;
     scrollbar-gutter: stable;
-    scroll-snap-type: y mandatory;
     scroll-padding-top: calc(5.5rem + env(safe-area-inset-top));
-  }
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-snap-type: none;
-    }
   }
   @media (min-width: 768px) {
     html {
@@ -143,11 +137,6 @@
   /** Cada sección del portfolio actúa como un “estado” a pantalla completa. */
   .snap-section {
     min-height: 100dvh;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-  }
-  .snap-section--long {
-    scroll-snap-stop: normal;
   }
 
   /**

@@ -70,6 +70,7 @@ export function ExperienceGate() {
 
   return (
     <div
+      data-experience-gate=""
       className={cn(
         'fixed inset-0 z-[200] flex items-center justify-center bg-zinc-950/95 px-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] backdrop-blur-sm',
         fadeClass,

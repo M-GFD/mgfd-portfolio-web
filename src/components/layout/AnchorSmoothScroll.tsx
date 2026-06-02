@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { scrollToSectionByHash } from '@/lib/section-scroll';
 
 function resolveHashFromHref(href: string): string | null {
   const trimmed = href.trim();
@@ -15,24 +16,6 @@ function resolveHashFromHref(href: string): string | null {
   } catch {
     return null;
   }
-}
-
-function scrollToSection(hash: string) {
-  const section = document.querySelector(hash);
-  if (!section) {
-    history.replaceState(null, '', hash);
-    return;
-  }
-
-  const reducedMotion = window.matchMedia(
-    '(prefers-reduced-motion: reduce)',
-  ).matches;
-
-  section.scrollIntoView({
-    behavior: reducedMotion ? 'instant' : 'smooth',
-    block: 'start',
-  });
-  history.replaceState(null, '', hash);
 }
 
 export function AnchorSmoothScroll() {
@@ -52,7 +35,7 @@ export function AnchorSmoothScroll() {
       if (!document.querySelector(hash)) return;
 
       e.preventDefault();
-      scrollToSection(hash);
+      void scrollToSectionByHash(hash);
     };
 
     document.addEventListener('click', onClickCapture, true);
