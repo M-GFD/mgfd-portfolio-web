@@ -24,6 +24,7 @@ export function ExperienceGate() {
     setMusicEnabled,
     enterExperience,
     onGateFadeComplete,
+    primeMedia,
   } = useExperience();
 
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -110,9 +111,10 @@ export function ExperienceGate() {
 
         <button
           type="button"
+          onPointerDown={primeMedia}
           onClick={enterExperience}
           disabled={isFadingOut}
-          className="inline-flex w-full max-w-xs items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-medium text-black shadow-sm shadow-black/40 transition-colors hover:bg-neutral-200 disabled:opacity-60 sm:text-base"
+          className="inline-flex w-full max-w-xs touch-manipulation items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-medium text-black shadow-sm shadow-black/40 transition-colors hover:bg-neutral-200 disabled:opacity-60 sm:text-base"
         >
           {t('experience.enter')}
         </button>

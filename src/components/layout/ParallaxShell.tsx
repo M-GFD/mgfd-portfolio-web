@@ -11,11 +11,6 @@ import {
   type ReactNode,
 } from 'react';
 import { cn } from '@/lib/utils';
-import {
-  BACKGROUND_VIDEO_SRC,
-  EXPERIENCE_ENTER_EVENT,
-  tryPlayBackgroundVideo,
-} from '@/lib/background-media';
 
 export type ParallaxDepth = 'near' | 'mid' | 'far';
 
@@ -62,7 +57,6 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
   const [scrollY, setScrollY] = useState(0);
   const reducedMotion = useReducedMotionPreference();
   const scrollRafRef = useRef<number | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const scheduleScrollRead = useCallback(() => {
     if (scrollRafRef.current != null) return;
@@ -89,39 +83,6 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
     };
   }, [scheduleScrollRead]);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const kick = () => {
-      if (reducedMotion) {
-        video.pause();
-        video.currentTime = 0;
-        return;
-      }
-      void tryPlayBackgroundVideo(video);
-    };
-
-    kick();
-    video.addEventListener('loadeddata', kick);
-    video.addEventListener('canplay', kick);
-
-    const onEnter = () => kick();
-    window.addEventListener(EXPERIENCE_ENTER_EVENT, onEnter);
-
-    const onVisibility = () => {
-      if (document.visibilityState === 'visible') kick();
-    };
-    document.addEventListener('visibilitychange', onVisibility);
-
-    return () => {
-      video.removeEventListener('loadeddata', kick);
-      video.removeEventListener('canplay', kick);
-      window.removeEventListener(EXPERIENCE_ENTER_EVENT, onEnter);
-      document.removeEventListener('visibilitychange', onVisibility);
-    };
-  }, [reducedMotion]);
-
   const value = useMemo(
     () => ({ scrollY, reducedMotion }),
     [scrollY, reducedMotion]
@@ -129,32 +90,7 @@ export function ParallaxRoot({ children }: { children: ReactNode }) {
 
   return (
     <ParallaxContext.Provider value={value}>
-      <div className="relative min-h-screen overflow-x-clip">
-        {/* z-0 + contenido z-10: evita que iOS oculte el video con z-index negativo */}
-        <div
-          aria-hidden
-          className="pointer-events-none fixed inset-0 z-0 [transform:translateZ(0)]"
-        >
-          <video
-            ref={videoRef}
-            className="absolute inset-0 h-full w-full object-cover object-center [transform:translateZ(0)]"
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            disablePictureInPicture
-            disableRemotePlayback
-          >
-            <source src={BACKGROUND_VIDEO_SRC} type="video/mp4" />
-          </video>
-          <div
-            className="absolute inset-0 bg-zinc-950/54 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-            aria-hidden
-          />
-        </div>
-        <div className="relative z-10">{children}</div>
-      </div>
+      <div className="relative min-h-screen overflow-x-clip">{children}</div>
     </ParallaxContext.Provider>
   );
 }

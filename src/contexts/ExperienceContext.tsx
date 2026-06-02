@@ -15,26 +15,46 @@ import {
   PORTFOLIO_LOOP_SRC,
   PORTFOLIO_LOOP_VOLUME,
 } from '@/lib/experience-audio';
-import { dispatchExperienceEnter } from '@/lib/background-media';
+import {
+  playBackgroundVideoFromGesture,
+  primeBackgroundVideo,
+} from '@/lib/background-media';
 
 type ExperienceContextValue = {
-  /** Gate ya superado (localStorage o tras fade). */
   hasEntered: boolean;
-  /** Preferencia: reproducir música cuando el usuario lo permita. */
   musicEnabled: boolean;
   setMusicEnabled: (enabled: boolean) => void;
-  /** Gate visible (antes del fade final). */
   showGate: boolean;
   isFadingOut: boolean;
-  /** Audio en reproducción activa. */
   isPlaying: boolean;
   enterExperience: () => void;
   onGateFadeComplete: () => void;
   togglePlayback: () => Promise<void>;
+  primeMedia: () => void;
   audioRef: React.RefObject<HTMLAudioElement | null>;
 };
 
 const ExperienceContext = createContext<ExperienceContextValue | null>(null);
+
+function startAudioPlayback(audio: HTMLAudioElement) {
+  audio.loop = true;
+  audio.volume = PORTFOLIO_LOOP_VOLUME;
+
+  const playAttempt = audio.play();
+  if (playAttempt === undefined) return;
+
+  playAttempt.catch(() => {
+    if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+      void audio.play().catch(() => undefined);
+      return;
+    }
+    const onReady = () => {
+      void audio.play().catch(() => undefined);
+    };
+    audio.addEventListener('canplaythrough', onReady, { once: true });
+    audio.load();
+  });
+}
 
 export function ExperienceProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -44,6 +64,11 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [musicEnabled, setMusicEnabledState] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const primeMedia = useCallback(() => {
+    primeBackgroundVideo();
+    audioRef.current?.load();
+  }, []);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -56,38 +81,30 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  useEffect(() => {
+    if (!mounted) return;
+    primeMedia();
+  }, [mounted, primeMedia]);
+
   const setMusicEnabled = useCallback((enabled: boolean) => {
     setMusicEnabledState(enabled);
   }, []);
 
   const enterExperience = useCallback(() => {
-    localStorage.setItem(EXPERIENCE_ENTERED_KEY, 'true');
-    localStorage.setItem(EXPERIENCE_MUSIC_KEY, String(musicEnabled));
-    setIsFadingOut(true);
-    dispatchExperienceEnter();
+    if (isFadingOut) return;
+
+    // Gesto de usuario: play síncrono antes de setState / storage (crítico en Android).
+    playBackgroundVideoFromGesture();
 
     const audio = audioRef.current;
     if (musicEnabled && audio) {
-      audio.loop = true;
-      audio.volume = PORTFOLIO_LOOP_VOLUME;
-      const playAttempt = audio.play();
-      if (playAttempt !== undefined) {
-        playAttempt.then(
-          () => setIsPlaying(true),
-          () => {
-            const onReady = () => {
-              void audio.play().then(
-                () => setIsPlaying(true),
-                () => setIsPlaying(false),
-              );
-            };
-            audio.addEventListener('canplay', onReady, { once: true });
-            audio.load();
-          },
-        );
-      }
+      startAudioPlayback(audio);
     }
-  }, [musicEnabled]);
+
+    localStorage.setItem(EXPERIENCE_ENTERED_KEY, 'true');
+    localStorage.setItem(EXPERIENCE_MUSIC_KEY, String(musicEnabled));
+    setIsFadingOut(true);
+  }, [isFadingOut, musicEnabled]);
 
   const onGateFadeComplete = useCallback(() => {
     setHasEntered(true);
@@ -161,6 +178,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
         enterExperience,
         onGateFadeComplete,
         togglePlayback,
+        primeMedia,
         audioRef,
       }}
     >
