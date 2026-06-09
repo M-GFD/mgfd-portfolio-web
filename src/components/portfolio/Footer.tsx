@@ -22,7 +22,7 @@ export default function Footer() {
             </div>
             <div className="flex gap-6 justify-center md:justify-start">
               <a
-                href="https://instagram.com/_mgfd_"
+                href="https://instagram.com/xmgfd"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-neutral-400 transition-colors hover:text-white"

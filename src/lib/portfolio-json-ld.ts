@@ -1,5 +1,5 @@
 const PERSON_SAME_AS = [
-  "https://www.instagram.com/_mgfd_/",
+  "https://www.instagram.com/xmgfd/",
   "https://www.linkedin.com/in/mateofontanad",
   "https://twitter.com/mgfd_",
 ] as const;
