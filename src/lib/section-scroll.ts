@@ -1,13 +1,15 @@
 export const SECTION_SELECTOR = '.snap-section';
 
 const DEFAULT_DURATION_MS = 1100;
+const SNAP_DURATION_MS = 780;
 const EDGE_THRESHOLD_PX = 12;
 const WHEEL_ACCUM_THRESHOLD = 36;
+const TOUCH_ACCUM_THRESHOLD = 28;
 const SWIPE_THRESHOLD_PX = 52;
 
 let animating = false;
-let wheelAccum = 0;
-let wheelResetTimer: ReturnType<typeof setTimeout> | null = null;
+let scrollIntentAccum = 0;
+let scrollIntentResetTimer: ReturnType<typeof setTimeout> | null = null;
 
 function easeInOutQuint(t: number): number {
   return t < 0.5 ? 16 * t ** 5 : 1 - (-2 * t + 2) ** 5 / 2;
@@ -162,25 +164,39 @@ export async function navigateSection(direction: 1 | -1): Promise<boolean> {
   return true;
 }
 
-function resetWheelAccum() {
-  wheelAccum = 0;
-  if (wheelResetTimer) {
-    clearTimeout(wheelResetTimer);
-    wheelResetTimer = null;
+function resetScrollIntentAccum() {
+  scrollIntentAccum = 0;
+  if (scrollIntentResetTimer) {
+    clearTimeout(scrollIntentResetTimer);
+    scrollIntentResetTimer = null;
   }
 }
 
-export function handleWheelIntent(deltaY: number): boolean {
+export function shouldAllowNativeVerticalScroll(deltaY: number): boolean {
+  if (animating || isGateOpen() || isPastLastSnapSection()) return true;
+
+  const sections = getSections();
+  if (sections.length === 0) return true;
+
+  const direction: 1 | -1 = deltaY > 0 ? 1 : -1;
+  const current = sections[getActiveSectionIndex(sections)];
+  return shouldAllowNativeScroll(current, direction);
+}
+
+export function handleScrollIntent(
+  deltaY: number,
+  threshold = WHEEL_ACCUM_THRESHOLD,
+): boolean {
   if (animating || isGateOpen() || isPastLastSnapSection()) return false;
 
-  wheelAccum += deltaY;
-  if (wheelResetTimer) clearTimeout(wheelResetTimer);
-  wheelResetTimer = setTimeout(resetWheelAccum, 120);
+  scrollIntentAccum += deltaY;
+  if (scrollIntentResetTimer) clearTimeout(scrollIntentResetTimer);
+  scrollIntentResetTimer = setTimeout(resetScrollIntentAccum, 120);
 
-  if (Math.abs(wheelAccum) < WHEEL_ACCUM_THRESHOLD) return false;
+  if (Math.abs(scrollIntentAccum) < threshold) return false;
 
-  const direction: 1 | -1 = wheelAccum > 0 ? 1 : -1;
-  resetWheelAccum();
+  const direction: 1 | -1 = scrollIntentAccum > 0 ? 1 : -1;
+  resetScrollIntentAccum();
 
   const sections = getSections();
   if (sections.length === 0) return false;
@@ -197,6 +213,18 @@ export function handleWheelIntent(deltaY: number): boolean {
 
   void navigateSection(direction);
   return true;
+}
+
+export function handleWheelIntent(deltaY: number): boolean {
+  return handleScrollIntent(deltaY, WHEEL_ACCUM_THRESHOLD);
+}
+
+export function handleTouchScrollIntent(deltaY: number): boolean {
+  return handleScrollIntent(deltaY, TOUCH_ACCUM_THRESHOLD);
+}
+
+export function resetScrollIntent(): void {
+  resetScrollIntentAccum();
 }
 
 export async function snapToNearestSection(): Promise<void> {
@@ -219,13 +247,19 @@ export async function snapToNearestSection(): Promise<void> {
     if (distFromTop > 72 && distFromBottom > 72) return;
 
     if (distFromTop <= distFromBottom) {
-      await animateScrollTo(targetTop, 780);
+      await animateScrollTo(targetTop, SNAP_DURATION_MS);
     }
     return;
   }
 
-  if (Math.abs(window.scrollY - targetTop) > 28) {
-    await animateScrollTo(targetTop, 780);
+  const snapThreshold =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(pointer: coarse)').matches
+      ? 44
+      : 28;
+
+  if (Math.abs(window.scrollY - targetTop) > snapThreshold) {
+    await animateScrollTo(targetTop, SNAP_DURATION_MS);
   }
 }
 
