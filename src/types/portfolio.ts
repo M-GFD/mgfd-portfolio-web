@@ -21,6 +21,8 @@ export interface Technology {
   icon: string;
   color: string;
   imageExt?: string;
+  /** Nombre de archivo en /images/ cuando no sigue el patrón name.toLowerCase() */
+  imageFile?: string;
 }
 
 export interface SocialLink {

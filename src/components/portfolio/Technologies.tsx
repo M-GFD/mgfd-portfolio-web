@@ -29,6 +29,7 @@ function getFrontIndex(spin: number, n: number): number {
 }
 
 function techImageSrc(tech: Technology) {
+  if (tech.imageFile) return `/images/${tech.imageFile}`;
   return `/images/${tech.name.toLowerCase()}.${tech.imageExt ?? 'png'}`;
 }
 
