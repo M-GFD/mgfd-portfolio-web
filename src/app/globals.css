@@ -134,36 +134,23 @@
   }
 
   /**
-   * Móvil: bloquear pan vertical nativo para que el scroll por secciones JS funcione.
+   * Táctil: scroll-snap nativo (clase activada por JS en cualquier dispositivo touch).
    */
-  @media (pointer: coarse) {
-    html.section-scroll-touch-lock,
-    html.section-scroll-touch-lock body,
-    html.section-scroll-animating,
-    html.section-scroll-animating body {
-      touch-action: none;
-      overscroll-behavior-y: none;
-    }
+  html.section-scroll-snap {
+    scroll-snap-type: y mandatory;
+    overscroll-behavior-y: none;
+  }
 
-    html.section-scroll-touch-native,
-    html.section-scroll-touch-native body {
-      touch-action: pan-y;
+  @media (prefers-reduced-motion: no-preference) {
+    html.section-scroll-snap {
+      scroll-behavior: smooth;
     }
   }
 
-  @media (max-width: 767px) {
-    html.section-scroll-touch-lock,
-    html.section-scroll-touch-lock body,
-    html.section-scroll-animating,
-    html.section-scroll-animating body {
-      touch-action: none;
-      overscroll-behavior-y: none;
-    }
-
-    html.section-scroll-touch-native,
-    html.section-scroll-touch-native body {
-      touch-action: pan-y;
-    }
+  html.section-scroll-snap
+    .snap-section:not(.snap-section--long):not(.snap-section--scrollable) {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
 }
 

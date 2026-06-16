@@ -4,9 +4,6 @@ const DEFAULT_DURATION_MS = 1100;
 const SNAP_DURATION_MS = 780;
 const EDGE_THRESHOLD_PX = 12;
 const WHEEL_ACCUM_THRESHOLD = 36;
-const TOUCH_ACCUM_THRESHOLD = 18;
-const SWIPE_THRESHOLD_PX = 52;
-const MOBILE_SWIPE_THRESHOLD_PX = 36;
 
 let animating = false;
 let scrollIntentAccum = 0;
@@ -14,6 +11,27 @@ let scrollIntentResetTimer: ReturnType<typeof setTimeout> | null = null;
 
 function easeInOutQuint(t: number): number {
   return t < 0.5 ? 16 * t ** 5 : 1 - (-2 * t + 2) ** 5 / 2;
+}
+
+/** Dispositivos táctiles: scroll-snap nativo del navegador (cross-browser). */
+export function usesNativeSectionSnap(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    return false;
+  }
+
+  return (
+    window.matchMedia('(hover: none), (pointer: coarse)').matches ||
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0
+  );
+}
+
+/** Desktop con ratón: animación JS entre secciones. */
+export function usesAnimatedSectionScroll(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 }
 
 export function isSectionScrollLocked(): boolean {
@@ -59,10 +77,15 @@ function isSectionTallerThanViewport(section: HTMLElement): boolean {
 }
 
 function isLongSection(section: HTMLElement): boolean {
-  return (
-    section.classList.contains('snap-section--long') ||
-    isSectionTallerThanViewport(section)
-  );
+  return section.classList.contains('snap-section--long');
+}
+
+function isScrollableSection(section: HTMLElement): boolean {
+  return section.classList.contains('snap-section--scrollable');
+}
+
+function sectionAllowsInternalScroll(section: HTMLElement): boolean {
+  return isLongSection(section) || isScrollableSection(section);
 }
 
 function atSectionTop(section: HTMLElement): boolean {
@@ -73,6 +96,24 @@ function atSectionBottom(section: HTMLElement): boolean {
   const sectionBottom = section.offsetTop + section.offsetHeight;
   const viewBottom = window.scrollY + window.innerHeight;
   return viewBottom >= sectionBottom - EDGE_THRESHOLD_PX;
+}
+
+/** Marca secciones más altas que el viewport para scroll interno sin snap forzado. */
+export function markScrollableSections(): void {
+  for (const section of getSections()) {
+    const scrollable =
+      !isLongSection(section) && isSectionTallerThanViewport(section);
+    section.classList.toggle('snap-section--scrollable', scrollable);
+  }
+}
+
+/** Activa scroll-snap nativo en html (más fiable que solo media queries CSS). */
+export function syncNativeSectionSnap(): void {
+  document.documentElement.classList.toggle(
+    'section-scroll-snap',
+    usesNativeSectionSnap(),
+  );
+  markScrollableSections();
 }
 
 export function animateScrollTo(
@@ -90,13 +131,10 @@ export function animateScrollTo(
 
   if (Math.abs(distance) < 1.5 || reducedMotion) {
     window.scrollTo(0, targetY);
-    syncSectionScrollTouchMode();
     return Promise.resolve();
   }
 
   animating = true;
-  document.documentElement.classList.add('section-scroll-animating');
-  syncSectionScrollTouchMode();
 
   return new Promise((resolve) => {
     const start = performance.now();
@@ -110,8 +148,6 @@ export function animateScrollTo(
         requestAnimationFrame(step);
       } else {
         animating = false;
-        document.documentElement.classList.remove('section-scroll-animating');
-        syncSectionScrollTouchMode();
         resolve();
       }
     };
@@ -121,6 +157,14 @@ export function animateScrollTo(
 }
 
 export async function scrollToSectionElement(section: Element): Promise<void> {
+  if (usesNativeSectionSnap()) {
+    (section as HTMLElement).scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+    return;
+  }
+
   await animateScrollTo(getSectionTargetY(section));
 }
 
@@ -139,14 +183,6 @@ function isGateOpen(): boolean {
   return document.querySelector('[data-experience-gate]') != null;
 }
 
-export function isCoarsePointerDevice(): boolean {
-  if (typeof window === 'undefined') return false;
-  return (
-    window.matchMedia('(pointer: coarse)').matches ||
-    window.matchMedia('(max-width: 767px)').matches
-  );
-}
-
 /** Debajo de la última sección con snap (p. ej. footer libre). */
 function isPastLastSnapSection(): boolean {
   const sections = getSections();
@@ -160,13 +196,13 @@ function shouldAllowNativeScroll(
   section: HTMLElement,
   direction: 1 | -1,
 ): boolean {
-  if (!isLongSection(section)) return false;
+  if (!sectionAllowsInternalScroll(section)) return false;
   if (direction > 0) return !atSectionBottom(section);
   return !atSectionTop(section);
 }
 
 export async function navigateSection(direction: 1 | -1): Promise<boolean> {
-  if (animating || isGateOpen()) return false;
+  if (animating || isGateOpen() || usesNativeSectionSnap()) return false;
 
   const sections = getSections();
   if (sections.length === 0) return false;
@@ -193,70 +229,21 @@ function resetScrollIntentAccum() {
   }
 }
 
-export function shouldCaptureTouchForSections(): boolean {
-  if (animating || isGateOpen() || isPastLastSnapSection()) return false;
-
-  const sections = getSections();
-  if (sections.length === 0) return false;
-
-  const current = sections[getActiveSectionIndex(sections)];
-  if (!isLongSection(current)) return true;
-
-  return atSectionTop(current) || atSectionBottom(current);
-}
-
-export function shouldAllowNativeVerticalScroll(deltaY: number): boolean {
-  if (!shouldCaptureTouchForSections()) return true;
-
-  const sections = getSections();
-  if (sections.length === 0) return true;
-
-  const direction: 1 | -1 = deltaY > 0 ? 1 : -1;
-  const current = sections[getActiveSectionIndex(sections)];
-  return shouldAllowNativeScroll(current, direction);
-}
-
-export function syncSectionScrollTouchMode(): void {
-  const html = document.documentElement;
-  const coarse = isCoarsePointerDevice();
-
-  if (!coarse) {
-    html.classList.remove(
-      'section-scroll-touch-lock',
-      'section-scroll-touch-native',
-      'section-scroll-animating',
-    );
-    return;
+export function handleWheelIntent(deltaY: number): boolean {
+  if (
+    animating ||
+    isGateOpen() ||
+    isPastLastSnapSection() ||
+    usesNativeSectionSnap()
+  ) {
+    return false;
   }
-
-  if (isGateOpen() || isPastLastSnapSection()) {
-    html.classList.remove(
-      'section-scroll-touch-lock',
-      'section-scroll-touch-native',
-    );
-    return;
-  }
-
-  if (shouldCaptureTouchForSections()) {
-    html.classList.add('section-scroll-touch-lock');
-    html.classList.remove('section-scroll-touch-native');
-  } else {
-    html.classList.remove('section-scroll-touch-lock');
-    html.classList.add('section-scroll-touch-native');
-  }
-}
-
-export function handleScrollIntent(
-  deltaY: number,
-  threshold = WHEEL_ACCUM_THRESHOLD,
-): boolean {
-  if (animating || isGateOpen() || isPastLastSnapSection()) return false;
 
   scrollIntentAccum += deltaY;
   if (scrollIntentResetTimer) clearTimeout(scrollIntentResetTimer);
   scrollIntentResetTimer = setTimeout(resetScrollIntentAccum, 120);
 
-  if (Math.abs(scrollIntentAccum) < threshold) return false;
+  if (Math.abs(scrollIntentAccum) < WHEEL_ACCUM_THRESHOLD) return false;
 
   const direction: 1 | -1 = scrollIntentAccum > 0 ? 1 : -1;
   resetScrollIntentAccum();
@@ -278,20 +265,15 @@ export function handleScrollIntent(
   return true;
 }
 
-export function handleWheelIntent(deltaY: number): boolean {
-  return handleScrollIntent(deltaY, WHEEL_ACCUM_THRESHOLD);
-}
-
-export function handleTouchScrollIntent(deltaY: number): boolean {
-  return handleScrollIntent(deltaY, TOUCH_ACCUM_THRESHOLD);
-}
-
-export function resetScrollIntent(): void {
-  resetScrollIntentAccum();
-}
-
 export async function snapToNearestSection(): Promise<void> {
-  if (animating || isGateOpen() || isPastLastSnapSection()) return;
+  if (
+    animating ||
+    isGateOpen() ||
+    isPastLastSnapSection() ||
+    usesNativeSectionSnap()
+  ) {
+    return;
+  }
 
   const sections = getSections();
   if (sections.length === 0) return;
@@ -300,7 +282,7 @@ export async function snapToNearestSection(): Promise<void> {
   const section = sections[index];
   const targetTop = getSectionTargetY(section);
 
-  if (isLongSection(section)) {
+  if (sectionAllowsInternalScroll(section)) {
     const distFromTop = Math.abs(window.scrollY - targetTop);
     const sectionBottom = section.offsetTop + section.offsetHeight;
     const distFromBottom = Math.abs(
@@ -315,27 +297,7 @@ export async function snapToNearestSection(): Promise<void> {
     return;
   }
 
-  const snapThreshold =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(pointer: coarse)').matches
-      ? 44
-      : 28;
-
-  if (Math.abs(window.scrollY - targetTop) > snapThreshold) {
+  if (Math.abs(window.scrollY - targetTop) > 28) {
     await animateScrollTo(targetTop, SNAP_DURATION_MS);
   }
 }
-
-export function handleSwipeIntent(
-  deltaY: number,
-  threshold = isCoarsePointerDevice()
-    ? MOBILE_SWIPE_THRESHOLD_PX
-    : SWIPE_THRESHOLD_PX,
-): void {
-  if (Math.abs(deltaY) < threshold) return;
-  if (isPastLastSnapSection()) return;
-  const direction: 1 | -1 = deltaY > 0 ? 1 : -1;
-  void navigateSection(direction);
-}
-
-export { SWIPE_THRESHOLD_PX };
