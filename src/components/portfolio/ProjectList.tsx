@@ -280,7 +280,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
               className="works-carousel__slide glass-card"
               data-in-view={index === 0 ? 'true' : 'false'}
             >
-              <div className="glass-card__media relative aspect-video p-3 sm:p-4 md:p-5">
+              <div className="works-carousel__media glass-card__media relative min-h-0">
                 <ProjectCoverMedia
                   images={coverImages}
                   title={project.title}
@@ -293,14 +293,14 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
                 />
               </div>
 
-              <div className="p-4 sm:p-6">
-                <h4 className="mb-1.5 text-xl font-bold text-white sm:mb-2 sm:text-2xl">
+              <div className="works-carousel__body min-w-0">
+                <h4 className="truncate text-sm font-bold text-white sm:text-base">
                   {project.title}
                 </h4>
-                <p className="mb-2 text-xs text-neutral-400 sm:mb-3 sm:text-sm md:text-base">
+                <p className="mt-0.5 truncate text-[0.6875rem] text-neutral-400 sm:text-xs">
                   {project.subtitle}
                 </p>
-                <p className="text-sm leading-relaxed text-neutral-300 sm:text-base">
+                <p className="mt-1 line-clamp-2 text-[0.6875rem] leading-snug text-neutral-300 sm:text-xs">
                   {project.description}
                 </p>
                 {project.websiteUrl && (
@@ -308,7 +308,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
                     href={project.websiteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-3 inline-block text-sm text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-neutral-200 hover:decoration-white/70 sm:mt-4 sm:text-base"
+                    className="mt-1.5 inline-block max-w-full truncate text-[0.6875rem] text-white/90 underline decoration-white/35 underline-offset-2 transition-colors hover:text-white sm:text-xs"
                   >
                     {project.websiteUrl}
                   </a>
