@@ -132,6 +132,39 @@
   body {
     @apply bg-zinc-950 text-foreground overflow-x-clip;
   }
+
+  /**
+   * Móvil: bloquear pan vertical nativo para que el scroll por secciones JS funcione.
+   */
+  @media (pointer: coarse) {
+    html.section-scroll-touch-lock,
+    html.section-scroll-touch-lock body,
+    html.section-scroll-animating,
+    html.section-scroll-animating body {
+      touch-action: none;
+      overscroll-behavior-y: none;
+    }
+
+    html.section-scroll-touch-native,
+    html.section-scroll-touch-native body {
+      touch-action: pan-y;
+    }
+  }
+
+  @media (max-width: 767px) {
+    html.section-scroll-touch-lock,
+    html.section-scroll-touch-lock body,
+    html.section-scroll-animating,
+    html.section-scroll-animating body {
+      touch-action: none;
+      overscroll-behavior-y: none;
+    }
+
+    html.section-scroll-touch-native,
+    html.section-scroll-touch-native body {
+      touch-action: pan-y;
+    }
+  }
 }
 
 @layer components {

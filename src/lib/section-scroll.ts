@@ -4,8 +4,9 @@ const DEFAULT_DURATION_MS = 1100;
 const SNAP_DURATION_MS = 780;
 const EDGE_THRESHOLD_PX = 12;
 const WHEEL_ACCUM_THRESHOLD = 36;
-const TOUCH_ACCUM_THRESHOLD = 28;
+const TOUCH_ACCUM_THRESHOLD = 18;
 const SWIPE_THRESHOLD_PX = 52;
+const MOBILE_SWIPE_THRESHOLD_PX = 36;
 
 let animating = false;
 let scrollIntentAccum = 0;
@@ -53,8 +54,15 @@ export function getActiveSectionIndex(sections: HTMLElement[]): number {
   return index;
 }
 
+function isSectionTallerThanViewport(section: HTMLElement): boolean {
+  return section.offsetHeight > window.innerHeight + EDGE_THRESHOLD_PX;
+}
+
 function isLongSection(section: HTMLElement): boolean {
-  return section.classList.contains('snap-section--long');
+  return (
+    section.classList.contains('snap-section--long') ||
+    isSectionTallerThanViewport(section)
+  );
 }
 
 function atSectionTop(section: HTMLElement): boolean {
@@ -82,10 +90,13 @@ export function animateScrollTo(
 
   if (Math.abs(distance) < 1.5 || reducedMotion) {
     window.scrollTo(0, targetY);
+    syncSectionScrollTouchMode();
     return Promise.resolve();
   }
 
   animating = true;
+  document.documentElement.classList.add('section-scroll-animating');
+  syncSectionScrollTouchMode();
 
   return new Promise((resolve) => {
     const start = performance.now();
@@ -99,6 +110,8 @@ export function animateScrollTo(
         requestAnimationFrame(step);
       } else {
         animating = false;
+        document.documentElement.classList.remove('section-scroll-animating');
+        syncSectionScrollTouchMode();
         resolve();
       }
     };
@@ -124,6 +137,14 @@ export async function scrollToSectionByHash(hash: string): Promise<void> {
 
 function isGateOpen(): boolean {
   return document.querySelector('[data-experience-gate]') != null;
+}
+
+export function isCoarsePointerDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  return (
+    window.matchMedia('(pointer: coarse)').matches ||
+    window.matchMedia('(max-width: 767px)').matches
+  );
 }
 
 /** Debajo de la última sección con snap (p. ej. footer libre). */
@@ -172,8 +193,20 @@ function resetScrollIntentAccum() {
   }
 }
 
+export function shouldCaptureTouchForSections(): boolean {
+  if (animating || isGateOpen() || isPastLastSnapSection()) return false;
+
+  const sections = getSections();
+  if (sections.length === 0) return false;
+
+  const current = sections[getActiveSectionIndex(sections)];
+  if (!isLongSection(current)) return true;
+
+  return atSectionTop(current) || atSectionBottom(current);
+}
+
 export function shouldAllowNativeVerticalScroll(deltaY: number): boolean {
-  if (animating || isGateOpen() || isPastLastSnapSection()) return true;
+  if (!shouldCaptureTouchForSections()) return true;
 
   const sections = getSections();
   if (sections.length === 0) return true;
@@ -181,6 +214,36 @@ export function shouldAllowNativeVerticalScroll(deltaY: number): boolean {
   const direction: 1 | -1 = deltaY > 0 ? 1 : -1;
   const current = sections[getActiveSectionIndex(sections)];
   return shouldAllowNativeScroll(current, direction);
+}
+
+export function syncSectionScrollTouchMode(): void {
+  const html = document.documentElement;
+  const coarse = isCoarsePointerDevice();
+
+  if (!coarse) {
+    html.classList.remove(
+      'section-scroll-touch-lock',
+      'section-scroll-touch-native',
+      'section-scroll-animating',
+    );
+    return;
+  }
+
+  if (isGateOpen() || isPastLastSnapSection()) {
+    html.classList.remove(
+      'section-scroll-touch-lock',
+      'section-scroll-touch-native',
+    );
+    return;
+  }
+
+  if (shouldCaptureTouchForSections()) {
+    html.classList.add('section-scroll-touch-lock');
+    html.classList.remove('section-scroll-touch-native');
+  } else {
+    html.classList.remove('section-scroll-touch-lock');
+    html.classList.add('section-scroll-touch-native');
+  }
 }
 
 export function handleScrollIntent(
@@ -263,8 +326,14 @@ export async function snapToNearestSection(): Promise<void> {
   }
 }
 
-export function handleSwipeIntent(deltaY: number): void {
-  if (Math.abs(deltaY) < SWIPE_THRESHOLD_PX) return;
+export function handleSwipeIntent(
+  deltaY: number,
+  threshold = isCoarsePointerDevice()
+    ? MOBILE_SWIPE_THRESHOLD_PX
+    : SWIPE_THRESHOLD_PX,
+): void {
+  if (Math.abs(deltaY) < threshold) return;
+  if (isPastLastSnapSection()) return;
   const direction: 1 | -1 = deltaY > 0 ? 1 : -1;
   void navigateSection(direction);
 }

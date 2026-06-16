@@ -5,11 +5,17 @@ import {
   handleSwipeIntent,
   handleTouchScrollIntent,
   handleWheelIntent,
+  isCoarsePointerDevice,
   isSectionScrollLocked,
   resetScrollIntent,
   shouldAllowNativeVerticalScroll,
+  shouldCaptureTouchForSections,
   snapToNearestSection,
+  syncSectionScrollTouchMode,
 } from '@/lib/section-scroll';
+
+const TOUCH_OPTS = { passive: false, capture: true } as const;
+const PASSIVE = { passive: true } as const;
 
 export function SmoothSectionScroll() {
   useEffect(() => {
@@ -19,13 +25,17 @@ export function SmoothSectionScroll() {
     if (reducedMotion.matches) return;
 
     const coarsePointer = window.matchMedia('(pointer: coarse)');
-    const scrollEndDelayMs = () => (coarsePointer.matches ? 320 : 160);
+    const scrollEndDelayMs = () => (coarsePointer.matches ? 280 : 160);
 
     let touchStartY = 0;
     let touchStartX = 0;
     let lastTouchY = 0;
-    let touchTracking = false;
+    let touchCapturing = false;
     let scrollEndTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const syncMode = () => {
+      syncSectionScrollTouchMode();
+    };
 
     const onWheel = (e: WheelEvent) => {
       if (isSectionScrollLocked()) {
@@ -38,17 +48,19 @@ export function SmoothSectionScroll() {
     };
 
     const onTouchStart = (e: TouchEvent) => {
+      syncMode();
+
       const touch = e.touches[0];
       if (!touch) return;
 
       touchStartY = touch.clientY;
       touchStartX = touch.clientX;
       lastTouchY = touch.clientY;
-      touchTracking = true;
+      touchCapturing = shouldCaptureTouchForSections();
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      if (!touchTracking) return;
+      if (!touchCapturing) return;
 
       if (isSectionScrollLocked()) {
         e.preventDefault();
@@ -65,19 +77,25 @@ export function SmoothSectionScroll() {
       const totalDeltaX = touchStartX - touch.clientX;
       if (Math.abs(totalDeltaY) <= Math.abs(totalDeltaX)) return;
 
-      if (shouldAllowNativeVerticalScroll(deltaY)) return;
+      if (shouldAllowNativeVerticalScroll(deltaY)) {
+        touchCapturing = false;
+        syncMode();
+        return;
+      }
 
       e.preventDefault();
       handleTouchScrollIntent(deltaY);
     };
 
     const onTouchEnd = (e: TouchEvent) => {
-      touchTracking = false;
-
-      if (isSectionScrollLocked()) return;
+      if (isSectionScrollLocked()) {
+        touchCapturing = false;
+        syncMode();
+        return;
+      }
 
       const touch = e.changedTouches[0];
-      if (touch) {
+      if (touch && touchCapturing) {
         const deltaY = touchStartY - touch.clientY;
         const deltaX = touchStartX - touch.clientX;
 
@@ -86,17 +104,21 @@ export function SmoothSectionScroll() {
         }
       }
 
+      touchCapturing = false;
       resetScrollIntent();
+      syncMode();
       void snapToNearestSection();
     };
 
     const onTouchCancel = () => {
-      touchTracking = false;
+      touchCapturing = false;
       resetScrollIntent();
+      syncMode();
       void snapToNearestSection();
     };
 
     const onScroll = () => {
+      syncMode();
       if (isSectionScrollLocked()) return;
       if (scrollEndTimer) clearTimeout(scrollEndTimer);
       scrollEndTimer = setTimeout(() => {
@@ -104,21 +126,42 @@ export function SmoothSectionScroll() {
       }, scrollEndDelayMs());
     };
 
+    syncMode();
+    if (isCoarsePointerDevice()) {
+      void snapToNearestSection();
+    }
+
     window.addEventListener('wheel', onWheel, { passive: false });
-    window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchmove', onTouchMove, { passive: false });
-    window.addEventListener('touchend', onTouchEnd, { passive: true });
-    window.addEventListener('touchcancel', onTouchCancel, { passive: true });
-    window.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('touchstart', onTouchStart, PASSIVE);
+    document.addEventListener('touchmove', onTouchMove, TOUCH_OPTS);
+    document.addEventListener('touchend', onTouchEnd, PASSIVE);
+    document.addEventListener('touchcancel', onTouchCancel, PASSIVE);
+    window.addEventListener('scroll', onScroll, PASSIVE);
+    window.addEventListener('resize', syncMode, PASSIVE);
+
+    const gateObserver = new MutationObserver(syncMode);
+    gateObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['data-experience-gate'],
+    });
 
     return () => {
       window.removeEventListener('wheel', onWheel);
-      window.removeEventListener('touchstart', onTouchStart);
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend', onTouchEnd);
-      window.removeEventListener('touchcancel', onTouchCancel);
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchmove', onTouchMove, TOUCH_OPTS);
+      document.removeEventListener('touchend', onTouchEnd);
+      document.removeEventListener('touchcancel', onTouchCancel);
       window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', syncMode);
+      gateObserver.disconnect();
       if (scrollEndTimer) clearTimeout(scrollEndTimer);
+      document.documentElement.classList.remove(
+        'section-scroll-touch-lock',
+        'section-scroll-touch-native',
+        'section-scroll-animating',
+      );
     };
   }, []);
 
