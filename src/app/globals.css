@@ -221,8 +221,11 @@
     -webkit-backdrop-filter: blur(8px);
   }
 
-  /** Trabajos: carrusel horizontal por card con fade en márgenes del viewport. */
+  /** Trabajos: card central + mitad de la anterior/siguiente visible (carrusel). */
   .works-carousel {
+    --works-gap: 1rem;
+    --works-slide: calc((100vw - 2 * var(--works-gap)) / 2);
+    --works-pad: calc((100vw - var(--works-slide)) / 2);
     position: relative;
     left: 50%;
     width: 100vw;
@@ -230,67 +233,46 @@
     transform: translateX(-50%);
   }
 
+  @media (min-width: 640px) {
+    .works-carousel {
+      --works-gap: 1.25rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .works-carousel {
+      --works-slide: 28rem;
+      --works-pad: calc((100vw - var(--works-slide)) / 2);
+    }
+  }
+
   .works-carousel__track {
     display: flex;
-    gap: 1rem;
+    gap: var(--works-gap);
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
-    scroll-padding-inline: max(1rem, calc((100vw - min(86vw, 28rem)) / 2));
+    scroll-padding-inline: var(--works-pad);
     padding-block: 0.25rem 1rem;
-    padding-inline: max(1rem, calc((100vw - min(86vw, 28rem)) / 2));
+    padding-inline: var(--works-pad);
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x pan-y pinch-zoom;
     scrollbar-width: none;
-    mask-image: linear-gradient(
-      90deg,
-      transparent 0%,
-      #000 7%,
-      #000 93%,
-      transparent 100%
-    );
   }
 
   .works-carousel__track::-webkit-scrollbar {
     display: none;
   }
 
-  @media (min-width: 640px) {
-    .works-carousel__track {
-      gap: 1.25rem;
-      scroll-padding-inline: max(1.5rem, calc((100vw - min(72vw, 32rem)) / 2));
-      padding-inline: max(1.5rem, calc((100vw - min(72vw, 32rem)) / 2));
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .works-carousel__track {
-      scroll-padding-inline: max(2rem, calc((100vw - 28rem) / 2));
-      padding-inline: max(2rem, calc((100vw - 28rem) / 2));
-    }
-  }
-
   .works-carousel__slide {
     flex: 0 0 auto;
-    width: min(86vw, 28rem);
+    width: var(--works-slide);
     scroll-snap-align: center;
     scroll-snap-stop: always;
     transition:
       opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
       transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  @media (min-width: 640px) {
-    .works-carousel__slide {
-      width: min(72vw, 32rem);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .works-carousel__slide {
-      width: min(42vw, 28rem);
-    }
   }
 
   .works-carousel__slide[data-in-view='false'] {

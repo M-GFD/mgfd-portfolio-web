@@ -240,7 +240,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
         for (const entry of entries) {
           entry.target.setAttribute(
             'data-in-view',
-            entry.intersectionRatio >= 0.55 ? 'true' : 'false',
+            entry.intersectionRatio >= 0.48 ? 'true' : 'false',
           );
         }
       },
