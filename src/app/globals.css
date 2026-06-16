@@ -220,4 +220,86 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
+
+  /** Trabajos: carrusel horizontal por card con fade en márgenes del viewport. */
+  .works-carousel {
+    position: relative;
+    left: 50%;
+    width: 100vw;
+    max-width: 100vw;
+    transform: translateX(-50%);
+  }
+
+  .works-carousel__track {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: max(1rem, calc((100vw - min(86vw, 28rem)) / 2));
+    padding-block: 0.25rem 1rem;
+    padding-inline: max(1rem, calc((100vw - min(86vw, 28rem)) / 2));
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y pinch-zoom;
+    scrollbar-width: none;
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      #000 7%,
+      #000 93%,
+      transparent 100%
+    );
+  }
+
+  .works-carousel__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .works-carousel__track {
+      gap: 1.25rem;
+      scroll-padding-inline: max(1.5rem, calc((100vw - min(72vw, 32rem)) / 2));
+      padding-inline: max(1.5rem, calc((100vw - min(72vw, 32rem)) / 2));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .works-carousel__track {
+      scroll-padding-inline: max(2rem, calc((100vw - 28rem) / 2));
+      padding-inline: max(2rem, calc((100vw - 28rem) / 2));
+    }
+  }
+
+  .works-carousel__slide {
+    flex: 0 0 auto;
+    width: min(86vw, 28rem);
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    transition:
+      opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (min-width: 640px) {
+    .works-carousel__slide {
+      width: min(72vw, 32rem);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .works-carousel__slide {
+      width: min(42vw, 28rem);
+    }
+  }
+
+  .works-carousel__slide[data-in-view='false'] {
+    opacity: 0.42;
+    transform: scale(0.94);
+  }
+
+  .works-carousel__slide[data-in-view='true'] {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

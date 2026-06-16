@@ -43,13 +43,15 @@ export default function HomePage() {
         <SnapSection
           id="works"
           long
-          className="flex flex-col px-4 pb-14 pt-[calc(5.5rem+env(safe-area-inset-top))] sm:px-6 sm:pb-20 sm:pt-8 md:pb-28 md:pt-10"
+          className="flex flex-col pb-14 pt-[calc(5.5rem+env(safe-area-inset-top))] sm:pb-20 sm:pt-8 md:pb-28 md:pt-10"
         >
-          <div className="container mx-auto max-w-6xl">
+          <div className="container mx-auto max-w-6xl px-4 sm:px-6">
             <h2 className="mb-6 text-center text-2xl font-bold text-white sm:mb-8 sm:text-3xl md:mb-10 md:text-4xl lg:text-5xl">
               {t('projects.sectionTitle')}
             </h2>
-            <ProjectList projects={projectsWithLocale} loading={false} />
+          </div>
+          <ProjectList projects={projectsWithLocale} loading={false} />
+          <div className="container mx-auto max-w-6xl px-4 sm:px-6">
             <div className="mt-10 flex justify-center sm:mt-14">
               <a
                 href="mailto:mgfd.design@gmail.com"

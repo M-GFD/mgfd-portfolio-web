@@ -225,6 +225,32 @@ function ProjectCoverMedia({
 
 export default function ProjectList({ projects, loading }: ProjectListProps) {
   const { t } = useLanguage();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<(HTMLElement | null)[]>([]);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const slides = slideRefs.current.filter(Boolean) as HTMLElement[];
+    if (slides.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          entry.target.setAttribute(
+            'data-in-view',
+            entry.intersectionRatio >= 0.55 ? 'true' : 'false',
+          );
+        }
+      },
+      { root: track, threshold: [0.15, 0.35, 0.55, 0.75] },
+    );
+
+    for (const slide of slides) observer.observe(slide);
+
+    return () => observer.disconnect();
+  }, [projects.length, loading]);
 
   if (loading) {
     return (
@@ -235,53 +261,63 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   }
 
   return (
-    <div className="grid min-w-0 grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2">
-      {projects.map((project) => {
-        const extra = project.galleryImages ?? [];
-        const coverImages = extra.length > 0 ? [project.image, ...extra] : [project.image];
+    <div
+      className="works-carousel"
+      aria-label={t('projects.sectionTitle')}
+    >
+      <div ref={trackRef} className="works-carousel__track">
+        {projects.map((project, index) => {
+          const extra = project.galleryImages ?? [];
+          const coverImages =
+            extra.length > 0 ? [project.image, ...extra] : [project.image];
 
-        return (
-          <article
-            key={project.id}
-            className="glass-card"
-          >
-            <div className="glass-card__media relative aspect-video p-3 sm:p-4 md:p-5">
-              <ProjectCoverMedia
-                images={coverImages}
-                title={project.title}
-                dotsAriaLabel={t('projects.gallery')}
-                prevLabel={t('projects.previousAria')}
-                nextLabel={t('projects.nextAria')}
-                expandAriaLabel={t('projects.expandImageAria')}
-                lightboxAriaLabel={t('projects.lightboxAria')}
-                closeAriaLabel={t('projects.closeAria')}
-              />
-            </div>
+          return (
+            <article
+              key={project.id}
+              ref={(el) => {
+                slideRefs.current[index] = el;
+              }}
+              className="works-carousel__slide glass-card"
+              data-in-view={index === 0 ? 'true' : 'false'}
+            >
+              <div className="glass-card__media relative aspect-video p-3 sm:p-4 md:p-5">
+                <ProjectCoverMedia
+                  images={coverImages}
+                  title={project.title}
+                  dotsAriaLabel={t('projects.gallery')}
+                  prevLabel={t('projects.previousAria')}
+                  nextLabel={t('projects.nextAria')}
+                  expandAriaLabel={t('projects.expandImageAria')}
+                  lightboxAriaLabel={t('projects.lightboxAria')}
+                  closeAriaLabel={t('projects.closeAria')}
+                />
+              </div>
 
-            <div className="p-4 sm:p-6">
-              <h4 className="mb-1.5 text-xl font-bold text-white sm:mb-2 sm:text-2xl">
-                {project.title}
-              </h4>
-              <p className="mb-2 text-xs text-neutral-400 sm:mb-3 sm:text-sm md:text-base">
-                {project.subtitle}
-              </p>
-              <p className="text-sm leading-relaxed text-neutral-300 sm:text-base">
-                {project.description}
-              </p>
-              {project.websiteUrl && (
-                <a
-                  href={project.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-block text-sm text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-neutral-200 hover:decoration-white/70 sm:mt-4 sm:text-base"
-                >
-                  {project.websiteUrl}
-                </a>
-              )}
-            </div>
-          </article>
-        );
-      })}
+              <div className="p-4 sm:p-6">
+                <h4 className="mb-1.5 text-xl font-bold text-white sm:mb-2 sm:text-2xl">
+                  {project.title}
+                </h4>
+                <p className="mb-2 text-xs text-neutral-400 sm:mb-3 sm:text-sm md:text-base">
+                  {project.subtitle}
+                </p>
+                <p className="text-sm leading-relaxed text-neutral-300 sm:text-base">
+                  {project.description}
+                </p>
+                {project.websiteUrl && (
+                  <a
+                    href={project.websiteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-block text-sm text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-neutral-200 hover:decoration-white/70 sm:mt-4 sm:text-base"
+                  >
+                    {project.websiteUrl}
+                  </a>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
     </div>
   );
 }
