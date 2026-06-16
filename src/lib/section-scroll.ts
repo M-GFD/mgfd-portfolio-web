@@ -72,20 +72,12 @@ export function getActiveSectionIndex(sections: HTMLElement[]): number {
   return index;
 }
 
-function isSectionTallerThanViewport(section: HTMLElement): boolean {
-  return section.offsetHeight > window.innerHeight + EDGE_THRESHOLD_PX;
-}
-
 function isLongSection(section: HTMLElement): boolean {
   return section.classList.contains('snap-section--long');
 }
 
-function isScrollableSection(section: HTMLElement): boolean {
-  return section.classList.contains('snap-section--scrollable');
-}
-
 function sectionAllowsInternalScroll(section: HTMLElement): boolean {
-  return isLongSection(section) || isScrollableSection(section);
+  return isLongSection(section);
 }
 
 function atSectionTop(section: HTMLElement): boolean {
@@ -98,22 +90,16 @@ function atSectionBottom(section: HTMLElement): boolean {
   return viewBottom >= sectionBottom - EDGE_THRESHOLD_PX;
 }
 
-/** Marca secciones más altas que el viewport para scroll interno sin snap forzado. */
-export function markScrollableSections(): void {
-  for (const section of getSections()) {
-    const scrollable =
-      !isLongSection(section) && isSectionTallerThanViewport(section);
-    section.classList.toggle('snap-section--scrollable', scrollable);
-  }
-}
-
-/** Activa scroll-snap nativo en html (más fiable que solo media queries CSS). */
+/** Activa scroll-snap nativo en html (dispositivos táctiles). */
 export function syncNativeSectionSnap(): void {
   document.documentElement.classList.toggle(
     'section-scroll-snap',
     usesNativeSectionSnap(),
   );
-  markScrollableSections();
+
+  for (const section of getSections()) {
+    section.classList.remove('snap-section--scrollable');
+  }
 }
 
 export function animateScrollTo(
