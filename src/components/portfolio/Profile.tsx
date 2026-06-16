@@ -28,11 +28,11 @@ export default function Profile() {
             >
               {t('about.title')}
             </h3>
-            {(['p1', 'p2', 'p3', 'p4'] as const).map((key, i) => (
+            {(['p1', 'p2', 'p3'] as const).map((key, i) => (
               <p
                 key={key}
                 className={`text-sm leading-relaxed text-neutral-300 sm:text-base ${
-                  i < 3 ? 'mb-4 sm:mb-5' : ''
+                  i < 2 ? 'mb-4 sm:mb-5' : ''
                 }`}
               >
                 {t(`about.${key}`)}
