@@ -2,8 +2,10 @@
 
 import { useEffect } from 'react';
 import {
+  checkReleaseSectionSnapOnScroll,
   handleWheelIntent,
   isSectionScrollLocked,
+  isSectionSnapReleased,
   snapToNearestSection,
   syncNativeSectionSnap,
   usesAnimatedSectionScroll,
@@ -35,8 +37,10 @@ export function SmoothSectionScroll() {
     };
 
     const onScroll = () => {
+      checkReleaseSectionSnapOnScroll();
+
       if (!enableWheelScroll || !usesAnimatedSectionScroll()) return;
-      if (isSectionScrollLocked()) return;
+      if (isSectionScrollLocked() || isSectionSnapReleased()) return;
 
       if (scrollEndTimer) clearTimeout(scrollEndTimer);
       scrollEndTimer = setTimeout(() => {

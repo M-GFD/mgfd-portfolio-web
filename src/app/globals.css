@@ -134,8 +134,8 @@
   }
 
   /**
-   * Táctil: scroll-snap en Hero, About y Herramientas.
-   * Trabajos y footer quedan fuera del snap (scroll libre).
+   * Táctil: scroll-snap en Hero, About y Herramientas hasta la primera llegada
+   * a Herramientas; después scroll libre hasta recargar la página.
    */
   html.section-scroll-snap {
     scroll-snap-type: y mandatory;

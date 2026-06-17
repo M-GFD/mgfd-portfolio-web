@@ -8,6 +8,16 @@ const WHEEL_ACCUM_THRESHOLD = 36;
 let animating = false;
 let scrollIntentAccum = 0;
 let scrollIntentResetTimer: ReturnType<typeof setTimeout> | null = null;
+/** Tras llegar a Herramientas, el snap queda off hasta recargar. */
+let sectionSnapReleased = false;
+
+export function isSectionSnapReleased(): boolean {
+  return sectionSnapReleased;
+}
+
+function canUseSectionSnap(): boolean {
+  return !sectionSnapReleased;
+}
 
 function easeInOutQuint(t: number): number {
   return t < 0.5 ? 16 * t ** 5 : 1 - (-2 * t + 2) ** 5 / 2;
@@ -16,6 +26,7 @@ function easeInOutQuint(t: number): number {
 /** Dispositivos táctiles: scroll-snap nativo del navegador (cross-browser). */
 export function usesNativeSectionSnap(): boolean {
   if (typeof window === 'undefined') return false;
+  if (!canUseSectionSnap()) return false;
 
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     return false;
@@ -108,6 +119,23 @@ export function syncNativeSectionSnap(): void {
 
   for (const section of getSections()) {
     section.classList.remove('snap-section--scrollable');
+  }
+}
+
+/** Desactiva snap al cruzar Herramientas por primera vez en la sesión. */
+export function checkReleaseSectionSnapOnScroll(): void {
+  if (sectionSnapReleased) return;
+
+  const technologies = document.getElementById('technologies');
+  if (!technologies) return;
+
+  const headerH = getHeaderOffset();
+  const sectionTop =
+    technologies.getBoundingClientRect().top + window.scrollY;
+
+  if (window.scrollY + headerH >= sectionTop - EDGE_THRESHOLD_PX) {
+    sectionSnapReleased = true;
+    document.documentElement.classList.remove('section-scroll-snap');
   }
 }
 
@@ -206,7 +234,14 @@ function shouldAllowNativeScroll(
 }
 
 export async function navigateSection(direction: 1 | -1): Promise<boolean> {
-  if (animating || isGateOpen() || usesNativeSectionSnap()) return false;
+  if (
+    animating ||
+    isGateOpen() ||
+    isSectionSnapReleased() ||
+    usesNativeSectionSnap()
+  ) {
+    return false;
+  }
 
   const sections = getSections();
   if (sections.length === 0) return false;
@@ -237,6 +272,7 @@ export function handleWheelIntent(deltaY: number): boolean {
   if (
     animating ||
     isGateOpen() ||
+    isSectionSnapReleased() ||
     isPastLastSnapSection() ||
     usesNativeSectionSnap()
   ) {
@@ -273,6 +309,7 @@ export async function snapToNearestSection(): Promise<void> {
   if (
     animating ||
     isGateOpen() ||
+    isSectionSnapReleased() ||
     isPastLastSnapSection() ||
     usesNativeSectionSnap()
   ) {
