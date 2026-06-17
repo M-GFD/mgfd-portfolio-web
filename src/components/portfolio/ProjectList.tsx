@@ -229,32 +229,77 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const depthRafRef = useRef<number | null>(null);
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
 
-    const slides = slideRefs.current.filter(Boolean) as HTMLElement[];
-    if (slides.length === 0) return;
+    const reducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const inView = entry.intersectionRatio >= 0.52;
-          entry.target.setAttribute('data-in-view', inView ? 'true' : 'false');
+    const slides = () =>
+      slideRefs.current.filter(Boolean) as HTMLElement[];
 
-          if (inView) {
-            const idx = slideRefs.current.indexOf(entry.target as HTMLElement);
-            if (idx >= 0) setActiveIndex(idx);
-          }
+    const updateSlideDepth = () => {
+      depthRafRef.current = null;
+
+      if (reducedMotion) return;
+
+      const trackEl = trackRef.current;
+      const items = slides();
+      if (!trackEl || items.length === 0) return;
+
+      const trackRect = trackEl.getBoundingClientRect();
+      const centerX = trackRect.left + trackRect.width / 2;
+      const falloff = Math.max(trackRect.width * 0.42, 1);
+
+      let closestIndex = 0;
+      let closestDistance = Number.POSITIVE_INFINITY;
+
+      for (let i = 0; i < items.length; i++) {
+        const slide = items[i];
+        const rect = slide.getBoundingClientRect();
+        const slideCenter = rect.left + rect.width / 2;
+        const offset = slideCenter - centerX;
+        const distance = Math.abs(offset);
+        const t = Math.min(1, distance / falloff);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = i;
         }
-      },
-      { root: track, threshold: [0.25, 0.52, 0.75] },
-    );
 
-    for (const slide of slides) observer.observe(slide);
+        const rotateY = (offset / falloff) * -38;
+        const translateZ = -t * 220;
+        const scale = 1 - t * 0.14;
+        const opacity = 1 - t * 0.72;
 
-    return () => observer.disconnect();
+        slide.style.transform = `rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`;
+        slide.style.opacity = String(opacity);
+        slide.style.zIndex = String(100 - Math.round(t * 90));
+      }
+
+      setActiveIndex((prev) => (prev === closestIndex ? prev : closestIndex));
+    };
+
+    const scheduleDepthUpdate = () => {
+      if (depthRafRef.current != null) return;
+      depthRafRef.current = requestAnimationFrame(updateSlideDepth);
+    };
+
+    scheduleDepthUpdate();
+    track.addEventListener('scroll', scheduleDepthUpdate, { passive: true });
+    window.addEventListener('resize', scheduleDepthUpdate, { passive: true });
+
+    return () => {
+      track.removeEventListener('scroll', scheduleDepthUpdate);
+      window.removeEventListener('resize', scheduleDepthUpdate);
+      if (depthRafRef.current != null) {
+        cancelAnimationFrame(depthRafRef.current);
+      }
+    };
   }, [projects.length, loading]);
 
   const scrollToSlide = (index: number) => {
@@ -275,7 +320,8 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
 
   return (
     <div className="works-carousel" aria-label={t('projects.sectionTitle')}>
-      <div ref={trackRef} className="works-carousel__track">
+      <div className="works-carousel__scene">
+        <div ref={trackRef} className="works-carousel__track">
         {projects.map((project, index) => {
           const extra = project.galleryImages ?? [];
           const coverImages =
@@ -288,7 +334,6 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
                 slideRefs.current[index] = el;
               }}
               className="works-carousel__slide glass-card"
-              data-in-view={index === 0 ? 'true' : 'false'}
             >
               <div className="glass-card__media relative aspect-video p-3 sm:p-4 md:p-5">
                 <ProjectCoverMedia
@@ -327,6 +372,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
             </article>
           );
         })}
+        </div>
       </div>
 
       {projects.length > 1 && (

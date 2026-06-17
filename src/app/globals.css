@@ -221,7 +221,7 @@
     -webkit-backdrop-filter: blur(8px);
   }
 
-  /** Trabajos: carrusel horizontal con cards a tamaño completo. */
+  /** Trabajos: carrusel horizontal con profundidad 3D (sin blur en márgenes). */
   .works-carousel {
     --works-gap: 1rem;
     --works-slide: min(86vw, 28rem);
@@ -231,42 +231,6 @@
     width: 100vw;
     max-width: 100vw;
     transform: translateX(-50%);
-  }
-
-  .works-carousel::before,
-  .works-carousel::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    z-index: 2;
-    width: min(18vw, 5.5rem);
-    height: 100dvh;
-    height: 100lvh;
-    min-height: -webkit-fill-available;
-    transform: translateY(-50%);
-    pointer-events: none;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-  }
-
-  .works-carousel::before {
-    left: 0;
-    background: linear-gradient(
-      90deg,
-      rgb(9 9 11 / 0.94) 0%,
-      rgb(9 9 11 / 0.5) 55%,
-      transparent 100%
-    );
-  }
-
-  .works-carousel::after {
-    right: 0;
-    background: linear-gradient(
-      270deg,
-      rgb(9 9 11 / 0.94) 0%,
-      rgb(9 9 11 / 0.5) 55%,
-      transparent 100%
-    );
   }
 
   @media (min-width: 640px) {
@@ -284,19 +248,26 @@
     }
   }
 
+  .works-carousel__scene {
+    overflow: visible;
+  }
+
   .works-carousel__track {
     display: flex;
     gap: var(--works-gap);
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     scroll-padding-inline: var(--works-pad);
-    padding-block: 0.25rem 0.5rem;
+    padding-block: 1.5rem 0.5rem;
     padding-inline: var(--works-pad);
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x pan-y pinch-zoom;
     scrollbar-width: none;
+    perspective: min(1200px, 100vw);
+    perspective-origin: center center;
+    transform-style: preserve-3d;
   }
 
   .works-carousel__track::-webkit-scrollbar {
@@ -308,22 +279,20 @@
     width: var(--works-slide);
     scroll-snap-align: center;
     scroll-snap-stop: always;
-    transition:
-      opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-      filter 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform, opacity;
   }
 
-  .works-carousel__slide[data-in-view='false'] {
-    opacity: 0.45;
-    transform: scale(0.97);
-    filter: saturate(0.88);
-  }
+  @media (prefers-reduced-motion: reduce) {
+    .works-carousel__track {
+      perspective: none;
+    }
 
-  .works-carousel__slide[data-in-view='true'] {
-    opacity: 1;
-    transform: scale(1);
-    filter: none;
+    .works-carousel__slide {
+      transform: none !important;
+      opacity: 1 !important;
+    }
   }
 
   .works-carousel__dots {
