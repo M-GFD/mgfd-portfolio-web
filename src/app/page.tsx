@@ -41,7 +41,7 @@ export default function HomePage() {
 
         <section
           id="works"
-          className="flex flex-col pt-[calc(5.5rem+env(safe-area-inset-top))] sm:pt-8"
+          className="flex min-h-dvh flex-col pt-[calc(5.5rem+env(safe-area-inset-top))] sm:pt-8"
         >
           <div className="container mx-auto max-w-6xl shrink-0 px-4 pb-2 sm:px-6 sm:pb-3">
             <h2 className="mb-4 text-center text-2xl font-bold text-white sm:mb-5 sm:text-3xl md:text-4xl">
