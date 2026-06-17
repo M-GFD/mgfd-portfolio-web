@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import type { Technology } from '@/types/portfolio';
 import { useEffect, useRef, useState } from 'react';
 
-const SPIN_SPEED_RAD_S = 0.42;
+const SPIN_SPEED_RAD_S = 0.3;
 /** Pixels horizontales → radianes al arrastrar (menor = giro más suave) */
 const DRAG_RAD_PER_PX = 0.0032;
 /** Escala visual de cada ítem del carrusel respecto al diseño base */

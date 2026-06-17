@@ -227,9 +227,61 @@ function ProjectCoverMedia({
 export default function ProjectList({ projects, loading }: ProjectListProps) {
   const { t } = useLanguage();
   const trackRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const depthRafRef = useRef<number | null>(null);
+  const isDraggingRef = useRef(false);
+  const dragPointerIdRef = useRef<number | null>(null);
+  const dragStartXRef = useRef(0);
+  const dragStartScrollLeftRef = useRef(0);
+
+  const isInteractiveDragTarget = (target: EventTarget | null) => {
+    if (!(target instanceof HTMLElement)) return false;
+    return Boolean(target.closest('a, button, input, textarea, select, label'));
+  };
+
+  const handleTrackPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0 || isInteractiveDragTarget(e.target)) return;
+
+    const track = trackRef.current;
+    const scene = sceneRef.current;
+    if (!track || !scene) return;
+
+    isDraggingRef.current = true;
+    dragPointerIdRef.current = e.pointerId;
+    dragStartXRef.current = e.clientX;
+    dragStartScrollLeftRef.current = track.scrollLeft;
+    scene.classList.add('is-dragging');
+    scene.setPointerCapture(e.pointerId);
+  };
+
+  const handleTrackPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (
+      !isDraggingRef.current ||
+      dragPointerIdRef.current !== e.pointerId ||
+      !trackRef.current
+    ) {
+      return;
+    }
+
+    const dx = e.clientX - dragStartXRef.current;
+    trackRef.current.scrollLeft = dragStartScrollLeftRef.current - dx;
+  };
+
+  const endTrackDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current || dragPointerIdRef.current !== e.pointerId) {
+      return;
+    }
+
+    isDraggingRef.current = false;
+    dragPointerIdRef.current = null;
+    sceneRef.current?.classList.remove('is-dragging');
+
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  };
 
   useEffect(() => {
     const track = trackRef.current;
@@ -323,7 +375,14 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
       className="works-carousel flex flex-col"
       aria-label={t('projects.sectionTitle')}
     >
-      <div className="works-carousel__scene">
+      <div
+        ref={sceneRef}
+        className="works-carousel__scene"
+        onPointerDown={handleTrackPointerDown}
+        onPointerMove={handleTrackPointerMove}
+        onPointerUp={endTrackDrag}
+        onPointerCancel={endTrackDrag}
+      >
         <div ref={trackRef} className="works-carousel__track">
         {projects.map((project, index) => {
           const extra = project.galleryImages ?? [];

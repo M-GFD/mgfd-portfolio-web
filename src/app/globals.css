@@ -258,6 +258,16 @@
 
   .works-carousel__scene {
     overflow: visible;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .works-carousel__scene.is-dragging {
+    cursor: grabbing;
+  }
+
+  .works-carousel__scene.is-dragging .works-carousel__track {
+    scroll-snap-type: none;
   }
 
   .works-carousel__track {
