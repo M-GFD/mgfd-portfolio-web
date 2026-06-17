@@ -44,8 +44,8 @@ export default function HomePage() {
           id="works"
           className="flex min-h-0 flex-col overflow-hidden pt-[calc(5.5rem+env(safe-area-inset-top))] sm:pt-8"
         >
-          <div className="container mx-auto max-w-6xl shrink-0 px-4 sm:px-6">
-            <h2 className="mb-3 text-center text-2xl font-bold text-white sm:mb-4 sm:text-3xl md:text-4xl">
+          <div className="container mx-auto max-w-6xl shrink-0 px-4 pb-2 sm:px-6 sm:pb-3">
+            <h2 className="mb-4 text-center text-2xl font-bold text-white sm:mb-5 sm:text-3xl md:text-4xl">
               {t('projects.sectionTitle')}
             </h2>
           </div>
@@ -54,18 +54,7 @@ export default function HomePage() {
             <ProjectList projects={projectsWithLocale} loading={false} />
           </div>
 
-          <div className="container mx-auto max-w-6xl shrink-0 px-4 pb-2 pt-2 sm:px-6 sm:pb-3">
-            <div className="flex justify-center">
-              <a
-                href="mailto:mgfd.design@gmail.com"
-                className="inline-flex w-auto items-center justify-center rounded-lg bg-white px-5 py-2 text-sm font-medium text-black shadow-sm shadow-black/40 transition-colors hover:bg-neutral-200 sm:px-7 sm:py-2.5"
-              >
-                {t('projects.cta')}
-              </a>
-            </div>
-          </div>
-
-          <Footer embedded />
+          <Footer embedded showCta />
         </SnapSection>
       </main>
     </div>

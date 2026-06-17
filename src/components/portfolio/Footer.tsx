@@ -5,9 +5,10 @@ import { cn } from '@/lib/utils';
 
 type FooterProps = {
   embedded?: boolean;
+  showCta?: boolean;
 };
 
-export default function Footer({ embedded = false }: FooterProps) {
+export default function Footer({ embedded = false, showCta = false }: FooterProps) {
   const { t } = useLanguage();
   return (
     <footer
@@ -25,10 +26,25 @@ export default function Footer({ embedded = false }: FooterProps) {
       >
         <div
           className={cn(
-            'flex flex-col items-center justify-between md:flex-row',
+            'flex flex-col items-center',
             embedded ? 'gap-4 sm:gap-5' : 'gap-6 sm:gap-8',
           )}
         >
+          {showCta && (
+            <a
+              href="mailto:mgfd.design@gmail.com"
+              className="inline-flex w-auto shrink-0 items-center justify-center rounded-lg bg-white px-5 py-2 text-sm font-medium text-black shadow-sm shadow-black/40 transition-colors hover:bg-neutral-200 sm:px-7 sm:py-2.5"
+            >
+              {t('projects.cta')}
+            </a>
+          )}
+
+          <div
+            className={cn(
+              'flex w-full flex-col items-center justify-between md:flex-row',
+              embedded ? 'gap-4 sm:gap-5' : 'gap-6 sm:gap-8',
+            )}
+          >
           <div className="flex flex-col text-center md:text-left">
             <div className={cn(embedded ? 'mb-2 sm:mb-3' : 'mb-4')}>
               <img
@@ -91,6 +107,7 @@ export default function Footer({ embedded = false }: FooterProps) {
 
           <div className="max-w-full whitespace-nowrap text-center text-[0.6rem] leading-tight tracking-tight text-neutral-400 min-[400px]:text-[0.65rem] sm:whitespace-normal sm:text-xs sm:tracking-normal md:text-right md:text-sm">
             {t('footer.copyright')}
+          </div>
           </div>
         </div>
       </div>

@@ -59,6 +59,8 @@ function startAudioPlayback(audio: HTMLAudioElement) {
 
 export function ExperienceProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  /** Pausa elegida por el usuario; no reanudar al volver a la pestaña. */
+  const userPausedPlaybackRef = useRef(false);
   const [mounted, setMounted] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
   const [showGate, setShowGate] = useState(true);
@@ -122,6 +124,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       audio.volume = PORTFOLIO_LOOP_VOLUME;
       try {
         await audio.play();
+        userPausedPlaybackRef.current = false;
         setIsPlaying(true);
         localStorage.setItem(EXPERIENCE_MUSIC_KEY, 'true');
       } catch {
@@ -129,6 +132,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       }
     } else {
       audio.pause();
+      userPausedPlaybackRef.current = true;
       setIsPlaying(false);
     }
   }, [musicEnabled]);
@@ -138,6 +142,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
 
     const onVisibility = () => {
       if (document.visibilityState !== 'visible') return;
+      if (userPausedPlaybackRef.current) return;
       const audio = audioRef.current;
       if (!audio || !musicEnabled) return;
       if (audio.paused) {
