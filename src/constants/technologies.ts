@@ -17,15 +17,10 @@ export const technologies: Technology[] = [
     color: '#FF9A00',
   },
   {
-    name: 'Antigravity',
-    icon: '▲',
-    color: '#000000',
-    imageExt: 'svg',
-  },
-  {
     name: 'Cursor',
     icon: '▲',
     color: '#000000',
+    imageExt: 'svg',
   },
   {
     name: 'Kling',
@@ -69,9 +64,9 @@ export const technologies: Technology[] = [
     imageExt: 'svg',
   },
   {
-    name: 'Slack',
+    name: 'Notion',
     icon: '▲',
     color: '#000000',
-    imageExt: 'svg',
+    imageFile: 'notion-light.svg',
   },
 ];
