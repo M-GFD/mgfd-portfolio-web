@@ -36,12 +36,17 @@ type ExperienceContextValue = {
 
 const ExperienceContext = createContext<ExperienceContextValue | null>(null);
 
-function startAudioPlayback(audio: HTMLAudioElement) {
+function startAudioPlayback(
+  audio: HTMLAudioElement,
+  shouldPlay: () => boolean,
+) {
   audio.loop = true;
   audio.volume = PORTFOLIO_LOOP_VOLUME;
   audio.muted = false;
 
   const attempt = () => {
+    if (!shouldPlay()) return;
+
     const playAttempt = audio.play();
     if (playAttempt !== undefined) {
       playAttempt.catch(() => undefined);
@@ -59,8 +64,8 @@ function startAudioPlayback(audio: HTMLAudioElement) {
 
 export function ExperienceProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  /** Pausa elegida por el usuario; no reanudar al volver a la pestaña. */
-  const userPausedPlaybackRef = useRef(false);
+  /** Solo true tras gesto explícito del usuario (entrar con música o pulsar play). */
+  const userRequestedPlaybackRef = useRef(false);
   const [mounted, setMounted] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
   const [showGate, setShowGate] = useState(true);
@@ -89,6 +94,13 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     primeMedia();
   }, [mounted, primeMedia]);
 
+  useEffect(() => {
+    if (!mounted || musicEnabled) return;
+
+    userRequestedPlaybackRef.current = false;
+    audioRef.current?.pause();
+  }, [mounted, musicEnabled]);
+
   const setMusicEnabled = useCallback((enabled: boolean) => {
     setMusicEnabledState(enabled);
   }, []);
@@ -101,7 +113,11 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
 
     const audio = audioRef.current;
     if (musicEnabled && audio) {
-      startAudioPlayback(audio);
+      userRequestedPlaybackRef.current = true;
+      startAudioPlayback(audio, () => userRequestedPlaybackRef.current);
+    } else {
+      userRequestedPlaybackRef.current = false;
+      audio?.pause();
     }
 
     localStorage.setItem(EXPERIENCE_ENTERED_KEY, 'true');
@@ -120,48 +136,35 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     if (!audio || !musicEnabled) return;
 
     if (audio.paused) {
+      userRequestedPlaybackRef.current = true;
       audio.loop = true;
       audio.volume = PORTFOLIO_LOOP_VOLUME;
       try {
         await audio.play();
-        userPausedPlaybackRef.current = false;
         setIsPlaying(true);
         localStorage.setItem(EXPERIENCE_MUSIC_KEY, 'true');
       } catch {
+        userRequestedPlaybackRef.current = false;
         setIsPlaying(false);
       }
     } else {
+      userRequestedPlaybackRef.current = false;
       audio.pause();
-      userPausedPlaybackRef.current = true;
       setIsPlaying(false);
     }
   }, [musicEnabled]);
 
   useEffect(() => {
-    if (!hasEntered || !musicEnabled) return;
-
-    const onVisibility = () => {
-      if (document.visibilityState !== 'visible') return;
-      if (userPausedPlaybackRef.current) return;
-      const audio = audioRef.current;
-      if (!audio || !musicEnabled) return;
-      if (audio.paused) {
-        void audio.play().then(
-          () => setIsPlaying(true),
-          () => setIsPlaying(false),
-        );
-      }
-    };
-
-    document.addEventListener('visibilitychange', onVisibility);
-    return () => document.removeEventListener('visibilitychange', onVisibility);
-  }, [hasEntered, musicEnabled]);
-
-  useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !mounted) return;
 
-    const onPlay = () => setIsPlaying(true);
+    const onPlay = () => {
+      if (!userRequestedPlaybackRef.current) {
+        audio.pause();
+        return;
+      }
+      setIsPlaying(true);
+    };
     const onPause = () => setIsPlaying(false);
 
     audio.addEventListener('play', onPlay);
