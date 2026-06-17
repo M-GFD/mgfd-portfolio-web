@@ -42,19 +42,20 @@ export default function HomePage() {
 
         <SnapSection
           id="works"
-          className="flex min-h-0 flex-col overflow-hidden pt-[calc(5.5rem+env(safe-area-inset-top))] sm:pt-8"
+          long
+          className="flex flex-col pt-[calc(5.5rem+env(safe-area-inset-top))] sm:pt-8"
         >
+          <div className="works-snap-start pointer-events-none" aria-hidden="true" />
+
           <div className="container mx-auto max-w-6xl shrink-0 px-4 pb-2 sm:px-6 sm:pb-3">
             <h2 className="mb-4 text-center text-2xl font-bold text-white sm:mb-5 sm:text-3xl md:text-4xl">
               {t('projects.sectionTitle')}
             </h2>
           </div>
 
-          <div className="min-h-0 flex-1">
-            <ProjectList projects={projectsWithLocale} loading={false} />
-          </div>
+          <ProjectList projects={projectsWithLocale} loading={false} />
 
-          <Footer embedded showCta />
+          <Footer embedded showCta snapEnd />
         </SnapSection>
       </main>
     </div>

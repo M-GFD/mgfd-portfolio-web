@@ -47,14 +47,23 @@ export function getSections(): HTMLElement[] {
   return Array.from(document.querySelectorAll<HTMLElement>(SECTION_SELECTOR));
 }
 
-export function getSectionTargetY(section: Element): number {
-  const headerH = getHeaderOffset();
-  const top = section.getBoundingClientRect().top + window.scrollY;
-  const maxY = Math.max(
+export function getMaxScrollY(): number {
+  return Math.max(
     0,
     document.documentElement.scrollHeight - window.innerHeight,
   );
-  return Math.min(Math.max(0, top - headerH), maxY);
+}
+
+export function getSectionTargetY(section: Element): number {
+  const headerH = getHeaderOffset();
+  const top = section.getBoundingClientRect().top + window.scrollY;
+  return Math.min(Math.max(0, top - headerH), getMaxScrollY());
+}
+
+export function getSectionBottomTargetY(section: Element): number {
+  const sectionBottom =
+    section.getBoundingClientRect().bottom + window.scrollY;
+  return Math.min(Math.max(0, sectionBottom - window.innerHeight), getMaxScrollY());
 }
 
 export function getActiveSectionIndex(sections: HTMLElement[]): number {
@@ -161,7 +170,16 @@ export async function scrollToSectionByHash(hash: string): Promise<void> {
     return;
   }
 
-  await scrollToSectionElement(section);
+  if (hash === '#contact') {
+    if (usesNativeSectionSnap()) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else {
+      await animateScrollTo(getSectionBottomTargetY(section));
+    }
+  } else {
+    await scrollToSectionElement(section);
+  }
+
   history.replaceState(null, '', hash);
 }
 
@@ -269,16 +287,16 @@ export async function snapToNearestSection(): Promise<void> {
   const targetTop = getSectionTargetY(section);
 
   if (sectionAllowsInternalScroll(section)) {
+    const targetBottom = getSectionBottomTargetY(section);
     const distFromTop = Math.abs(window.scrollY - targetTop);
-    const sectionBottom = section.offsetTop + section.offsetHeight;
-    const distFromBottom = Math.abs(
-      window.scrollY + window.innerHeight - sectionBottom,
-    );
+    const distFromBottom = Math.abs(window.scrollY - targetBottom);
 
     if (distFromTop > 72 && distFromBottom > 72) return;
 
     if (distFromTop <= distFromBottom) {
       await animateScrollTo(targetTop, SNAP_DURATION_MS);
+    } else {
+      await animateScrollTo(targetBottom, SNAP_DURATION_MS);
     }
     return;
   }

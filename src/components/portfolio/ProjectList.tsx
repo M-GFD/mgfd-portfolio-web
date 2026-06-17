@@ -320,7 +320,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
 
   return (
     <div
-      className="works-carousel flex h-full min-h-0 flex-col"
+      className="works-carousel flex flex-col"
       aria-label={t('projects.sectionTitle')}
     >
       <div className="works-carousel__scene">
@@ -338,7 +338,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
               }}
               className="works-carousel__slide glass-card"
             >
-              <div className="works-carousel__card-media glass-card__media relative min-h-0 p-2 sm:p-3">
+              <div className="works-carousel__card-media glass-card__media relative aspect-video p-2 sm:p-3">
                 <ProjectCoverMedia
                   images={coverImages}
                   title={project.title}
