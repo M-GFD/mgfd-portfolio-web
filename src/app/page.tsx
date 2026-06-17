@@ -52,7 +52,18 @@ export default function HomePage() {
           <ProjectList projects={projectsWithLocale} loading={false} />
         </section>
 
-        <Footer showCta />
+        <div className="container mx-auto max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8">
+          <div className="flex justify-center">
+            <a
+              href="mailto:mgfd.design@gmail.com"
+              className="inline-flex w-auto items-center justify-center rounded-lg bg-white px-5 py-2 text-sm font-medium text-black shadow-sm shadow-black/40 transition-colors hover:bg-neutral-200 sm:px-7 sm:py-2.5"
+            >
+              {t('projects.cta')}
+            </a>
+          </div>
+        </div>
+
+        <Footer />
       </main>
     </div>
   );
