@@ -237,19 +237,24 @@
   .works-carousel::after {
     content: '';
     position: absolute;
-    top: 0;
+    top: 50%;
     z-index: 2;
     width: min(18vw, 5.5rem);
-    height: calc(100% - 2.5rem);
+    height: 100dvh;
+    height: 100lvh;
+    min-height: -webkit-fill-available;
+    transform: translateY(-50%);
     pointer-events: none;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
   }
 
   .works-carousel::before {
     left: 0;
     background: linear-gradient(
       90deg,
-      rgb(9 9 11 / 0.92) 0%,
-      rgb(9 9 11 / 0.45) 55%,
+      rgb(9 9 11 / 0.94) 0%,
+      rgb(9 9 11 / 0.5) 55%,
       transparent 100%
     );
   }
@@ -258,8 +263,8 @@
     right: 0;
     background: linear-gradient(
       270deg,
-      rgb(9 9 11 / 0.92) 0%,
-      rgb(9 9 11 / 0.45) 55%,
+      rgb(9 9 11 / 0.94) 0%,
+      rgb(9 9 11 / 0.5) 55%,
       transparent 100%
     );
   }
