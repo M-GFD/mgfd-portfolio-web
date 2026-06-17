@@ -63,7 +63,7 @@ export default function Footer({
         'border-none bg-zinc-950/86 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.45)] backdrop-blur-[10px] transition-[backdrop-filter] duration-300 ease-out hover:backdrop-blur-[12px]',
         embedded
           ? 'mt-auto flex flex-1 flex-col pt-6 sm:pt-8 md:pt-10'
-          : 'mt-6 shrink-0 sm:mt-8 md:mt-10',
+          : 'mt-10 shrink-0 sm:mt-12 md:mt-16',
       )}
     >
       <div
