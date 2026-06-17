@@ -319,7 +319,10 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   }
 
   return (
-    <div className="works-carousel" aria-label={t('projects.sectionTitle')}>
+    <div
+      className="works-carousel flex h-full min-h-0 flex-col"
+      aria-label={t('projects.sectionTitle')}
+    >
       <div className="works-carousel__scene">
         <div ref={trackRef} className="works-carousel__track">
         {projects.map((project, index) => {
@@ -335,7 +338,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
               }}
               className="works-carousel__slide glass-card"
             >
-              <div className="glass-card__media relative aspect-video p-3 sm:p-4 md:p-5">
+              <div className="works-carousel__card-media glass-card__media relative min-h-0 p-2 sm:p-3">
                 <ProjectCoverMedia
                   images={coverImages}
                   title={project.title}
@@ -348,14 +351,14 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
                 />
               </div>
 
-              <div className="p-4 sm:p-6">
-                <h4 className="mb-1.5 text-xl font-bold text-white sm:mb-2 sm:text-2xl">
+              <div className="works-carousel__card-body p-3 sm:p-4">
+                <h4 className="mb-1 text-base font-bold text-white sm:text-lg">
                   {project.title}
                 </h4>
-                <p className="mb-2 text-xs text-neutral-400 sm:mb-3 sm:text-sm md:text-base">
+                <p className="mb-1.5 line-clamp-1 text-xs text-neutral-400 sm:text-sm">
                   {project.subtitle}
                 </p>
-                <p className="text-sm leading-relaxed text-neutral-300 sm:text-base">
+                <p className="line-clamp-2 text-xs leading-relaxed text-neutral-300 sm:text-sm">
                   {project.description}
                 </p>
                 {project.websiteUrl && (
@@ -363,7 +366,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
                     href={project.websiteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-3 inline-block text-sm text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-neutral-200 hover:decoration-white/70 sm:mt-4 sm:text-base"
+                    className="mt-2 inline-block max-w-full truncate text-xs text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-neutral-200 hover:decoration-white/70 sm:text-sm"
                   >
                     {project.websiteUrl}
                   </a>

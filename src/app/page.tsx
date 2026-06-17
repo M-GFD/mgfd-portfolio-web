@@ -42,29 +42,32 @@ export default function HomePage() {
 
         <SnapSection
           id="works"
-          long
-          className="flex flex-col pb-14 pt-[calc(5.5rem+env(safe-area-inset-top))] sm:pb-20 sm:pt-8 md:pb-28 md:pt-10"
+          className="flex min-h-0 flex-col overflow-hidden pt-[calc(5.5rem+env(safe-area-inset-top))] sm:pt-8"
         >
-          <div className="container mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 className="mb-6 text-center text-2xl font-bold text-white sm:mb-8 sm:text-3xl md:mb-10 md:text-4xl lg:text-5xl">
+          <div className="container mx-auto max-w-6xl shrink-0 px-4 sm:px-6">
+            <h2 className="mb-3 text-center text-2xl font-bold text-white sm:mb-4 sm:text-3xl md:text-4xl">
               {t('projects.sectionTitle')}
             </h2>
           </div>
-          <ProjectList projects={projectsWithLocale} loading={false} />
-          <div className="container mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="mt-10 flex justify-center sm:mt-14">
+
+          <div className="min-h-0 flex-1">
+            <ProjectList projects={projectsWithLocale} loading={false} />
+          </div>
+
+          <div className="container mx-auto max-w-6xl shrink-0 px-4 pb-2 pt-2 sm:px-6 sm:pb-3">
+            <div className="flex justify-center">
               <a
                 href="mailto:mgfd.design@gmail.com"
-                className="inline-flex w-auto items-center justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black shadow-sm shadow-black/40 transition-colors hover:bg-neutral-200 sm:px-8 sm:py-3 sm:text-base"
+                className="inline-flex w-auto items-center justify-center rounded-lg bg-white px-5 py-2 text-sm font-medium text-black shadow-sm shadow-black/40 transition-colors hover:bg-neutral-200 sm:px-7 sm:py-2.5"
               >
                 {t('projects.cta')}
               </a>
             </div>
           </div>
+
+          <Footer embedded />
         </SnapSection>
       </main>
-
-      <Footer />
     </div>
   );
 }
