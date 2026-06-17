@@ -341,10 +341,12 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
 
     scheduleDepthUpdate();
     track.addEventListener('scroll', scheduleDepthUpdate, { passive: true });
+    track.addEventListener('touchmove', scheduleDepthUpdate, { passive: true });
     window.addEventListener('resize', scheduleDepthUpdate, { passive: true });
 
     return () => {
       track.removeEventListener('scroll', scheduleDepthUpdate);
+      track.removeEventListener('touchmove', scheduleDepthUpdate);
       window.removeEventListener('resize', scheduleDepthUpdate);
       if (depthRafRef.current != null) {
         cancelAnimationFrame(depthRafRef.current);
@@ -393,8 +395,9 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
               ref={(el) => {
                 slideRefs.current[index] = el;
               }}
-              className="works-carousel__slide glass-card"
+              className="works-carousel__slide"
             >
+              <div className="works-carousel__slide-inner glass-card">
               <div className="works-carousel__card-media glass-card__media p-2 sm:p-3">
                 <ProjectCoverMedia
                   images={coverImages}
@@ -428,6 +431,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
                     {project.websiteUrl}
                   </a>
                 )}
+              </div>
               </div>
             </article>
           );
