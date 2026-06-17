@@ -306,6 +306,20 @@
     will-change: transform, opacity;
   }
 
+  .works-carousel__card-media {
+    flex-shrink: 0;
+  }
+
+  .works-carousel__card-viewport {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  .works-carousel__card-body {
+    flex-shrink: 0;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .works-carousel__track {
       perspective: none;

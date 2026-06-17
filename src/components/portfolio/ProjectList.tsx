@@ -153,72 +153,70 @@ function ProjectCoverMedia({
 
   return (
     <>
-      <div className="flex h-full min-h-0 flex-col">
-        <div className="relative min-h-0 flex-1">
-          <button
-            type="button"
-            onClick={openLightbox}
-            className="group absolute inset-0 z-[1] cursor-zoom-in rounded-none border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/80"
-            aria-label={expandAriaLabel}
-          />
-          <img
-            src={images[index]}
-            alt={count === 1 ? title : `${title} — ${index + 1}/${count}`}
-            className="pointer-events-none h-full w-full object-contain object-center select-none"
-            loading={index === 0 ? 'lazy' : 'eager'}
-            draggable={false}
-          />
-          {count > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  go(-1);
-                }}
-                className="absolute left-0 top-1/2 z-[2] flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/35 sm:h-8 sm:w-8"
-                aria-label={prevLabel}
-              >
-                <ChevronLeft className="h-5 w-5" aria-hidden />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  go(1);
-                }}
-                className="absolute right-0 top-1/2 z-[2] flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/35 sm:h-8 sm:w-8"
-                aria-label={nextLabel}
-              >
-                <ChevronRight className="h-5 w-5" aria-hidden />
-              </button>
-            </>
-          )}
-        </div>
+      <div className="works-carousel__card-viewport relative aspect-video w-full">
+        <button
+          type="button"
+          onClick={openLightbox}
+          className="group absolute inset-0 z-[1] cursor-zoom-in rounded-none border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/80"
+          aria-label={expandAriaLabel}
+        />
+        <img
+          src={images[index]}
+          alt={count === 1 ? title : `${title} — ${index + 1}/${count}`}
+          className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center select-none"
+          loading={index === 0 ? 'lazy' : 'eager'}
+          draggable={false}
+        />
         {count > 1 && (
-          <div
-            className="relative z-[2] flex flex-shrink-0 flex-wrap justify-center gap-1.5 pt-2"
-            role="tablist"
-            aria-label={dotsAriaLabel}
-          >
-            {images.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                role="tab"
-                aria-selected={i === index}
-                aria-label={`${i + 1} / ${count}`}
-                onClick={() => setIndex(i)}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === index
-                    ? 'w-4 bg-white'
-                    : 'w-1.5 bg-white/35 hover:bg-white/55'
-                }`}
-              />
-            ))}
-          </div>
+          <>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                go(-1);
+              }}
+              className="absolute left-0 top-1/2 z-[2] flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/35 sm:h-8 sm:w-8"
+              aria-label={prevLabel}
+            >
+              <ChevronLeft className="h-5 w-5" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                go(1);
+              }}
+              className="absolute right-0 top-1/2 z-[2] flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/35 sm:h-8 sm:w-8"
+              aria-label={nextLabel}
+            >
+              <ChevronRight className="h-5 w-5" aria-hidden />
+            </button>
+          </>
         )}
       </div>
+      {count > 1 && (
+        <div
+          className="relative z-[2] mt-2 flex flex-shrink-0 flex-wrap justify-center gap-1.5"
+          role="tablist"
+          aria-label={dotsAriaLabel}
+        >
+          {images.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              role="tab"
+              aria-selected={i === index}
+              aria-label={`${i + 1} / ${count}`}
+              onClick={() => setIndex(i)}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index
+                  ? 'w-4 bg-white'
+                  : 'w-1.5 bg-white/35 hover:bg-white/55'
+              }`}
+            />
+          ))}
+        </div>
+      )}
       {lightbox}
     </>
   );
@@ -397,7 +395,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
               }}
               className="works-carousel__slide glass-card"
             >
-              <div className="works-carousel__card-media glass-card__media relative aspect-video p-2 sm:p-3">
+              <div className="works-carousel__card-media glass-card__media p-2 sm:p-3">
                 <ProjectCoverMedia
                   images={coverImages}
                   title={project.title}
@@ -414,10 +412,10 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
                 <h4 className="mb-1 text-base font-bold text-white sm:text-lg">
                   {project.title}
                 </h4>
-                <p className="mb-1.5 line-clamp-1 text-xs text-neutral-400 sm:text-sm">
+                <p className="mb-1.5 text-xs text-neutral-400 sm:text-sm">
                   {project.subtitle}
                 </p>
-                <p className="line-clamp-2 text-xs leading-relaxed text-neutral-300 sm:text-sm">
+                <p className="text-xs leading-relaxed text-neutral-300 sm:text-sm">
                   {project.description}
                 </p>
                 {project.websiteUrl && (
@@ -425,7 +423,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
                     href={project.websiteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 inline-block max-w-full truncate text-xs text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-neutral-200 hover:decoration-white/70 sm:text-sm"
+                    className="mt-2 inline-block break-all text-xs text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-neutral-200 hover:decoration-white/70 sm:text-sm"
                   >
                     {project.websiteUrl}
                   </a>
