@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react';
 import { Project } from '@/types/portfolio';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
 
 interface ProjectListProps {
   projects: Project[];
@@ -227,6 +228,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   const { t } = useLanguage();
   const trackRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -238,19 +240,30 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          entry.target.setAttribute(
-            'data-in-view',
-            entry.intersectionRatio >= 0.48 ? 'true' : 'false',
-          );
+          const inView = entry.intersectionRatio >= 0.52;
+          entry.target.setAttribute('data-in-view', inView ? 'true' : 'false');
+
+          if (inView) {
+            const idx = slideRefs.current.indexOf(entry.target as HTMLElement);
+            if (idx >= 0) setActiveIndex(idx);
+          }
         }
       },
-      { root: track, threshold: [0.15, 0.35, 0.55, 0.75] },
+      { root: track, threshold: [0.25, 0.52, 0.75] },
     );
 
     for (const slide of slides) observer.observe(slide);
 
     return () => observer.disconnect();
   }, [projects.length, loading]);
+
+  const scrollToSlide = (index: number) => {
+    slideRefs.current[index]?.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'center',
+      block: 'nearest',
+    });
+  };
 
   if (loading) {
     return (
@@ -261,10 +274,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   }
 
   return (
-    <div
-      className="works-carousel"
-      aria-label={t('projects.sectionTitle')}
-    >
+    <div className="works-carousel" aria-label={t('projects.sectionTitle')}>
       <div ref={trackRef} className="works-carousel__track">
         {projects.map((project, index) => {
           const extra = project.galleryImages ?? [];
@@ -280,7 +290,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
               className="works-carousel__slide glass-card"
               data-in-view={index === 0 ? 'true' : 'false'}
             >
-              <div className="works-carousel__media glass-card__media relative min-h-0">
+              <div className="glass-card__media relative aspect-video p-3 sm:p-4 md:p-5">
                 <ProjectCoverMedia
                   images={coverImages}
                   title={project.title}
@@ -293,14 +303,14 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
                 />
               </div>
 
-              <div className="works-carousel__body min-w-0">
-                <h4 className="truncate text-sm font-bold text-white sm:text-base">
+              <div className="p-4 sm:p-6">
+                <h4 className="mb-1.5 text-xl font-bold text-white sm:mb-2 sm:text-2xl">
                   {project.title}
                 </h4>
-                <p className="mt-0.5 truncate text-[0.6875rem] text-neutral-400 sm:text-xs">
+                <p className="mb-2 text-xs text-neutral-400 sm:mb-3 sm:text-sm md:text-base">
                   {project.subtitle}
                 </p>
-                <p className="mt-1 line-clamp-2 text-[0.6875rem] leading-snug text-neutral-300 sm:text-xs">
+                <p className="text-sm leading-relaxed text-neutral-300 sm:text-base">
                   {project.description}
                 </p>
                 {project.websiteUrl && (
@@ -308,7 +318,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
                     href={project.websiteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-1.5 inline-block max-w-full truncate text-[0.6875rem] text-white/90 underline decoration-white/35 underline-offset-2 transition-colors hover:text-white sm:text-xs"
+                    className="mt-3 inline-block text-sm text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-neutral-200 hover:decoration-white/70 sm:mt-4 sm:text-base"
                   >
                     {project.websiteUrl}
                   </a>
@@ -318,6 +328,31 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
           );
         })}
       </div>
+
+      {projects.length > 1 && (
+        <div
+          className="works-carousel__dots"
+          role="tablist"
+          aria-label={t('projects.sectionTitle')}
+        >
+          {projects.map((project, index) => (
+            <button
+              key={project.id}
+              type="button"
+              role="tab"
+              aria-selected={index === activeIndex}
+              aria-label={`${project.title} (${index + 1}/${projects.length})`}
+              onClick={() => scrollToSlide(index)}
+              className={cn(
+                'h-1.5 rounded-full transition-all duration-300 ease-out',
+                index === activeIndex
+                  ? 'w-7 bg-white'
+                  : 'w-1.5 bg-white/35 hover:bg-white/55',
+              )}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
