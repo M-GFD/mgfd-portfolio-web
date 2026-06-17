@@ -259,6 +259,7 @@
     overflow: visible;
     cursor: grab;
     user-select: none;
+    touch-action: pan-y;
     perspective: min(1200px, 100vw);
     perspective-origin: center center;
     transform-style: preserve-3d;
@@ -267,39 +268,28 @@
 
   .works-carousel__scene.is-dragging {
     cursor: grabbing;
-  }
-
-  .works-carousel__scene.is-dragging .works-carousel__track {
-    scroll-snap-type: none;
+    touch-action: none;
   }
 
   .works-carousel__track {
+    overflow: hidden;
+    overscroll-behavior-x: contain;
+    padding-block: 1.5rem 0.5rem;
+  }
+
+  .works-carousel__row {
     display: flex;
     gap: var(--works-gap);
     align-items: stretch;
-    overflow-x: auto;
-    overflow-y: visible;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--works-pad);
-    padding-block: 1.5rem 0.5rem;
     padding-inline: var(--works-pad);
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x pan-y pinch-zoom;
-    scrollbar-width: none;
     transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
-  }
-
-  .works-carousel__track::-webkit-scrollbar {
-    display: none;
+    will-change: transform;
   }
 
   .works-carousel__slide {
     flex: 0 0 auto;
     width: var(--works-slide);
-    scroll-snap-align: center;
-    scroll-snap-stop: always;
     transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
     backface-visibility: hidden;

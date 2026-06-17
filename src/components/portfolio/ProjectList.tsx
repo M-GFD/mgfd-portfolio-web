@@ -58,7 +58,7 @@ function ProjectCoverMedia({
         return next;
       });
     },
-    [count]
+    [count],
   );
 
   const openLightbox = () => {
@@ -148,7 +148,7 @@ function ProjectCoverMedia({
           </span>
         )}
       </div>,
-      portalTarget
+      portalTarget,
     );
 
   return (
@@ -222,34 +222,212 @@ function ProjectCoverMedia({
   );
 }
 
+function easeOutCubic(t: number): number {
+  return 1 - (1 - t) ** 3;
+}
+
 export default function ProjectList({ projects, loading }: ProjectListProps) {
   const { t } = useLanguage();
   const trackRef = useRef<HTMLDivElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const depthRafRef = useRef<number | null>(null);
+  const offsetRef = useRef(0);
+  const animRafRef = useRef<number | null>(null);
   const isDraggingRef = useRef(false);
   const dragPointerIdRef = useRef<number | null>(null);
   const dragStartXRef = useRef(0);
-  const dragStartScrollLeftRef = useRef(0);
+  const dragStartOffsetRef = useRef(0);
 
   const isInteractiveDragTarget = (target: EventTarget | null) => {
     if (!(target instanceof HTMLElement)) return false;
     return Boolean(target.closest('a, button, input, textarea, select, label'));
   };
 
+  const getSnapOffset = useCallback((index: number) => {
+    const track = trackRef.current;
+    const slide = slideRefs.current[index];
+    if (!track || !slide) return 0;
+
+    const trackCenter = track.clientWidth / 2;
+    const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+    return trackCenter - slideCenter;
+  }, []);
+
+  const applyRowOffset = useCallback((offset: number) => {
+    offsetRef.current = offset;
+    if (rowRef.current) {
+      rowRef.current.style.transform = `translate3d(${offset}px, 0, 0)`;
+    }
+  }, []);
+
+  const updateSlideDepth = useCallback(() => {
+    depthRafRef.current = null;
+
+    const reducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    if (reducedMotion) return;
+
+    const trackEl = trackRef.current;
+    const items = slideRefs.current.filter(Boolean) as HTMLElement[];
+    if (!trackEl || items.length === 0) return;
+
+    const trackRect = trackEl.getBoundingClientRect();
+    const centerX = trackRect.left + trackRect.width / 2;
+    const falloff = Math.max(trackRect.width * 0.42, 1);
+
+    let closestIndex = 0;
+    let closestDistance = Number.POSITIVE_INFINITY;
+
+    for (let i = 0; i < items.length; i++) {
+      const slide = items[i];
+      const rect = slide.getBoundingClientRect();
+      const slideCenter = rect.left + rect.width / 2;
+      const offset = slideCenter - centerX;
+      const distance = Math.abs(offset);
+      const t = Math.min(1, distance / falloff);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = i;
+      }
+
+      const rotateY = (offset / falloff) * -38;
+      const translateZ = -t * 220;
+      const scale = 1 - t * 0.14;
+      const opacity = 1 - t * 0.72;
+
+      slide.style.transform = `rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`;
+      slide.style.opacity = String(opacity);
+      slide.style.zIndex = String(100 - Math.round(t * 90));
+    }
+
+    setActiveIndex((prev) => (prev === closestIndex ? prev : closestIndex));
+  }, []);
+
+  const scheduleDepthUpdate = useCallback(() => {
+    if (depthRafRef.current != null) return;
+    depthRafRef.current = requestAnimationFrame(updateSlideDepth);
+  }, [updateSlideDepth]);
+
+  const findNearestSnapIndex = useCallback(() => {
+    let bestIndex = 0;
+    let bestDistance = Number.POSITIVE_INFINITY;
+
+    for (let i = 0; i < slideRefs.current.length; i++) {
+      const snapOffset = getSnapOffset(i);
+      const distance = Math.abs(offsetRef.current - snapOffset);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = i;
+      }
+    }
+
+    return bestIndex;
+  }, [getSnapOffset]);
+
+  const animateToOffset = useCallback(
+    (targetOffset: number, durationMs = 420) => {
+      if (animRafRef.current != null) {
+        cancelAnimationFrame(animRafRef.current);
+        animRafRef.current = null;
+      }
+
+      const reducedMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)',
+      ).matches;
+
+      if (reducedMotion || durationMs <= 0) {
+        applyRowOffset(targetOffset);
+        scheduleDepthUpdate();
+        return;
+      }
+
+      const startOffset = offsetRef.current;
+      const distance = targetOffset - startOffset;
+      if (Math.abs(distance) < 0.5) {
+        applyRowOffset(targetOffset);
+        scheduleDepthUpdate();
+        return;
+      }
+
+      const start = performance.now();
+
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / durationMs);
+        applyRowOffset(startOffset + distance * easeOutCubic(t));
+        scheduleDepthUpdate();
+
+        if (t < 1) {
+          animRafRef.current = requestAnimationFrame(step);
+        } else {
+          animRafRef.current = null;
+        }
+      };
+
+      animRafRef.current = requestAnimationFrame(step);
+    },
+    [applyRowOffset, scheduleDepthUpdate],
+  );
+
+  const snapToIndex = useCallback(
+    (index: number, durationMs = 420) => {
+      animateToOffset(getSnapOffset(index), durationMs);
+    },
+    [animateToOffset, getSnapOffset],
+  );
+
+  const snapToNearest = useCallback(() => {
+    snapToIndex(findNearestSnapIndex());
+  }, [findNearestSnapIndex, snapToIndex]);
+
+  useEffect(() => {
+    const syncLayout = () => {
+      snapToIndex(findNearestSnapIndex(), 0);
+      scheduleDepthUpdate();
+    };
+
+    const rafId = requestAnimationFrame(() => {
+      requestAnimationFrame(syncLayout);
+    });
+    window.addEventListener('resize', syncLayout);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', syncLayout);
+    };
+  }, [projects.length, loading, snapToIndex, findNearestSnapIndex, scheduleDepthUpdate]);
+
+  useEffect(() => {
+    scheduleDepthUpdate();
+    return () => {
+      if (depthRafRef.current != null) {
+        cancelAnimationFrame(depthRafRef.current);
+      }
+      if (animRafRef.current != null) {
+        cancelAnimationFrame(animRafRef.current);
+      }
+    };
+  }, [scheduleDepthUpdate]);
+
   const handleTrackPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 || isInteractiveDragTarget(e.target)) return;
 
-    const track = trackRef.current;
     const scene = sceneRef.current;
-    if (!track || !scene) return;
+    if (!scene) return;
+
+    if (animRafRef.current != null) {
+      cancelAnimationFrame(animRafRef.current);
+      animRafRef.current = null;
+    }
 
     isDraggingRef.current = true;
     dragPointerIdRef.current = e.pointerId;
     dragStartXRef.current = e.clientX;
-    dragStartScrollLeftRef.current = track.scrollLeft;
+    dragStartOffsetRef.current = offsetRef.current;
     scene.classList.add('is-dragging');
     scene.setPointerCapture(e.pointerId);
   };
@@ -257,14 +435,14 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   const handleTrackPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (
       !isDraggingRef.current ||
-      dragPointerIdRef.current !== e.pointerId ||
-      !trackRef.current
+      dragPointerIdRef.current !== e.pointerId
     ) {
       return;
     }
 
     const dx = e.clientX - dragStartXRef.current;
-    trackRef.current.scrollLeft = dragStartScrollLeftRef.current - dx;
+    applyRowOffset(dragStartOffsetRef.current + dx);
+    scheduleDepthUpdate();
   };
 
   const endTrackDrag = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -279,87 +457,12 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     if (e.currentTarget.hasPointerCapture(e.pointerId)) {
       e.currentTarget.releasePointerCapture(e.pointerId);
     }
+
+    snapToNearest();
   };
 
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-
-    const reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-
-    const slides = () =>
-      slideRefs.current.filter(Boolean) as HTMLElement[];
-
-    const updateSlideDepth = () => {
-      depthRafRef.current = null;
-
-      if (reducedMotion) return;
-
-      const trackEl = trackRef.current;
-      const items = slides();
-      if (!trackEl || items.length === 0) return;
-
-      const trackRect = trackEl.getBoundingClientRect();
-      const centerX = trackRect.left + trackRect.width / 2;
-      const falloff = Math.max(trackRect.width * 0.42, 1);
-
-      let closestIndex = 0;
-      let closestDistance = Number.POSITIVE_INFINITY;
-
-      for (let i = 0; i < items.length; i++) {
-        const slide = items[i];
-        const rect = slide.getBoundingClientRect();
-        const slideCenter = rect.left + rect.width / 2;
-        const offset = slideCenter - centerX;
-        const distance = Math.abs(offset);
-        const t = Math.min(1, distance / falloff);
-
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestIndex = i;
-        }
-
-        const rotateY = (offset / falloff) * -38;
-        const translateZ = -t * 220;
-        const scale = 1 - t * 0.14;
-        const opacity = 1 - t * 0.72;
-
-        slide.style.transform = `rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`;
-        slide.style.opacity = String(opacity);
-        slide.style.zIndex = String(100 - Math.round(t * 90));
-      }
-
-      setActiveIndex((prev) => (prev === closestIndex ? prev : closestIndex));
-    };
-
-    const scheduleDepthUpdate = () => {
-      if (depthRafRef.current != null) return;
-      depthRafRef.current = requestAnimationFrame(updateSlideDepth);
-    };
-
-    scheduleDepthUpdate();
-    track.addEventListener('scroll', scheduleDepthUpdate, { passive: true });
-    track.addEventListener('touchmove', scheduleDepthUpdate, { passive: true });
-    window.addEventListener('resize', scheduleDepthUpdate, { passive: true });
-
-    return () => {
-      track.removeEventListener('scroll', scheduleDepthUpdate);
-      track.removeEventListener('touchmove', scheduleDepthUpdate);
-      window.removeEventListener('resize', scheduleDepthUpdate);
-      if (depthRafRef.current != null) {
-        cancelAnimationFrame(depthRafRef.current);
-      }
-    };
-  }, [projects.length, loading]);
-
   const scrollToSlide = (index: number) => {
-    slideRefs.current[index]?.scrollIntoView({
-      behavior: 'smooth',
-      inline: 'center',
-      block: 'nearest',
-    });
+    snapToIndex(index);
   };
 
   if (loading) {
@@ -384,58 +487,60 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
         onPointerCancel={endTrackDrag}
       >
         <div ref={trackRef} className="works-carousel__track">
-        {projects.map((project, index) => {
-          const extra = project.galleryImages ?? [];
-          const coverImages =
-            extra.length > 0 ? [project.image, ...extra] : [project.image];
+          <div ref={rowRef} className="works-carousel__row">
+            {projects.map((project, index) => {
+              const extra = project.galleryImages ?? [];
+              const coverImages =
+                extra.length > 0 ? [project.image, ...extra] : [project.image];
 
-          return (
-            <article
-              key={project.id}
-              ref={(el) => {
-                slideRefs.current[index] = el;
-              }}
-              className="works-carousel__slide"
-            >
-              <div className="works-carousel__slide-inner glass-card">
-              <div className="works-carousel__card-media glass-card__media p-2 sm:p-3">
-                <ProjectCoverMedia
-                  images={coverImages}
-                  title={project.title}
-                  dotsAriaLabel={t('projects.gallery')}
-                  prevLabel={t('projects.previousAria')}
-                  nextLabel={t('projects.nextAria')}
-                  expandAriaLabel={t('projects.expandImageAria')}
-                  lightboxAriaLabel={t('projects.lightboxAria')}
-                  closeAriaLabel={t('projects.closeAria')}
-                />
-              </div>
+              return (
+                <article
+                  key={project.id}
+                  ref={(el) => {
+                    slideRefs.current[index] = el;
+                  }}
+                  className="works-carousel__slide"
+                >
+                  <div className="works-carousel__slide-inner glass-card">
+                    <div className="works-carousel__card-media glass-card__media p-2 sm:p-3">
+                      <ProjectCoverMedia
+                        images={coverImages}
+                        title={project.title}
+                        dotsAriaLabel={t('projects.gallery')}
+                        prevLabel={t('projects.previousAria')}
+                        nextLabel={t('projects.nextAria')}
+                        expandAriaLabel={t('projects.expandImageAria')}
+                        lightboxAriaLabel={t('projects.lightboxAria')}
+                        closeAriaLabel={t('projects.closeAria')}
+                      />
+                    </div>
 
-              <div className="works-carousel__card-body p-3 sm:p-4">
-                <h4 className="mb-1 text-base font-bold text-white sm:text-lg">
-                  {project.title}
-                </h4>
-                <p className="mb-1.5 text-xs text-neutral-400 sm:text-sm">
-                  {project.subtitle}
-                </p>
-                <p className="text-xs leading-relaxed text-neutral-300 sm:text-sm">
-                  {project.description}
-                </p>
-                {project.websiteUrl && (
-                  <a
-                    href={project.websiteUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-block break-all text-xs text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-neutral-200 hover:decoration-white/70 sm:text-sm"
-                  >
-                    {project.websiteUrl}
-                  </a>
-                )}
-              </div>
-              </div>
-            </article>
-          );
-        })}
+                    <div className="works-carousel__card-body p-3 sm:p-4">
+                      <h4 className="mb-1 text-base font-bold text-white sm:text-lg">
+                        {project.title}
+                      </h4>
+                      <p className="mb-1.5 text-xs text-neutral-400 sm:text-sm">
+                        {project.subtitle}
+                      </p>
+                      <p className="text-xs leading-relaxed text-neutral-300 sm:text-sm">
+                        {project.description}
+                      </p>
+                      {project.websiteUrl && (
+                        <a
+                          href={project.websiteUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 inline-block break-all text-xs text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-neutral-200 hover:decoration-white/70 sm:text-sm"
+                        >
+                          {project.websiteUrl}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </div>
 
