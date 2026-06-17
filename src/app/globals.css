@@ -134,8 +134,8 @@
   }
 
   /**
-   * Táctil: cada .snap-section es un punto de snap.
-   * Trabajos usa anclas inicio/fin para permitir ver el footer completo.
+   * Táctil: scroll-snap en Hero, About y Herramientas.
+   * Trabajos y footer quedan fuera del snap (scroll libre).
    */
   html.section-scroll-snap {
     scroll-snap-type: y mandatory;
@@ -221,31 +221,10 @@
     -webkit-backdrop-filter: blur(8px);
   }
 
-  /** Trabajos + footer: altura natural; snap inicio (título) y fin (footer). */
-  #works.snap-section {
+  /** Trabajos + footer embebido (sin scroll-snap vertical). */
+  #works {
     min-height: 100dvh;
-    height: auto;
-    max-height: none;
-    overflow: visible;
     box-sizing: border-box;
-  }
-
-  html.section-scroll-snap #works.snap-section {
-    scroll-snap-align: none;
-    scroll-snap-stop: normal;
-  }
-
-  html.section-scroll-snap .works-snap-start {
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-    height: 1px;
-    margin-bottom: -1px;
-    flex-shrink: 0;
-  }
-
-  html.section-scroll-snap #contact.works-snap-end {
-    scroll-snap-align: end;
-    scroll-snap-stop: always;
   }
 
   /** Trabajos: carrusel horizontal con profundidad 3D (sin blur en márgenes). */

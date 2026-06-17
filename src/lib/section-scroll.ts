@@ -187,7 +187,7 @@ function isGateOpen(): boolean {
   return document.querySelector('[data-experience-gate]') != null;
 }
 
-/** Debajo de la última sección con snap (p. ej. footer libre). */
+/** Debajo de la última sección con snap (Trabajos en adelante: scroll libre). */
 function isPastLastSnapSection(): boolean {
   const sections = getSections();
   if (!sections.length) return false;

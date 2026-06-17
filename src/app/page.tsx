@@ -7,7 +7,6 @@ import Profile from '@/components/portfolio/Profile';
 import Technologies from '@/components/portfolio/Technologies';
 import ProjectList from '@/components/portfolio/ProjectList';
 import Footer from '@/components/portfolio/Footer';
-import { SnapSection } from '@/components/layout/SnapSection';
 import { projects } from '@/data/projects';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -40,13 +39,10 @@ export default function HomePage() {
 
         <Technologies />
 
-        <SnapSection
+        <section
           id="works"
-          long
           className="flex flex-col pt-[calc(5.5rem+env(safe-area-inset-top))] sm:pt-8"
         >
-          <div className="works-snap-start pointer-events-none" aria-hidden="true" />
-
           <div className="container mx-auto max-w-6xl shrink-0 px-4 pb-2 sm:px-6 sm:pb-3">
             <h2 className="mb-4 text-center text-2xl font-bold text-white sm:mb-5 sm:text-3xl md:text-4xl">
               {t('projects.sectionTitle')}
@@ -55,8 +51,8 @@ export default function HomePage() {
 
           <ProjectList projects={projectsWithLocale} loading={false} />
 
-          <Footer embedded showCta snapEnd />
-        </SnapSection>
+          <Footer embedded showCta />
+        </section>
       </main>
     </div>
   );
