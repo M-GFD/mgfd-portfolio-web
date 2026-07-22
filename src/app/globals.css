@@ -130,7 +130,36 @@
     }
   }
   body {
-    @apply bg-zinc-950 text-foreground overflow-x-clip;
+    @apply bg-zinc-950 text-foreground;
+    /* visible: overflow-x clip aplana perspective/preserve-3d del recorrido orbital */
+    overflow-x: visible;
+  }
+
+  /**
+   * Escenario 3D del recorrido circular (anime.js + scroll).
+   * overflow visible para no aplanar preserve-3d / perspective.
+   */
+  .orbit-stage {
+    perspective: min(1400px, 160vw);
+    perspective-origin: 50% 42%;
+    transform-style: preserve-3d;
+    overflow: visible;
+  }
+
+  .orbit-panel {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orbit-stage {
+      perspective: none;
+    }
+
+    .orbit-panel {
+      transform: none !important;
+    }
   }
 
   /**
