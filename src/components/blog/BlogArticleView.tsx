@@ -44,7 +44,11 @@ export function BlogArticleView({ post, shareUrl }: BlogArticleViewProps) {
             {post.description}
           </p>
           <div className="flex flex-wrap items-center gap-3">
-            <BlogShareButton url={shareUrl} title={post.title} />
+            <BlogShareButton
+              url={shareUrl}
+              title={post.title}
+              className="sm:hidden"
+            />
             {post.tags.length > 0 && (
               <ul className="flex flex-wrap gap-2">
                 {post.tags.map((tag) => (
