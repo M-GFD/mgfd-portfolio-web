@@ -64,7 +64,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
         <div className="flex min-w-0 flex-1 items-center pr-2">
           <a href="/" className="flex min-w-0 items-center">
             <img
-              src="images/_mgfd_logo.svg"
+              src="/images/_mgfd_logo.svg"
               alt="Mateo G. Fontana Dalmasso (MGFD) — portfolio web"
               className="h-7 w-auto invert brightness-0 contrast-200 sm:h-8"
             />
@@ -73,22 +73,28 @@ export default function Header({ onMenuToggle }: HeaderProps) {
 
         <nav className="hidden items-center gap-8 md:flex">
           <a
-            href="#about"
+            href="/#about"
             className="text-neutral-400 transition-colors hover:text-white"
           >
             {t('nav.about')}
           </a>
           <a
-            href="#contact"
+            href="/#contact"
             className="text-neutral-400 transition-colors hover:text-white"
           >
             {t('nav.contact')}
           </a>
           <a
-            href="#works"
+            href="/#works"
             className="text-neutral-400 transition-colors hover:text-white"
           >
             {t('nav.works')}
+          </a>
+          <a
+            href="/blog"
+            className="text-neutral-400 transition-colors hover:text-white"
+          >
+            {t('nav.blog')}
           </a>
           <div className="flex items-center gap-3 border-l border-white/15 pl-6">
             <MusicControls />
@@ -151,25 +157,32 @@ export default function Header({ onMenuToggle }: HeaderProps) {
       {mobileMenuOpen && (
         <nav className="px-3 py-3 sm:px-6 sm:py-4 md:hidden">
           <a
-            href="#about"
+            href="/#about"
             className="block py-2 text-neutral-400 transition-colors hover:text-white"
             onClick={handleNavClick}
           >
             {t('nav.about')}
           </a>
           <a
-            href="#contact"
+            href="/#contact"
             className="block py-2 text-neutral-400 transition-colors hover:text-white"
             onClick={handleNavClick}
           >
             {t('nav.contact')}
           </a>
           <a
-            href="#works"
+            href="/#works"
             className="block py-2 text-neutral-400 transition-colors hover:text-white"
             onClick={handleNavClick}
           >
             {t('nav.works')}
+          </a>
+          <a
+            href="/blog"
+            className="block py-2 text-neutral-400 transition-colors hover:text-white"
+            onClick={handleNavClick}
+          >
+            {t('nav.blog')}
           </a>
         </nav>
       )}

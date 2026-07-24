@@ -11,6 +11,7 @@ function resolveHashFromHref(href: string): string | null {
   try {
     const url = new URL(href, window.location.href);
     if (url.origin !== window.location.origin) return null;
+    // En home: scroll suave. Desde /blog u otra ruta: navegación normal a /#sección.
     if (url.pathname !== window.location.pathname) return null;
     return url.hash.length > 1 ? url.hash : null;
   } catch {

@@ -77,7 +77,7 @@ export default function Footer({ embedded = false }: FooterProps) {
           <div className="flex flex-col text-center md:text-left">
             <div className={cn(embedded ? 'mb-2 sm:mb-3' : 'mb-4')}>
               <img
-                src="images/_mgfd_logo.svg"
+                src="/images/_mgfd_logo.svg"
                 alt="Mateo G. Fontana Dalmasso (MGFD) — portfolio web"
                 className={cn(
                   'w-auto invert brightness-0 contrast-200',

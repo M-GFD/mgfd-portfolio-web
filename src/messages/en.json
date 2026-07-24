@@ -3,10 +3,20 @@
     "about": "About",
     "contact": "Contact",
     "works": "Works",
+    "blog": "Blog",
     "themeToggle": "Switch between light and dark theme",
     "themeHint": "Light or dark theme",
     "themeLight": "Light theme",
     "themeDark": "Dark theme"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Research and outreach articles on design, AI, and professional practice.",
+    "empty": "New articles coming soon.",
+    "readMore": "Read article",
+    "backToBlog": "Back to blog",
+    "share": "Share",
+    "linkCopied": "Link copied"
   },
   "hero": {
     "subtitle": "Graphic Design | UX/UI | Vibe Coding | Vibe Design",
