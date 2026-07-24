@@ -48,13 +48,10 @@ export function BlogArticleView({ post, shareUrl }: BlogArticleViewProps) {
             {resolved.title}
           </h1>
           {resolved.subtitle ? (
-            <p className="mb-4 text-base italic leading-relaxed text-neutral-300 sm:text-lg">
+            <p className="mb-6 text-base italic leading-relaxed text-neutral-300 sm:text-lg">
               {resolved.subtitle}
             </p>
           ) : null}
-          <p className="mb-6 max-w-2xl text-sm leading-relaxed text-neutral-400 sm:text-base">
-            {resolved.description}
-          </p>
           <div className="flex flex-wrap items-center gap-3">
             <BlogShareButton
               url={shareUrl}
