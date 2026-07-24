@@ -14,7 +14,7 @@ draft: false
 
 Cognition construyó el motor que ejecuta la intención. Google construyó el formato donde la intención se guarda. Ninguno construyó la pieza del medio — y esa pieza es un problema de escritura, no de programación.
 
-Los dos productos de los que habla este ensayo: **Devin**, de Cognition, el ingeniero de software autónomo, y **DESIGN.md**, de Google Labs, el formato de intención de diseño para agentes de código.
+Los dos productos de los que habla este ensayo: [**Devin**](https://devin.ai/), de Cognition, el ingeniero de software autónomo, y [**DESIGN.md**](https://github.com/google-labs-code/design.md), de Google Labs, el formato de intención de diseño para agentes de código.
 
 ## Dos empresas construyeron la misma idea sin nombrarla
 

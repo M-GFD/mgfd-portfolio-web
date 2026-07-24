@@ -14,7 +14,7 @@ draft: false
 
 Cognition built the engine that executes intention. Google built the format where intention is stored. Neither built the middle piece — and that piece is a writing problem, not a programming problem.
 
-The two products this essay is about: **Devin**, from Cognition, the autonomous software engineer, and **DESIGN.md**, from Google Labs, the design-intention format for coding agents.
+The two products this essay is about: [**Devin**](https://devin.ai/), from Cognition, the autonomous software engineer, and [**DESIGN.md**](https://github.com/google-labs-code/design.md), from Google Labs, the design-intention format for coding agents.
 
 ## Two companies built the same idea without naming it
 
