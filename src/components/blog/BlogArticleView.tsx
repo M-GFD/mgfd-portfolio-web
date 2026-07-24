@@ -43,10 +43,15 @@ export function BlogArticleView({ post, shareUrl }: BlogArticleViewProps) {
           </p>
           <h1
             id="blog-article-title"
-            className="mb-4 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-[2.75rem] md:leading-tight"
+            className="mb-3 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-[2.75rem] md:leading-tight"
           >
             {resolved.title}
           </h1>
+          {resolved.subtitle ? (
+            <p className="mb-4 text-base italic leading-relaxed text-neutral-300 sm:text-lg">
+              {resolved.subtitle}
+            </p>
+          ) : null}
           <p className="mb-6 max-w-2xl text-sm leading-relaxed text-neutral-400 sm:text-base">
             {resolved.description}
           </p>

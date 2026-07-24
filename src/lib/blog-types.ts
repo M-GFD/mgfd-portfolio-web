@@ -2,6 +2,8 @@ export type BlogLocale = 'es' | 'en';
 
 export type BlogPostTranslation = {
   title: string;
+  /** Subtítulo bajo el título principal (opcional). */
+  subtitle?: string;
   description: string;
   content: string;
   tags: string[];
@@ -22,6 +24,7 @@ export type BlogPostView = {
   draft: boolean;
   locale: BlogLocale;
   title: string;
+  subtitle?: string;
   description: string;
   content: string;
   tags: string[];

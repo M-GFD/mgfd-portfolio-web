@@ -1,5 +1,6 @@
 ---
 title: "The two halves of software's future"
+subtitle: "(and why the missing one is not written in code)"
 description: "Cognition built the engine that executes intention. Google built the format where intention is stored. Neither built the middle piece — and that piece is a writing problem, not a programming problem."
 date: "2026-07-24"
 tags:
@@ -9,8 +10,6 @@ tags:
   - AI
 draft: false
 ---
-
-*(and why the missing one is not written in code)*
 
 Cognition built the engine that executes intention. Google built the format where intention is stored. Neither built the middle piece — and that piece is a writing problem, not a programming problem.
 

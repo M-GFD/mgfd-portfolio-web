@@ -28,6 +28,8 @@ function readLocaleFile(
   const raw = fs.readFileSync(filePath, 'utf8');
   const { data, content } = matter(raw);
   const title = typeof data.title === 'string' ? data.title.trim() : '';
+  const subtitle =
+    typeof data.subtitle === 'string' ? data.subtitle.trim() : undefined;
   const description =
     typeof data.description === 'string' ? data.description.trim() : '';
   const date = typeof data.date === 'string' ? data.date.trim() : '';
@@ -38,6 +40,7 @@ function readLocaleFile(
     draft: data.draft === true,
     translation: {
       title,
+      ...(subtitle ? { subtitle } : {}),
       description,
       content: content.trim(),
       tags: parseTags(data.tags),

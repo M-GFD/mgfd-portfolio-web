@@ -20,6 +20,7 @@ export function resolveBlogPost(
       draft: bundle.draft,
       locale: candidate,
       title: translation.title,
+      ...(translation.subtitle ? { subtitle: translation.subtitle } : {}),
       description: translation.description,
       content: translation.content,
       tags: translation.tags,
