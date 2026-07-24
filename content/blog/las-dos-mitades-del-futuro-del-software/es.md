@@ -2,7 +2,6 @@
 title: "Las dos mitades del futuro del software"
 description: "Cognition construyó el motor que ejecuta la intención. Google construyó el formato donde la intención se guarda. Ninguno construyó la pieza del medio — y esa pieza es un problema de escritura, no de programación."
 date: "2026-07-24"
-locale: "es"
 tags:
   - ensayo
   - software

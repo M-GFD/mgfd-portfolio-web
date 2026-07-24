@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllBlogPosts } from "@/lib/blog";
+import { getAllBlogPostBundles } from "@/lib/blog";
 import { getSiteUrl } from "@/lib/site-url";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -7,7 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const home = new URL("/", origin);
   const blog = new URL("/blog", origin);
 
-  const posts = getAllBlogPosts().map((post) => ({
+  const posts = getAllBlogPostBundles().map((post) => ({
     url: new URL(`/blog/${post.slug}`, origin).href,
     lastModified: new Date(post.date),
     changeFrequency: "monthly" as const,

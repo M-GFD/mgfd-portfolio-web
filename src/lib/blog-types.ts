@@ -1,15 +1,28 @@
 export type BlogLocale = 'es' | 'en';
 
-export type BlogPostMeta = {
-  slug: string;
+export type BlogPostTranslation = {
   title: string;
   description: string;
-  date: string;
-  locale: BlogLocale;
+  content: string;
   tags: string[];
-  draft: boolean;
 };
 
-export type BlogPost = BlogPostMeta & {
+/** Artículo con todas las traducciones disponibles (misma URL /blog/[slug]). */
+export type BlogPostBundle = {
+  slug: string;
+  date: string;
+  draft: boolean;
+  translations: Partial<Record<BlogLocale, BlogPostTranslation>>;
+};
+
+/** Vista resuelta para un locale concreto (con fallback). */
+export type BlogPostView = {
+  slug: string;
+  date: string;
+  draft: boolean;
+  locale: BlogLocale;
+  title: string;
+  description: string;
   content: string;
+  tags: string[];
 };

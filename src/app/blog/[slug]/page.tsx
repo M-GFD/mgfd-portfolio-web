@@ -3,7 +3,11 @@ import { notFound } from 'next/navigation';
 import Header from '@/components/portfolio/Header';
 import Footer from '@/components/portfolio/Footer';
 import { BlogArticleView } from '@/components/blog/BlogArticleView';
-import { getBlogPostBySlug, getBlogSlugs } from '@/lib/blog';
+import {
+  getBlogPostBundleBySlug,
+  getBlogSlugs,
+  resolveBlogPost,
+} from '@/lib/blog';
 import { getSiteUrl } from '@/lib/site-url';
 
 type BlogArticlePageProps = {
@@ -18,41 +22,53 @@ export async function generateMetadata({
   params,
 }: BlogArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
-  if (!post) {
+  const bundle = getBlogPostBundleBySlug(slug);
+  if (!bundle) {
     return { title: 'Blog' };
   }
 
-  const path = `/blog/${post.slug}`;
+  const es = resolveBlogPost(bundle, 'es');
+  const en = resolveBlogPost(bundle, 'en');
+  const primary = es ?? en;
+  if (!primary) {
+    return { title: 'Blog' };
+  }
+
+  const path = `/blog/${bundle.slug}`;
   const url = new URL(path, getSiteUrl()).href;
 
   return {
-    title: post.title,
-    description: post.description,
+    title: primary.title,
+    description: primary.description,
     alternates: {
       canonical: path,
+      languages: {
+        ...(es ? { es: path } : {}),
+        ...(en ? { en: path } : {}),
+      },
     },
     openGraph: {
       type: 'article',
       url,
-      title: post.title,
-      description: post.description,
-      publishedTime: post.date,
+      title: primary.title,
+      description: primary.description,
+      publishedTime: bundle.date,
       siteName: 'Portfolio web Mateo G. Fontana Dalmasso (MGFD)',
-      locale: post.locale === 'en' ? 'en_US' : 'es_AR',
-      tags: post.tags,
+      locale: primary.locale === 'en' ? 'en_US' : 'es_AR',
+      alternateLocale: en && es ? ['en_US'] : undefined,
+      tags: primary.tags,
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.title,
-      description: post.description,
+      title: primary.title,
+      description: primary.description,
     },
   };
 }
 
 export default async function BlogArticlePage({ params }: BlogArticlePageProps) {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const post = getBlogPostBundleBySlug(slug);
   if (!post) notFound();
 
   const shareUrl = new URL(`/blog/${post.slug}`, getSiteUrl()).href;

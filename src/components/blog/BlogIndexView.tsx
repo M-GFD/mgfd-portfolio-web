@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatBlogDate } from '@/lib/blog-format';
-import type { BlogPostMeta } from '@/lib/blog-types';
+import { resolveBlogPostMeta } from '@/lib/blog-localize';
+import type { BlogPostBundle } from '@/lib/blog-types';
 
 type BlogIndexViewProps = {
-  posts: BlogPostMeta[];
+  posts: BlogPostBundle[];
 };
 
 export function BlogIndexView({ posts }: BlogIndexViewProps) {
@@ -31,13 +32,15 @@ export function BlogIndexView({ posts }: BlogIndexViewProps) {
       ) : (
         <ul className="flex flex-col gap-4 sm:gap-5">
           {posts.map((post) => {
-            const href = `/blog/${post.slug}`;
+            const resolved = resolveBlogPostMeta(post, locale);
+            if (!resolved) return null;
+            const href = `/blog/${resolved.slug}`;
             return (
-              <li key={post.slug}>
-                <article className="glass-card p-5 sm:p-6">
+              <li key={resolved.slug}>
+                <article className="glass-card p-5 sm:p-6" lang={resolved.locale}>
                   <p className="mb-2 text-xs text-neutral-500 sm:text-sm">
-                    <time dateTime={post.date}>
-                      {formatBlogDate(post.date, locale)}
+                    <time dateTime={resolved.date}>
+                      {formatBlogDate(resolved.date, locale)}
                     </time>
                   </p>
                   <h2 className="mb-2 text-xl font-bold text-white sm:text-2xl">
@@ -45,11 +48,11 @@ export function BlogIndexView({ posts }: BlogIndexViewProps) {
                       href={href}
                       className="transition-colors hover:text-neutral-200"
                     >
-                      {post.title}
+                      {resolved.title}
                     </Link>
                   </h2>
                   <p className="mb-4 text-sm leading-relaxed text-neutral-400 sm:text-base">
-                    {post.description}
+                    {resolved.description}
                   </p>
                   <Link
                     href={href}

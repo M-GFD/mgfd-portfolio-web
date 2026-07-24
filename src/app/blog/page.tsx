@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Header from '@/components/portfolio/Header';
 import Footer from '@/components/portfolio/Footer';
 import { BlogIndexView } from '@/components/blog/BlogIndexView';
-import { getAllBlogPosts } from '@/lib/blog';
+import { getAllBlogPostBundles } from '@/lib/blog';
 import esMessages from '@/messages/es.json';
 
 export const metadata: Metadata = {
@@ -26,9 +26,7 @@ export const metadata: Metadata = {
 };
 
 export default function BlogIndexPage() {
-  const posts = getAllBlogPosts().map(
-    ({ content: _content, ...meta }) => meta,
-  );
+  const posts = getAllBlogPostBundles();
 
   return (
     <div className="flex min-h-screen flex-col bg-transparent">
