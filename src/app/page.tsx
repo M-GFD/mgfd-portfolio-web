@@ -37,23 +37,23 @@ export default function HomePage() {
           Portfolio web Mateo G. Fontana Dalmasso (MGFD)
         </h1>
 
-        <PremiumScrollJourney className="scroll-journey--with-fixed-footer flex min-h-0 flex-1 flex-col">
-          <ScrollChapter runway="long">
+        <PremiumScrollJourney>
+          <ScrollChapter>
             <Hero />
           </ScrollChapter>
 
-          <ScrollChapter runway="medium">
+          <ScrollChapter>
             <Profile />
           </ScrollChapter>
 
-          <ScrollChapter runway="medium">
+          <ScrollChapter>
             <Technologies />
           </ScrollChapter>
 
-          <ScrollChapter runway="long">
+          <ScrollChapter>
             <section
               id="works"
-              className="scroll-mt-[calc(5.5rem+env(safe-area-inset-top))] flex min-h-full w-full flex-col justify-center pt-2 sm:pt-4"
+              className="scroll-mt-[calc(5.5rem+env(safe-area-inset-top))] flex h-full min-h-full w-full flex-col justify-center pt-2 sm:pt-4"
             >
               <div className="container mx-auto w-full max-w-6xl px-4 pb-2 text-center sm:px-6 sm:pb-3">
                 <h2 className="mb-4 text-2xl font-bold text-white sm:mb-5 sm:text-3xl md:text-4xl">
