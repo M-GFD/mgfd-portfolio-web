@@ -37,52 +37,50 @@ export default function HomePage() {
           Portfolio web Mateo G. Fontana Dalmasso (MGFD)
         </h1>
 
-        <PremiumScrollJourney className="flex min-h-0 flex-1 flex-col">
-          <ScrollChapter mode="depth-in" runway="long">
+        <PremiumScrollJourney className="scroll-journey--with-fixed-footer flex min-h-0 flex-1 flex-col">
+          <ScrollChapter runway="long">
             <Hero />
           </ScrollChapter>
 
-          <ScrollChapter mode="horizontal" runway="medium">
+          <ScrollChapter runway="medium">
             <Profile />
           </ScrollChapter>
 
-          <ScrollChapter mode="depth-out" runway="medium">
+          <ScrollChapter runway="medium">
             <Technologies />
           </ScrollChapter>
 
-          <ScrollChapter mode="helix" runway="short">
+          <ScrollChapter runway="long">
             <section
               id="works"
-              className="scroll-mt-[calc(5.5rem+env(safe-area-inset-top))] flex min-h-dvh flex-col justify-center pt-2 sm:pt-4"
+              className="scroll-mt-[calc(5.5rem+env(safe-area-inset-top))] flex min-h-full w-full flex-col justify-center pt-2 sm:pt-4"
             >
-              <div className="container mx-auto max-w-6xl px-4 pb-2 sm:px-6 sm:pb-3">
-                <h2 className="mb-4 text-center text-2xl font-bold text-white sm:mb-5 sm:text-3xl md:text-4xl">
+              <div className="container mx-auto w-full max-w-6xl px-4 pb-2 text-center sm:px-6 sm:pb-3">
+                <h2 className="mb-4 text-2xl font-bold text-white sm:mb-5 sm:text-3xl md:text-4xl">
                   {t('projects.sectionTitle')}
                 </h2>
               </div>
-            </section>
-          </ScrollChapter>
 
-          <ScrollChapter mode="drift" pin={false}>
-            <div className="pt-2 sm:pt-4">
-              <ProjectList projects={projectsWithLocale} loading={false} />
+              <div className="w-full pt-2 sm:pt-4">
+                <ProjectList projects={projectsWithLocale} loading={false} />
 
-              <div className="container mx-auto max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8">
-                <div className="flex justify-center">
-                  <a
-                    href="mailto:mgfd.design@gmail.com"
-                    className="inline-flex w-auto items-center justify-center rounded-lg bg-white px-5 py-2 text-sm font-medium text-black shadow-sm shadow-black/40 transition-colors hover:bg-neutral-200 sm:px-7 sm:py-2.5"
-                  >
-                    {t('projects.cta')}
-                  </a>
+                <div className="container mx-auto max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8">
+                  <div className="flex justify-center">
+                    <a
+                      href="mailto:mgfd.design@gmail.com"
+                      className="inline-flex w-auto items-center justify-center rounded-lg bg-white px-5 py-2 text-sm font-medium text-black shadow-sm shadow-black/40 transition-colors hover:bg-neutral-200 sm:px-7 sm:py-2.5"
+                    >
+                      {t('projects.cta')}
+                    </a>
+                  </div>
                 </div>
               </div>
-
-              <Footer />
-            </div>
+            </section>
           </ScrollChapter>
         </PremiumScrollJourney>
       </main>
+
+      <Footer fixed />
     </div>
   );
 }

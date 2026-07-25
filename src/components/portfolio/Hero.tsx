@@ -7,7 +7,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="snap-section flex min-h-dvh flex-col pt-[calc(5.5rem+env(safe-area-inset-top))]"
+      className="snap-section flex min-h-full w-full flex-col pt-[calc(5.5rem+env(safe-area-inset-top))]"
     >
       {/* Primera vista: sólo SVG + tagline + CTA, centrados; el resto de la página queda tras scroll */}
       <div className="flex flex-1 flex-col items-center justify-center px-4 pb-14 sm:px-6 md:pb-16">

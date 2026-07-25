@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils';
 
 type FooterProps = {
   embedded?: boolean;
+  /** Fijo al fondo del viewport; no participa del scroll de la página. */
+  fixed?: boolean;
 };
 
 function SocialLinks({ embedded }: { embedded: boolean }) {
@@ -49,44 +51,51 @@ function SocialLinks({ embedded }: { embedded: boolean }) {
   );
 }
 
-export default function Footer({ embedded = false }: FooterProps) {
+export default function Footer({
+  embedded = false,
+  fixed = false,
+}: FooterProps) {
   const { t } = useLanguage();
+  const compact = embedded || fixed;
 
   return (
     <footer
       id="contact"
       className={cn(
         'border-none bg-zinc-950/86 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.45)] backdrop-blur-[10px] transition-[backdrop-filter] duration-300 ease-out hover:backdrop-blur-[12px]',
-        embedded
-          ? 'mt-auto flex flex-1 flex-col pt-6 sm:pt-8 md:pt-10'
-          : 'mt-16 shrink-0 sm:mt-20 md:mt-24',
+        fixed &&
+          'pointer-events-auto fixed inset-x-0 bottom-0 z-[110] mt-0 shrink-0',
+        !fixed &&
+          embedded &&
+          'mt-auto flex flex-1 flex-col pt-6 sm:pt-8 md:pt-10',
+        !fixed && !embedded && 'mt-16 shrink-0 sm:mt-20 md:mt-24',
       )}
     >
       <div
         className={cn(
-          'mx-auto max-w-7xl px-4 sm:px-6',
-          embedded ? 'py-4 sm:py-5' : 'py-8 sm:py-10 md:py-12',
+          'mx-auto w-full max-w-7xl px-4 sm:px-6',
+          compact ? 'py-3 sm:py-3.5' : 'py-8 sm:py-10 md:py-12',
         )}
       >
         <div
           className={cn(
             'flex w-full flex-col items-center justify-between md:flex-row md:items-end',
-            embedded ? 'gap-4 sm:gap-5' : 'gap-6 sm:gap-8',
+            compact ? 'gap-3 sm:gap-4' : 'gap-6 sm:gap-8',
           )}
         >
-          <div className="flex flex-col text-center md:text-left">
-            <div className={cn(embedded ? 'mb-2 sm:mb-3' : 'mb-4')}>
+          <div className="flex flex-col items-center text-center md:items-start md:text-left">
+            <div className={cn(compact ? 'mb-1.5 sm:mb-2' : 'mb-4')}>
               <img
                 src="/images/_mgfd_logo.svg"
                 alt="Mateo G. Fontana Dalmasso (MGFD) — portfolio web"
                 className={cn(
-                  'w-auto invert brightness-0 contrast-200',
-                  embedded ? 'h-8' : 'h-10',
+                  'mx-auto w-auto invert brightness-0 contrast-200 md:mx-0',
+                  compact ? 'h-7 sm:h-8' : 'h-10',
                 )}
               />
             </div>
             <div className="flex justify-center gap-5 md:justify-start md:gap-6">
-              <SocialLinks embedded={embedded} />
+              <SocialLinks embedded={compact} />
             </div>
           </div>
 

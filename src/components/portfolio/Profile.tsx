@@ -7,10 +7,10 @@ export default function Profile() {
   return (
     <section
       id="about"
-      className="snap-section flex min-h-dvh items-center px-4 py-10 sm:px-6 sm:py-12 md:py-16"
+      className="snap-section flex min-h-full w-full items-center justify-center px-4 py-10 sm:px-6 sm:py-12 md:py-16"
     >
-      <div className="mx-auto max-w-7xl">
-        <div className="flex flex-col items-center gap-8 sm:gap-10 md:flex-row md:items-start md:gap-12">
+      <div className="mx-auto w-full max-w-7xl">
+        <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-8 sm:gap-10 md:flex-row md:items-center md:gap-12">
           <div className="flex h-44 w-44 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-black ring-1 ring-white/12 sm:h-52 sm:w-52 md:h-72 md:w-72 lg:h-80 lg:w-80">
             <img
               src="/images/profile_03.png"
