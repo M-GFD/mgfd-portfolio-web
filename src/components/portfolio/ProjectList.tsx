@@ -226,12 +226,6 @@ function easeOutCubic(t: number): number {
   return 1 - (1 - t) ** 3;
 }
 
-const MOBILE_FREE_SCROLL_MQ = '(max-width: 639px)';
-
-function isMobileFreeScroll(): boolean {
-  return window.matchMedia(MOBILE_FREE_SCROLL_MQ).matches;
-}
-
 export default function ProjectList({ projects, loading }: ProjectListProps) {
   const { t } = useLanguage();
   const trackRef = useRef<HTMLDivElement>(null);
@@ -261,26 +255,6 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
     return trackCenter - slideCenter;
   }, []);
-
-  const getOffsetBounds = useCallback(() => {
-    const count = slideRefs.current.length;
-    if (count === 0) return { min: 0, max: 0 };
-
-    const first = getSnapOffset(0);
-    const last = getSnapOffset(count - 1);
-    return {
-      min: Math.min(first, last),
-      max: Math.max(first, last),
-    };
-  }, [getSnapOffset]);
-
-  const clampOffset = useCallback(
-    (offset: number) => {
-      const { min, max } = getOffsetBounds();
-      return Math.min(max, Math.max(min, offset));
-    },
-    [getOffsetBounds],
-  );
 
   const applyRowOffset = useCallback((offset: number) => {
     offsetRef.current = offset;
@@ -412,11 +386,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
 
   useEffect(() => {
     const syncLayout = () => {
-      if (isMobileFreeScroll()) {
-        applyRowOffset(clampOffset(offsetRef.current));
-      } else {
-        snapToIndex(findNearestSnapIndex(), 0);
-      }
+      snapToIndex(findNearestSnapIndex(), 0);
       scheduleDepthUpdate();
     };
 
@@ -435,8 +405,6 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     snapToIndex,
     findNearestSnapIndex,
     scheduleDepthUpdate,
-    applyRowOffset,
-    clampOffset,
   ]);
 
   useEffect(() => {
@@ -479,10 +447,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     }
 
     const dx = e.clientX - dragStartXRef.current;
-    const nextOffset = dragStartOffsetRef.current + dx;
-    applyRowOffset(
-      isMobileFreeScroll() ? clampOffset(nextOffset) : nextOffset,
-    );
+    applyRowOffset(dragStartOffsetRef.current + dx);
     scheduleDepthUpdate();
   };
 
@@ -497,12 +462,6 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
 
     if (e.currentTarget.hasPointerCapture(e.pointerId)) {
       e.currentTarget.releasePointerCapture(e.pointerId);
-    }
-
-    if (isMobileFreeScroll()) {
-      applyRowOffset(clampOffset(offsetRef.current));
-      scheduleDepthUpdate();
-      return;
     }
 
     snapToNearest();
@@ -593,7 +552,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
 
       {projects.length > 1 && (
         <div
-          className="works-carousel__dots hidden sm:flex"
+          className="works-carousel__dots"
           role="tablist"
           aria-label={t('projects.sectionTitle')}
         >

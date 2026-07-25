@@ -196,7 +196,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
       </div>
 
       {mobileMenuOpen && (
-        <nav className="border-t border-white/10 bg-zinc-950/92 px-3 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-[12px] sm:px-6 sm:py-4 md:hidden">
+        <nav className="border-t border-white/10 bg-transparent px-3 py-3 sm:px-6 sm:py-4 md:hidden">
           <a
             href="/#about"
             className="block py-2 text-neutral-400 transition-colors hover:text-white"
