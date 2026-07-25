@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Menu, Volume2, VolumeX, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useExperience } from '@/contexts/ExperienceContext';
@@ -49,49 +49,11 @@ function MusicControls() {
 
 export default function Header({ onMenuToggle }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [headerHidden, setHeaderHidden] = useState(false);
-  const lastScrollYRef = useRef(0);
   const { locale, setLocale, t } = useLanguage();
-
-  useEffect(() => {
-    lastScrollYRef.current = window.scrollY;
-    let rafId: number | null = null;
-    let pendingY = window.scrollY;
-
-    const apply = () => {
-      rafId = null;
-      const y = pendingY;
-      const prev = lastScrollYRef.current;
-      const delta = y - prev;
-
-      if (mobileMenuOpen || y < 24) {
-        setHeaderHidden(false);
-      } else if (delta > 10) {
-        setHeaderHidden(true);
-      } else if (delta < -10) {
-        setHeaderHidden(false);
-      }
-
-      lastScrollYRef.current = y;
-    };
-
-    const onScroll = () => {
-      pendingY = window.scrollY;
-      if (rafId != null) return;
-      rafId = requestAnimationFrame(apply);
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (rafId != null) cancelAnimationFrame(rafId);
-    };
-  }, [mobileMenuOpen]);
 
   const handleMenuToggle = () => {
     const newState = !mobileMenuOpen;
     setMobileMenuOpen(newState);
-    if (newState) setHeaderHidden(false);
     onMenuToggle?.(newState);
   };
 
@@ -103,11 +65,10 @@ export default function Header({ onMenuToggle }: HeaderProps) {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-[120] pt-[env(safe-area-inset-top)] transition-[transform,background-color] duration-300 ease-out',
+        'fixed top-0 left-0 right-0 z-[120] pt-[env(safe-area-inset-top)] transition-colors duration-300 ease-out',
         mobileMenuOpen
           ? 'bg-zinc-950/92 backdrop-blur-[12px] md:bg-transparent md:backdrop-blur-none'
           : 'bg-transparent',
-        headerHidden && !mobileMenuOpen && '-translate-y-full',
       )}
     >
       <div className="flex w-full items-center justify-between px-3 py-3 sm:px-5 sm:py-3.5 md:px-6 md:py-4">
