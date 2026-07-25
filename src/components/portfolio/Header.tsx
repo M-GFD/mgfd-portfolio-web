@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Menu, Volume2, VolumeX, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useExperience } from '@/contexts/ExperienceContext';
@@ -13,6 +13,9 @@ interface HeaderProps {
 
 /** Volver a `true` cuando el Blog deba mostrarse otra vez en el nav. */
 const SHOW_BLOG_NAV = false;
+
+/** Hide-on-scroll solo en viewport móvil (menú hamburguesa). */
+const MOBILE_NAV_MQ = '(max-width: 767px)';
 
 const localePillClass = (active: boolean) =>
   `rounded px-2 py-1 text-sm font-medium transition-colors ${
@@ -49,26 +52,77 @@ function MusicControls() {
 
 export default function Header({ onMenuToggle }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [headerHidden, setHeaderHidden] = useState(false);
+  const lastScrollYRef = useRef(0);
   const { locale, setLocale, t } = useLanguage();
+
+  useEffect(() => {
+    lastScrollYRef.current = window.scrollY;
+    let rafId: number | null = null;
+    let pendingY = window.scrollY;
+
+    const isMobileNav = () => window.matchMedia(MOBILE_NAV_MQ).matches;
+
+    const apply = () => {
+      rafId = null;
+      const y = pendingY;
+
+      if (!isMobileNav() || mobileMenuOpen || y < 24) {
+        setHeaderHidden(false);
+        lastScrollYRef.current = y;
+        return;
+      }
+
+      const delta = y - lastScrollYRef.current;
+      if (delta > 8) {
+        setHeaderHidden(true);
+      } else if (delta < -8) {
+        setHeaderHidden(false);
+      }
+
+      lastScrollYRef.current = y;
+    };
+
+    const onScroll = () => {
+      pendingY = window.scrollY;
+      if (rafId != null) return;
+      rafId = requestAnimationFrame(apply);
+    };
+
+    const onResize = () => {
+      if (!isMobileNav()) setHeaderHidden(false);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      if (rafId != null) cancelAnimationFrame(rafId);
+    };
+  }, [mobileMenuOpen]);
 
   const handleMenuToggle = () => {
     const newState = !mobileMenuOpen;
     setMobileMenuOpen(newState);
+    if (newState) setHeaderHidden(false);
     onMenuToggle?.(newState);
   };
 
   const handleNavClick = () => {
     setMobileMenuOpen(false);
+    setHeaderHidden(false);
     onMenuToggle?.(false);
   };
 
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-[120] pt-[env(safe-area-inset-top)] transition-colors duration-300 ease-out',
+        'fixed top-0 left-0 right-0 z-[120] pt-[env(safe-area-inset-top)] transition-[transform,background-color] duration-300 ease-out',
         mobileMenuOpen
           ? 'bg-zinc-950/92 backdrop-blur-[12px] md:bg-transparent md:backdrop-blur-none'
           : 'bg-transparent',
+        headerHidden && !mobileMenuOpen && '-translate-y-full md:translate-y-0',
       )}
     >
       <div className="flex w-full items-center justify-between px-3 py-3 sm:px-5 sm:py-3.5 md:px-6 md:py-4">
