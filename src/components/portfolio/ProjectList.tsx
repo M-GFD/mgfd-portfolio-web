@@ -236,9 +236,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   const sceneRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [timerPaused, setTimerPaused] = useState(false);
-  const [timerKey, setTimerKey] = useState(0);
-  const [autoplayEnabled, setAutoplayEnabled] = useState(true);
+  const [dotProgress, setDotProgress] = useState(0);
   const depthRafRef = useRef<number | null>(null);
   const offsetRef = useRef(0);
   const animRafRef = useRef<number | null>(null);
@@ -248,6 +246,11 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   const dragStartOffsetRef = useRef(0);
   const activeIndexRef = useRef(0);
   const projectsLenRef = useRef(projects.length);
+  const timerPausedRef = useRef(false);
+  const timerProgressRef = useRef(0);
+  const timerLastTsRef = useRef<number | null>(null);
+  const timerRafRef = useRef<number | null>(null);
+  const goToNextSlideRef = useRef<() => void>(() => {});
 
   activeIndexRef.current = activeIndex;
   projectsLenRef.current = projects.length;
@@ -395,8 +398,17 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     snapToIndex(findNearestSnapIndex());
   }, [findNearestSnapIndex, snapToIndex]);
 
+  const setTimerPaused = useCallback((paused: boolean) => {
+    timerPausedRef.current = paused;
+    if (paused) {
+      timerLastTsRef.current = null;
+    }
+  }, []);
+
   const restartDotTimer = useCallback(() => {
-    setTimerKey((k) => k + 1);
+    timerProgressRef.current = 0;
+    timerLastTsRef.current = null;
+    setDotProgress(0);
   }, []);
 
   const goToNextSlide = useCallback(() => {
@@ -406,21 +418,56 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     snapToIndex(next);
   }, [snapToIndex]);
 
+  goToNextSlideRef.current = goToNextSlide;
+
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const sync = () => setAutoplayEnabled(!mq.matches);
-    sync();
-    mq.addEventListener('change', sync);
-    return () => mq.removeEventListener('change', sync);
-  }, []);
+    if (loading || projects.length < 2) return;
+
+    const tick = (now: number) => {
+      if (!timerPausedRef.current && document.visibilityState === 'visible') {
+        if (timerLastTsRef.current == null) {
+          timerLastTsRef.current = now;
+        } else {
+          const delta = now - timerLastTsRef.current;
+          timerLastTsRef.current = now;
+          timerProgressRef.current = Math.min(
+            1,
+            timerProgressRef.current + delta / DOT_TIMER_MS,
+          );
+          setDotProgress(timerProgressRef.current);
+
+          if (timerProgressRef.current >= 1) {
+            timerProgressRef.current = 0;
+            timerLastTsRef.current = null;
+            setDotProgress(0);
+            goToNextSlideRef.current();
+          }
+        }
+      } else {
+        timerLastTsRef.current = null;
+      }
+
+      timerRafRef.current = requestAnimationFrame(tick);
+    };
+
+    timerRafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (timerRafRef.current != null) {
+        cancelAnimationFrame(timerRafRef.current);
+        timerRafRef.current = null;
+      }
+    };
+  }, [loading, projects.length]);
 
   useEffect(() => {
     const onVisibility = () => {
-      setTimerPaused(document.visibilityState !== 'visible' || isDraggingRef.current);
+      setTimerPaused(
+        document.visibilityState !== 'visible' || isDraggingRef.current,
+      );
     };
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);
-  }, []);
+  }, [setTimerPaused]);
 
   useEffect(() => {
     restartDotTimer();
@@ -503,8 +550,12 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     dragPointerIdRef.current = null;
     sceneRef.current?.classList.remove('is-dragging');
 
-    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-      e.currentTarget.releasePointerCapture(e.pointerId);
+    try {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // iOS a veces ya liberó la captura
     }
 
     snapToNearest();
@@ -537,6 +588,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
         onPointerMove={handleTrackPointerMove}
         onPointerUp={endTrackDrag}
         onPointerCancel={endTrackDrag}
+        onLostPointerCapture={endTrackDrag}
       >
         <div ref={trackRef} className="works-carousel__track">
           <div ref={rowRef} className="works-carousel__row">
@@ -598,10 +650,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
 
       {projects.length > 1 && (
         <div
-          className={cn(
-            'works-carousel__dots',
-            timerPaused && 'works-carousel__dots--paused',
-          )}
+          className="works-carousel__dots"
           role="tablist"
           aria-label={t('projects.sectionTitle')}
         >
@@ -620,12 +669,10 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
                   isActive && 'works-carousel__dot--active',
                 )}
               >
-                {isActive && autoplayEnabled && (
+                {isActive && (
                   <span
-                    key={`${activeIndex}-${timerKey}`}
                     className="works-carousel__dot-fill"
-                    style={{ animationDuration: `${DOT_TIMER_MS}ms` }}
-                    onAnimationEnd={goToNextSlide}
+                    style={{ transform: `scaleX(${dotProgress})` }}
                   />
                 )}
               </button>
