@@ -123,6 +123,8 @@
     scrollbar-gutter: stable;
     scroll-padding-top: calc(5.5rem + env(safe-area-inset-top));
     background-color: #09090b;
+    /* Evita tirones de overscroll / rubber-band al llegar a los extremos */
+    overscroll-behavior-y: none;
   }
   @media (min-width: 768px) {
     html {
@@ -162,24 +164,9 @@
     }
   }
 
-  /**
-   * Táctil: scroll-snap en Hero, About y Herramientas hasta la primera llegada
-   * a Herramientas; después scroll libre hasta recargar la página.
-   */
+  /* Snap de sección desactivado (clase residual por compatibilidad). */
   html.section-scroll-snap {
-    scroll-snap-type: y mandatory;
-    overscroll-behavior-y: none;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    html.section-scroll-snap {
-      scroll-behavior: smooth;
-    }
-  }
-
-  html.section-scroll-snap .snap-section {
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
+    scroll-snap-type: none;
   }
 }
 

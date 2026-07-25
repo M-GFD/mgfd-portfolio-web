@@ -17,14 +17,15 @@ type CircularScrollOrbitProps = {
 };
 
 function orbitConfig(intensity: OrbitIntensity, narrow: boolean) {
+  // Ángulos más suaves para no percibir tirones al cruzar secciones.
   if (intensity === 'soft') {
     return narrow
-      ? { angle: 14, radius: 56, perspective: 900 }
-      : { angle: 20, radius: 90, perspective: 1200 };
+      ? { angle: 8, radius: 36, perspective: 1100 }
+      : { angle: 12, radius: 56, perspective: 1400 };
   }
   return narrow
-    ? { angle: 26, radius: 88, perspective: 1000 }
-    : { angle: 40, radius: 160, perspective: 1400 };
+    ? { angle: 14, radius: 52, perspective: 1200 }
+    : { angle: 22, radius: 96, perspective: 1600 };
 }
 
 function applyOrbitTransform(
@@ -98,7 +99,8 @@ export function CircularScrollOrbit({
 
         const observer = onScroll({
           target: panel,
-          sync: 0.14,
+          // Sync lineal con el scroll: evita “rubber-band” de catch-up.
+          sync: true,
           enter: 'bottom bottom',
           leave: 'top top',
           repeat: true,

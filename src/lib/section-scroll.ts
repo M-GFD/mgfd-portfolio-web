@@ -19,30 +19,21 @@ function canUseSectionSnap(): boolean {
   return !sectionSnapReleased;
 }
 
-function easeInOutQuint(t: number): number {
-  return t < 0.5 ? 16 * t ** 5 : 1 - (-2 * t + 2) ** 5 / 2;
+function easeOutCubic(t: number): number {
+  return 1 - (1 - t) ** 3;
 }
 
-/** Dispositivos táctiles: scroll-snap nativo del navegador (cross-browser). */
+/**
+ * Snap de sección desactivado: el scroll libre nativo evita tirones
+ * entre secciones y en los extremos de la página.
+ */
 export function usesNativeSectionSnap(): boolean {
-  if (typeof window === 'undefined') return false;
-  if (!canUseSectionSnap()) return false;
-
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    return false;
-  }
-
-  return (
-    window.matchMedia('(hover: none), (pointer: coarse)').matches ||
-    'ontouchstart' in window ||
-    navigator.maxTouchPoints > 0
-  );
+  return false;
 }
 
-/** Desktop con ratón: animación JS entre secciones. */
+/** Animación forzada entre secciones desactivada (mismo motivo). */
 export function usesAnimatedSectionScroll(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  return false;
 }
 
 export function isSectionScrollLocked(): boolean {
@@ -164,7 +155,7 @@ export function animateScrollTo(
 
     const step = (now: number) => {
       const t = Math.min(1, (now - start) / durationMs);
-      const eased = easeInOutQuint(t);
+      const eased = easeOutCubic(t);
       window.scrollTo(0, startY + distance * eased);
 
       if (t < 1) {
