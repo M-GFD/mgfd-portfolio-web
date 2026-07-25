@@ -5,6 +5,29 @@ export const DEPTH_HOLD_END = 0.8;
 export const DEPTH_UNITS_PER_SECTION = 1;
 export const DEPTH_SCROLL_VH_PER_UNIT = 1.15;
 
+/** Nav/CTA: sin hold al 100%; scroll manual: con fijación leve. */
+let depthNavScrolling = false;
+
+export function setDepthNavScrolling(active: boolean) {
+  depthNavScrolling = active;
+  if (typeof document !== 'undefined') {
+    const root = getDepthJourney();
+    if (root) {
+      if (active) root.dataset.depthNav = 'true';
+      else delete root.dataset.depthNav;
+    }
+  }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent('depth-stack-nav', { detail: { active } }),
+    );
+  }
+}
+
+export function isDepthNavScrolling() {
+  return depthNavScrolling;
+}
+
 export function depthMaxUnit(sectionCount: number): number {
   return (
     Math.max(sectionCount - 1, 0) * DEPTH_UNITS_PER_SECTION + DEPTH_EMERGE_END

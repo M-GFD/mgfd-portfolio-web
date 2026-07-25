@@ -15,6 +15,7 @@ import {
   DEPTH_SCROLL_VH_PER_UNIT,
   DEPTH_UNITS_PER_SECTION,
   depthMaxUnit,
+  isDepthNavScrolling,
   prefersDepthStack,
 } from '@/lib/depth-stack';
 
@@ -113,7 +114,15 @@ function emergeMotion(local: number): MotionSample {
   };
 }
 
-function sampleLayer(local: number, isLast: boolean): MotionSample {
+/**
+ * @param skipHold — true en nav/CTA: emerge → sale sin pausa al 100%.
+ *                   false en scroll manual: leve fijación en reposo.
+ */
+function sampleLayer(
+  local: number,
+  isLast: boolean,
+  skipHold: boolean,
+): MotionSample {
   if (local < 0) {
     return deepPark(-local);
   }
@@ -127,7 +136,8 @@ function sampleLayer(local: number, isLast: boolean): MotionSample {
     return emergeMotion(local);
   }
 
-  if (local <= DEPTH_HOLD_END) {
+  // Scroll manual: breve hold al 100% antes de salir.
+  if (!skipHold && local <= DEPTH_HOLD_END) {
     return restMotion();
   }
 
@@ -135,9 +145,9 @@ function sampleLayer(local: number, isLast: boolean): MotionSample {
     return exitedPark();
   }
 
-  const u = smoothstep(
-    (local - DEPTH_HOLD_END) / (DEPTH_UNITS_PER_SECTION - DEPTH_HOLD_END),
-  );
+  const exitStart = skipHold ? DEPTH_EMERGE_END : DEPTH_HOLD_END;
+  const span = Math.max(DEPTH_UNITS_PER_SECTION - exitStart, 0.001);
+  const u = smoothstep((local - exitStart) / span);
   return {
     y: lerp(0, -36, u),
     z: lerp(0, 520, u),
@@ -235,9 +245,10 @@ export function PremiumScrollJourney({
 
     const paint = () => {
       const u = proxy.u;
+      const skipHold = isDepthNavScrolling();
       const painted = layers.map((el, i) => {
         const local = u - i * DEPTH_UNITS_PER_SECTION;
-        const motion = sampleLayer(local, i === count - 1);
+        const motion = sampleLayer(local, i === count - 1, skipHold);
         applyLayerMotion(el, motion);
         return { el, z: motion.atRest ? 0 : motion.z };
       });
@@ -250,6 +261,16 @@ export function PremiumScrollJourney({
 
     const driveTo = (next: number) => {
       const target = Math.max(0, Math.min(depthMaxUnit(count), next));
+      // Nav/CTA: seguimiento 1:1 sin lag de suavizado (evita micro-travas).
+      if (isDepthNavScrolling()) {
+        if (smoothAnim) {
+          smoothAnim.pause();
+          smoothAnim = null;
+        }
+        proxy.u = target;
+        paint();
+        return;
+      }
       if (Math.abs(target - proxy.u) < 0.0015) {
         proxy.u = target;
         paint();

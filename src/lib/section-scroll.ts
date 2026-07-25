@@ -1,4 +1,7 @@
-import { getDepthStackTargetY } from '@/lib/depth-stack';
+import {
+  getDepthStackTargetY,
+  setDepthNavScrolling,
+} from '@/lib/depth-stack';
 
 export const SECTION_SELECTOR = '.snap-section';
 
@@ -238,7 +241,12 @@ export async function scrollToSectionByHash(hash: string): Promise<void> {
       DEPTH_NAV_MAX_MS,
       Math.max(DEPTH_NAV_MIN_MS, distance * DEPTH_NAV_PX_FACTOR),
     );
-    await animateScrollTo(depthY, durationMs);
+    setDepthNavScrolling(true);
+    try {
+      await animateScrollTo(depthY, durationMs);
+    } finally {
+      setDepthNavScrolling(false);
+    }
     history.replaceState(null, '', normalized);
     return;
   }
