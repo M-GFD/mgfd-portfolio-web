@@ -15,9 +15,19 @@ export function getDepthJourney(): HTMLElement | null {
   return document.querySelector<HTMLElement>('[data-scroll-journey]');
 }
 
+/** Desktop ancho: pila 3D. Móvil / tablet: scroll tradicional. */
+export function prefersDepthStack(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(min-width: 1024px)').matches;
+}
+
 export function isDepthStackActive(root?: HTMLElement | null): boolean {
   const el = root ?? getDepthJourney();
-  return Boolean(el && !el.classList.contains('depth-stack--flat'));
+  return Boolean(
+    el &&
+      !el.classList.contains('depth-stack--flat') &&
+      prefersDepthStack(),
+  );
 }
 
 function viewHeight(): number {

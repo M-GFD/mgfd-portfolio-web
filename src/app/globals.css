@@ -276,6 +276,7 @@
     position: relative;
     inset: auto;
     height: auto;
+    overflow: visible;
     opacity: 1 !important;
     transform: none !important;
     pointer-events: auto !important;
@@ -284,6 +285,78 @@
 
   .depth-stack--flat .depth-stack__glow {
     display: none;
+  }
+
+  .depth-stack--flat .depth-stack__layer .snap-section,
+  .depth-stack--flat .depth-stack__layer > .depth-stack__chapter > section {
+    min-height: 100dvh;
+    height: auto;
+  }
+
+  .depth-stack--flat.scroll-journey--with-fixed-footer {
+    padding-bottom: calc(5.25rem + env(safe-area-inset-bottom));
+  }
+
+  /* Restaura carrusel full-bleed en scroll tradicional */
+  .depth-stack--flat .depth-stack__layer .works-carousel {
+    left: 50%;
+    width: 100vw;
+    max-width: 100vw;
+    transform: translateX(-50%);
+    --works-slide: min(86vw, 28rem);
+    --works-pad: calc((100vw - min(86vw, 28rem)) / 2);
+  }
+
+  /**
+   * Móvil / tablet: scroll tradicional (sin pila 3D).
+   * Evita FOUC de capas en opacity:0 antes del JS.
+   */
+  @media (max-width: 1023px) {
+    .depth-stack {
+      height: auto !important;
+    }
+
+    .depth-stack__viewport {
+      position: relative;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      perspective: none;
+    }
+
+    .depth-stack__layer {
+      position: relative;
+      inset: auto;
+      height: auto;
+      overflow: visible;
+      opacity: 1 !important;
+      transform: none !important;
+      pointer-events: auto !important;
+      will-change: auto;
+    }
+
+    .depth-stack__glow {
+      display: none;
+    }
+
+    .depth-stack__layer .snap-section,
+    .depth-stack__layer > .depth-stack__chapter > section {
+      min-height: 100dvh;
+      height: auto;
+    }
+
+    .depth-stack.scroll-journey--with-fixed-footer {
+      padding-bottom: calc(5.25rem + env(safe-area-inset-bottom));
+    }
+
+    .depth-stack__layer .works-carousel {
+      left: 50%;
+      width: 100vw;
+      max-width: 100vw;
+      transform: translateX(-50%);
+      --works-slide: min(86vw, 28rem);
+      --works-pad: calc((100vw - min(86vw, 28rem)) / 2);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

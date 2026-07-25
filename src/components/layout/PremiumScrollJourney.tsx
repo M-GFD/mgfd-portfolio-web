@@ -15,6 +15,7 @@ import {
   DEPTH_SCROLL_VH_PER_UNIT,
   DEPTH_UNITS_PER_SECTION,
   depthMaxUnit,
+  prefersDepthStack,
 } from '@/lib/depth-stack';
 
 export type ScrollMode = 'depth-in';
@@ -170,6 +171,16 @@ function applyLayerMotion(el: HTMLElement, motion: MotionSample) {
   el.setAttribute('aria-hidden', motion.opacity < 0.08 ? 'true' : 'false');
 }
 
+function clearLayerStyles(el: HTMLElement) {
+  el.style.removeProperty('transform');
+  el.style.removeProperty('opacity');
+  el.style.removeProperty('pointer-events');
+  el.style.removeProperty('will-change');
+  el.style.removeProperty('transform-style');
+  el.style.removeProperty('z-index');
+  el.removeAttribute('aria-hidden');
+}
+
 function journeyProgress(root: HTMLElement, viewH: number): number {
   const rect = root.getBoundingClientRect();
   const scrollable = Math.max(root.offsetHeight - viewH, 1);
@@ -195,46 +206,32 @@ export function PremiumScrollJourney({
     );
     if (layers.length === 0) return;
 
-    const reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-    if (reducedMotion) {
-      root.classList.add('depth-stack--flat');
-      layers.forEach((el) => {
-        el.style.removeProperty('transform');
-        el.style.removeProperty('opacity');
-        el.style.removeProperty('transform-style');
-        el.style.pointerEvents = 'auto';
-        el.removeAttribute('aria-hidden');
-      });
-      return;
-    }
+    const desktopMq = window.matchMedia('(min-width: 1024px)');
+    const motionMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    let smoothAnim: ReturnType<typeof animate> | null = null;
+    let rafId: number | null = null;
+    const proxy = { u: 0 };
 
     const footerH = () => {
       const footer = document.getElementById('contact');
       return footer?.offsetHeight ?? 84;
     };
 
-    const layout = () => {
-      const viewH = viewHeight();
-      const pinH = Math.max(viewH - footerH(), 240);
-      const unitPx = viewH * DEPTH_SCROLL_VH_PER_UNIT;
-      const scrollable = unitPx * depthMaxUnit(count);
-      root.style.setProperty('--depth-pin-h', `${pinH}px`);
-      root.style.height = `${pinH + scrollable}px`;
+    const stopDepth = () => {
+      window.removeEventListener('scroll', sync);
+      window.removeEventListener('resize', onResize);
+      window.visualViewport?.removeEventListener('resize', onResize);
+      window.visualViewport?.removeEventListener('scroll', sync);
+      if (rafId != null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      if (smoothAnim) {
+        smoothAnim.pause();
+        smoothAnim = null;
+      }
     };
-
-    const hashOnMount = window.location.hash;
-    layout();
-
-    // Al crecer el runway, el scroll anchoring del navegador puede empujar
-    // el scroll hasta el final y “recorrer” toda la pila sin interacción.
-    if (!hashOnMount || hashOnMount === '#contact' || hashOnMount === '#hero') {
-      window.scrollTo(0, 0);
-    }
-
-    const proxy = { u: 0 };
-    let smoothAnim: ReturnType<typeof animate> | null = null;
 
     const paint = () => {
       const u = proxy.u;
@@ -250,9 +247,6 @@ export function PremiumScrollJourney({
           item.el.style.zIndex = String(rank + 1);
         });
     };
-
-    proxy.u = 0;
-    paint();
 
     const driveTo = (next: number) => {
       const target = Math.max(0, Math.min(depthMaxUnit(count), next));
@@ -270,7 +264,6 @@ export function PremiumScrollJourney({
       });
     };
 
-    let rafId: number | null = null;
     const sync = () => {
       if (rafId != null) return;
       rafId = requestAnimationFrame(() => {
@@ -281,38 +274,78 @@ export function PremiumScrollJourney({
       });
     };
 
+    const layoutDepth = () => {
+      const viewH = viewHeight();
+      const pinH = Math.max(viewH - footerH(), 240);
+      const unitPx = viewH * DEPTH_SCROLL_VH_PER_UNIT;
+      const scrollable = unitPx * depthMaxUnit(count);
+      root.style.setProperty('--depth-pin-h', `${pinH}px`);
+      root.style.height = `${pinH + scrollable}px`;
+    };
+
+    const enableFlat = () => {
+      stopDepth();
+      root.classList.add('depth-stack--flat');
+      root.style.removeProperty('height');
+      root.style.removeProperty('--depth-pin-h');
+      layers.forEach(clearLayerStyles);
+      root.dataset.depthReady = 'true';
+      window.dispatchEvent(new CustomEvent('depth-stack-ready'));
+    };
+
+    const enableDepth = () => {
+      stopDepth();
+      root.classList.remove('depth-stack--flat');
+
+      const hashOnMount = window.location.hash;
+      layoutDepth();
+
+      if (!hashOnMount || hashOnMount === '#contact' || hashOnMount === '#hero') {
+        window.scrollTo(0, 0);
+      }
+
+      proxy.u = 0;
+      paint();
+
+      window.addEventListener('scroll', sync, { passive: true });
+      window.addEventListener('resize', onResize, { passive: true });
+      window.visualViewport?.addEventListener('resize', onResize);
+      window.visualViewport?.addEventListener('scroll', sync);
+      sync();
+
+      root.dataset.depthReady = 'true';
+      window.dispatchEvent(new CustomEvent('depth-stack-ready'));
+    };
+
     const onResize = () => {
-      layout();
+      if (!prefersDepthStack() || motionMq.matches) return;
+      layoutDepth();
       sync();
     };
 
-    window.addEventListener('scroll', sync, { passive: true });
-    window.addEventListener('resize', onResize, { passive: true });
-    window.visualViewport?.addEventListener('resize', onResize);
-    window.visualViewport?.addEventListener('scroll', sync);
-    sync();
+    const applyMode = () => {
+      if (!prefersDepthStack() || motionMq.matches) {
+        enableFlat();
+      } else {
+        enableDepth();
+      }
+    };
 
-    // Permite que la navegación por anclas espere al layout inicial.
-    root.dataset.depthReady = 'true';
-    window.dispatchEvent(new CustomEvent('depth-stack-ready'));
+    applyMode();
+
+    const onMqChange = () => applyMode();
+    desktopMq.addEventListener('change', onMqChange);
+    motionMq.addEventListener('change', onMqChange);
 
     return () => {
+      desktopMq.removeEventListener('change', onMqChange);
+      motionMq.removeEventListener('change', onMqChange);
+      stopDepth();
       delete root.dataset.depthReady;
-      window.removeEventListener('scroll', sync);
-      window.removeEventListener('resize', onResize);
-      window.visualViewport?.removeEventListener('resize', onResize);
-      window.visualViewport?.removeEventListener('scroll', sync);
-      if (rafId != null) cancelAnimationFrame(rafId);
-      if (smoothAnim) smoothAnim.pause();
       root.classList.remove('depth-stack--flat');
-      layers.forEach((el) => {
-        el.style.removeProperty('transform');
-        el.style.removeProperty('opacity');
-        el.style.removeProperty('pointer-events');
-        el.style.removeProperty('will-change');
-        el.style.removeProperty('transform-style');
-        el.removeAttribute('aria-hidden');
-      });
+      root.style.removeProperty('height');
+      root.style.removeProperty('--depth-pin-h');
+      layers.forEach(clearLayerStyles);
     };
   }, [count]);
 

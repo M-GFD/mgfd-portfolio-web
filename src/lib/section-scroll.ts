@@ -2,8 +2,12 @@ import { getDepthStackTargetY } from '@/lib/depth-stack';
 
 export const SECTION_SELECTOR = '.snap-section';
 
-const DEFAULT_DURATION_MS = 1100;
-const SNAP_DURATION_MS = 780;
+/** ~mitad de velocidad respecto al valor previo (1100 → 2200). */
+const DEFAULT_DURATION_MS = 2200;
+const SNAP_DURATION_MS = 1560;
+const DEPTH_NAV_MIN_MS = 1800;
+const DEPTH_NAV_MAX_MS = 5200;
+const DEPTH_NAV_PX_FACTOR = 1.7;
 const EDGE_THRESHOLD_PX = 12;
 const WHEEL_ACCUM_THRESHOLD = 36;
 
@@ -230,7 +234,10 @@ export async function scrollToSectionByHash(hash: string): Promise<void> {
   }
   if (depthY != null) {
     const distance = Math.abs(depthY - window.scrollY);
-    const durationMs = Math.min(2600, Math.max(900, distance * 0.85));
+    const durationMs = Math.min(
+      DEPTH_NAV_MAX_MS,
+      Math.max(DEPTH_NAV_MIN_MS, distance * DEPTH_NAV_PX_FACTOR),
+    );
     await animateScrollTo(depthY, durationMs);
     history.replaceState(null, '', normalized);
     return;
@@ -242,19 +249,11 @@ export async function scrollToSectionByHash(hash: string): Promise<void> {
     return;
   }
 
-  if (prefersNativeAnchorScroll() || usesNativeSectionSnap()) {
-    (section as HTMLElement).scrollIntoView({
-      behavior: 'smooth',
-      block: normalized === '#contact' ? 'end' : 'start',
-    });
-    history.replaceState(null, '', normalized);
-    return;
-  }
-
+  // Scroll tradicional (móvil / sin pila): misma animación, ~mitad de velocidad.
   if (normalized === '#contact') {
-    await animateScrollTo(getSectionBottomTargetY(section));
+    await animateScrollTo(getSectionBottomTargetY(section), DEFAULT_DURATION_MS);
   } else {
-    await scrollToSectionElement(section);
+    await animateScrollTo(getSectionTargetY(section), DEFAULT_DURATION_MS);
   }
 
   history.replaceState(null, '', normalized);
