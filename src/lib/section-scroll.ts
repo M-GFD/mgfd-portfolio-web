@@ -1,3 +1,5 @@
+import { getDepthStackTargetY } from '@/lib/depth-stack';
+
 export const SECTION_SELECTOR = '.snap-section';
 
 const DEFAULT_DURATION_MS = 1100;
@@ -192,29 +194,70 @@ export async function scrollToSectionElement(section: Element): Promise<void> {
   await animateScrollTo(getSectionTargetY(section));
 }
 
+async function waitForDepthStackReady(timeoutMs = 1200): Promise<void> {
+  const root = document.querySelector<HTMLElement>('[data-scroll-journey]');
+  if (!root) return;
+  if (root.dataset.depthReady === 'true' || root.classList.contains('depth-stack--flat')) {
+    return;
+  }
+
+  await new Promise<void>((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      window.removeEventListener('depth-stack-ready', finish);
+      window.clearTimeout(timer);
+      resolve();
+    };
+    const timer = window.setTimeout(finish, timeoutMs);
+    window.addEventListener('depth-stack-ready', finish, { once: true });
+  });
+}
+
 export async function scrollToSectionByHash(hash: string): Promise<void> {
-  const section = document.querySelector(hash);
+  const normalized = hash.startsWith('#') ? hash : `#${hash}`;
+
+  await waitForDepthStackReady();
+
+  // Pila en profundidad: scroll del documento → el journey pinta el efecto.
+  let depthY = getDepthStackTargetY(normalized);
+  if (depthY == null) {
+    await new Promise<void>((r) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => r()));
+    });
+    depthY = getDepthStackTargetY(normalized);
+  }
+  if (depthY != null) {
+    const distance = Math.abs(depthY - window.scrollY);
+    const durationMs = Math.min(2600, Math.max(900, distance * 0.85));
+    await animateScrollTo(depthY, durationMs);
+    history.replaceState(null, '', normalized);
+    return;
+  }
+
+  const section = document.querySelector(normalized);
   if (!section) {
-    history.replaceState(null, '', hash);
+    history.replaceState(null, '', normalized);
     return;
   }
 
   if (prefersNativeAnchorScroll() || usesNativeSectionSnap()) {
     (section as HTMLElement).scrollIntoView({
       behavior: 'smooth',
-      block: hash === '#contact' ? 'end' : 'start',
+      block: normalized === '#contact' ? 'end' : 'start',
     });
-    history.replaceState(null, '', hash);
+    history.replaceState(null, '', normalized);
     return;
   }
 
-  if (hash === '#contact') {
+  if (normalized === '#contact') {
     await animateScrollTo(getSectionBottomTargetY(section));
   } else {
     await scrollToSectionElement(section);
   }
 
-  history.replaceState(null, '', hash);
+  history.replaceState(null, '', normalized);
 }
 
 function isGateOpen(): boolean {

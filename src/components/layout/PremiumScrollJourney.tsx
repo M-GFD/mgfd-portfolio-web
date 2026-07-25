@@ -9,6 +9,13 @@ import {
 } from 'react';
 import { animate } from 'animejs';
 import { cn } from '@/lib/utils';
+import {
+  DEPTH_EMERGE_END,
+  DEPTH_HOLD_END,
+  DEPTH_SCROLL_VH_PER_UNIT,
+  DEPTH_UNITS_PER_SECTION,
+  depthMaxUnit,
+} from '@/lib/depth-stack';
 
 export type ScrollMode = 'depth-in';
 
@@ -36,12 +43,6 @@ type MotionSample = {
   atRest: boolean;
 };
 
-/** Fracción local: emerger hasta el 100%; la última se detiene ahí. */
-const EMERGE_END = 0.72;
-/** Hold corto solo para capas intermedias antes de salir. */
-const HOLD_END = 0.8;
-const UNITS_PER_SECTION = 1;
-const SCROLL_VH_PER_UNIT = 1.15;
 const SMOOTH_MS = 160;
 
 function lerp(a: number, b: number, t: number) {
@@ -99,7 +100,7 @@ function restMotion(): MotionSample {
 }
 
 function emergeMotion(local: number): MotionSample {
-  const u = smoothstep(local / EMERGE_END);
+  const u = smoothstep(local / DEPTH_EMERGE_END);
   return {
     y: lerp(48, 0, u),
     z: lerp(-1000, 0, u),
@@ -111,33 +112,31 @@ function emergeMotion(local: number): MotionSample {
   };
 }
 
-/**
- * local: posición de la capa en el eje de la pila (0 = empieza a emerger).
- * isLast: la última no sale hacia adelante; se queda en pantalla al 100%.
- */
 function sampleLayer(local: number, isLast: boolean): MotionSample {
   if (local < 0) {
     return deepPark(-local);
   }
 
   if (isLast) {
-    if (local >= EMERGE_END) return restMotion();
+    if (local >= DEPTH_EMERGE_END) return restMotion();
     return emergeMotion(local);
   }
 
-  if (local <= EMERGE_END) {
+  if (local <= DEPTH_EMERGE_END) {
     return emergeMotion(local);
   }
 
-  if (local <= HOLD_END) {
+  if (local <= DEPTH_HOLD_END) {
     return restMotion();
   }
 
-  if (local >= UNITS_PER_SECTION) {
+  if (local >= DEPTH_UNITS_PER_SECTION) {
     return exitedPark();
   }
 
-  const u = smoothstep((local - HOLD_END) / (UNITS_PER_SECTION - HOLD_END));
+  const u = smoothstep(
+    (local - DEPTH_HOLD_END) / (DEPTH_UNITS_PER_SECTION - DEPTH_HOLD_END),
+  );
   return {
     y: lerp(0, -36, u),
     z: lerp(0, 520, u),
@@ -150,8 +149,6 @@ function sampleLayer(local: number, isLast: boolean): MotionSample {
 }
 
 function applyLayerMotion(el: HTMLElement, motion: MotionSample) {
-  // En reposo: sin transform del padre. Evita que perspectiva/scale
-  // hinchen el contenido (p. ej. carrusel 3D de Trabajos).
   if (motion.atRest) {
     el.style.transform = 'none';
     el.style.opacity = '1';
@@ -161,7 +158,6 @@ function applyLayerMotion(el: HTMLElement, motion: MotionSample) {
     return;
   }
 
-  // Escala nunca por encima de 1 (tamaño natural = 100%).
   const scale = Math.min(1, Math.max(0.42, motion.scale));
   el.style.transformStyle = 'preserve-3d';
   el.style.transform = [
@@ -178,10 +174,6 @@ function journeyProgress(root: HTMLElement, viewH: number): number {
   const rect = root.getBoundingClientRect();
   const scrollable = Math.max(root.offsetHeight - viewH, 1);
   return clamp01(-rect.top / scrollable);
-}
-
-function maxUnit(sectionCount: number) {
-  return Math.max(sectionCount - 1, 0) * UNITS_PER_SECTION + EMERGE_END;
 }
 
 export function PremiumScrollJourney({
@@ -226,8 +218,8 @@ export function PremiumScrollJourney({
     const layout = () => {
       const viewH = viewHeight();
       const pinH = Math.max(viewH - footerH(), 240);
-      const unitPx = viewH * SCROLL_VH_PER_UNIT;
-      const scrollable = unitPx * maxUnit(count);
+      const unitPx = viewH * DEPTH_SCROLL_VH_PER_UNIT;
+      const scrollable = unitPx * depthMaxUnit(count);
       root.style.setProperty('--depth-pin-h', `${pinH}px`);
       root.style.height = `${pinH + scrollable}px`;
     };
@@ -240,7 +232,7 @@ export function PremiumScrollJourney({
     const paint = () => {
       const u = proxy.u;
       const painted = layers.map((el, i) => {
-        const local = u - i * UNITS_PER_SECTION;
+        const local = u - i * DEPTH_UNITS_PER_SECTION;
         const motion = sampleLayer(local, i === count - 1);
         applyLayerMotion(el, motion);
         return { el, z: motion.atRest ? 0 : motion.z };
@@ -256,7 +248,7 @@ export function PremiumScrollJourney({
     paint();
 
     const driveTo = (next: number) => {
-      const target = Math.max(0, Math.min(maxUnit(count), next));
+      const target = Math.max(0, Math.min(depthMaxUnit(count), next));
       if (Math.abs(target - proxy.u) < 0.0015) {
         proxy.u = target;
         paint();
@@ -278,7 +270,7 @@ export function PremiumScrollJourney({
         rafId = null;
         const viewH = viewHeight();
         const p = journeyProgress(root, viewH);
-        driveTo(p * maxUnit(count));
+        driveTo(p * depthMaxUnit(count));
       });
     };
 
@@ -293,7 +285,12 @@ export function PremiumScrollJourney({
     window.visualViewport?.addEventListener('scroll', sync);
     sync();
 
+    // Permite que la navegación por anclas espere al layout inicial.
+    root.dataset.depthReady = 'true';
+    window.dispatchEvent(new CustomEvent('depth-stack-ready'));
+
     return () => {
+      delete root.dataset.depthReady;
       window.removeEventListener('scroll', sync);
       window.removeEventListener('resize', onResize);
       window.visualViewport?.removeEventListener('resize', onResize);
