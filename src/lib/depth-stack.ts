@@ -40,9 +40,8 @@ export function resolveDepthSectionIndex(
   if (!id) return 0;
 
   const count = Number(root.dataset.depthCount || 0);
-  if (id === 'contact') {
-    return count > 0 ? count - 1 : null;
-  }
+  // Contacto es el footer fijo: no forma parte del recorrido de la pila.
+  if (id === 'contact') return null;
 
   if (id === 'hero' || id === 'top') return 0;
 

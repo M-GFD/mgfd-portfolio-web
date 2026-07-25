@@ -90,12 +90,6 @@ export default function Header({ onMenuToggle }: HeaderProps) {
             {t('nav.about')}
           </a>
           <a
-            href="/#contact"
-            className="text-neutral-400 transition-colors hover:text-white"
-          >
-            {t('nav.contact')}
-          </a>
-          <a
             href="/#works"
             className="text-neutral-400 transition-colors hover:text-white"
           >
@@ -176,13 +170,6 @@ export default function Header({ onMenuToggle }: HeaderProps) {
             onClick={handleNavClick}
           >
             {t('nav.about')}
-          </a>
-          <a
-            href="/#contact"
-            className="block py-2 text-neutral-400 transition-colors hover:text-white"
-            onClick={handleNavClick}
-          >
-            {t('nav.contact')}
           </a>
           <a
             href="/#works"

@@ -3,6 +3,9 @@
 import { useEffect } from 'react';
 import { scrollToSectionByHash } from '@/lib/section-scroll';
 
+/** Anclas que disparan recorrido de la pila (clic o URL con hash). */
+const DEPTH_NAV_HASHES = new Set(['#about', '#works', '#technologies']);
+
 function resolveHashFromHref(href: string): string | null {
   const trimmed = href.trim();
   if (trimmed.startsWith('#')) {
@@ -20,20 +23,19 @@ function resolveHashFromHref(href: string): string | null {
 }
 
 function hashTargetExists(hash: string): boolean {
+  if (hash === '#contact') return false;
   if (document.querySelector(hash)) return true;
-  // Contacto / anclas de la pila pueden resolverse aunque el id esté en capa absoluta.
   return Boolean(
-    document.querySelector('[data-scroll-journey]') &&
-      (hash === '#contact' ||
-        hash === '#hero' ||
-        hash === '#about' ||
-        hash === '#works' ||
-        hash === '#technologies'),
+    document.querySelector('[data-scroll-journey]') && DEPTH_NAV_HASHES.has(hash),
   );
 }
 
 export function AnchorSmoothScroll() {
   useEffect(() => {
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
     const onClickCapture = (e: MouseEvent) => {
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
         return;
@@ -56,15 +58,20 @@ export function AnchorSmoothScroll() {
 
     document.addEventListener('click', onClickCapture, true);
 
-    // Carga con /#about, /#works, etc.
     const initialHash = window.location.hash;
-    if (initialHash.length > 1 && hashTargetExists(initialHash)) {
+    // Solo honrar hash de navegación intencional; nunca auto-recorrer en "/" limpio.
+    if (DEPTH_NAV_HASHES.has(initialHash) && hashTargetExists(initialHash)) {
       void scrollToSectionByHash(initialHash);
+    } else if (initialHash === '#contact' || !initialHash) {
+      window.scrollTo(0, 0);
+      if (initialHash === '#contact') {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
     }
 
     const onHashChange = () => {
       const hash = window.location.hash;
-      if (hash.length > 1 && hashTargetExists(hash)) {
+      if (DEPTH_NAV_HASHES.has(hash) && hashTargetExists(hash)) {
         void scrollToSectionByHash(hash);
       }
     };

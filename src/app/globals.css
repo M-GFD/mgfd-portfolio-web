@@ -146,6 +146,8 @@
     position: relative;
     isolation: isolate;
     width: 100%;
+    /* Evita que al definir la altura del runway el navegador desplace el scroll */
+    overflow-anchor: none;
   }
 
   .depth-stack__viewport {

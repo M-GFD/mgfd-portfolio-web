@@ -224,7 +224,14 @@ export function PremiumScrollJourney({
       root.style.height = `${pinH + scrollable}px`;
     };
 
+    const hashOnMount = window.location.hash;
     layout();
+
+    // Al crecer el runway, el scroll anchoring del navegador puede empujar
+    // el scroll hasta el final y “recorrer” toda la pila sin interacción.
+    if (!hashOnMount || hashOnMount === '#contact' || hashOnMount === '#hero') {
+      window.scrollTo(0, 0);
+    }
 
     const proxy = { u: 0 };
     let smoothAnim: ReturnType<typeof animate> | null = null;
