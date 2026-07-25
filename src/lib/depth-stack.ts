@@ -5,8 +5,10 @@ export const DEPTH_HOLD_END = 0.8;
 export const DEPTH_UNITS_PER_SECTION = 1;
 export const DEPTH_SCROLL_VH_PER_UNIT = 1.15;
 
-/** Nav/CTA: sin hold al 100%; scroll manual: con fijación leve. */
+/** Nav/CTA multi-sección: sin hold + warp de salida. */
 let depthNavScrolling = false;
+/** Intro/programático: bloquea sync del scroll, pero NO aplica warp de nav. */
+let depthProgrammatic = false;
 
 type DepthNavDriver = {
   getUnit: () => number;
@@ -22,17 +24,30 @@ export function registerDepthNavDriver(driver: DepthNavDriver | null) {
 
 export function setDepthNavScrolling(active: boolean) {
   depthNavScrolling = active;
-  if (typeof document !== 'undefined') {
-    const root = getDepthJourney();
-    if (root) {
-      if (active) root.dataset.depthNav = 'true';
-      else delete root.dataset.depthNav;
-    }
-  }
+  syncDepthNavDataset();
 }
 
+export function setDepthProgrammatic(active: boolean) {
+  depthProgrammatic = active;
+  syncDepthNavDataset();
+}
+
+function syncDepthNavDataset() {
+  if (typeof document === 'undefined') return;
+  const root = getDepthJourney();
+  if (!root) return;
+  if (depthNavScrolling || depthProgrammatic) root.dataset.depthNav = 'true';
+  else delete root.dataset.depthNav;
+}
+
+/** true solo en nav/CTA entre secciones (omite hold). */
 export function isDepthNavScrolling() {
   return depthNavScrolling;
+}
+
+/** true si el journey no debe leer el scroll nativo. */
+export function isDepthSyncLocked() {
+  return depthNavScrolling || depthProgrammatic;
 }
 
 export function depthMaxUnit(sectionCount: number): number {
@@ -142,7 +157,8 @@ export async function playDepthHeroIntro(): Promise<boolean> {
   if (window.scrollY > 32) return false;
 
   const count = depthNavDriver.getCount();
-  const targetUnit = unitForSectionIndex(0, count);
+  // Tope duro: 100% emergido del Hero (sin entrar en hold/salida).
+  const targetUnit = Math.min(DEPTH_EMERGE_END, unitForSectionIndex(0, count));
   const startUnit = 0;
 
   depthNavDriver.setUnit(startUnit);
@@ -151,16 +167,16 @@ export async function playDepthHeroIntro(): Promise<boolean> {
   let cancelled = false;
   const cancel = () => {
     cancelled = true;
-    setDepthNavScrolling(false);
+    setDepthProgrammatic(false);
   };
   heroIntroAbort = cancel;
 
   const onUserInterrupt = () => cancel();
   window.addEventListener('wheel', onUserInterrupt, { passive: true });
   window.addEventListener('touchstart', onUserInterrupt, { passive: true });
-  window.addEventListener('pointerdown', onUserInterrupt, { passive: true });
+  // No pointerdown: el click del gate cancelaría la intro al entrar.
 
-  setDepthNavScrolling(true);
+  setDepthProgrammatic(true);
 
   await new Promise<void>((resolve) => {
     const t0 = performance.now();
@@ -172,7 +188,10 @@ export async function playDepthHeroIntro(): Promise<boolean> {
       }
 
       const t = Math.min(1, (now - t0) / HERO_INTRO_MS);
-      const unit = startUnit + (targetUnit - startUnit) * easeInOutCubic(t);
+      const unit = Math.min(
+        targetUnit,
+        startUnit + (targetUnit - startUnit) * easeInOutCubic(t),
+      );
       depthNavDriver.setUnit(unit);
       window.scrollTo(0, scrollYForDepthUnit(root, unit, count));
 
@@ -190,9 +209,12 @@ export async function playDepthHeroIntro(): Promise<boolean> {
 
   window.removeEventListener('wheel', onUserInterrupt);
   window.removeEventListener('touchstart', onUserInterrupt);
-  window.removeEventListener('pointerdown', onUserInterrupt);
 
-  if (!cancelled) setDepthNavScrolling(false);
+  if (!cancelled) {
+    depthNavDriver?.setUnit(targetUnit);
+    window.scrollTo(0, scrollYForDepthUnit(root, targetUnit, count));
+    setDepthProgrammatic(false);
+  }
   if (heroIntroAbort === cancel) heroIntroAbort = null;
   return !cancelled;
 }

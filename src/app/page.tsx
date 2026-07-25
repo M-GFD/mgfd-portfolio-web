@@ -22,6 +22,7 @@ const DESKTOP_MQ = '(min-width: 1024px)';
 
 export default function HomePage() {
   const { t } = useLanguage();
+  /** null = aún no hidratado: no montar secciones (evita flash de todas a la vez). */
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -45,33 +46,31 @@ export default function HomePage() {
   );
 
   const worksBlock = (
-    <>
-      <section
-        id="works"
-        className="scroll-mt-[calc(5.5rem+env(safe-area-inset-top))] pt-2 sm:pt-4 lg:flex lg:h-full lg:min-h-0 lg:w-full lg:max-w-full lg:flex-col lg:justify-center lg:overflow-hidden lg:px-0"
-      >
-        <div className="container mx-auto max-w-6xl px-4 pb-2 text-center sm:px-6 sm:pb-3 lg:shrink-0 lg:pb-1">
-          <h2 className="mb-4 text-2xl font-bold text-white sm:mb-5 sm:text-3xl md:text-4xl lg:mb-3">
-            {t('projects.sectionTitle')}
-          </h2>
-        </div>
+    <section
+      id="works"
+      className="scroll-mt-[calc(5.5rem+env(safe-area-inset-top))] pt-2 sm:pt-4 lg:flex lg:h-full lg:min-h-0 lg:w-full lg:max-w-full lg:flex-col lg:justify-center lg:overflow-hidden lg:px-0"
+    >
+      <div className="container mx-auto max-w-6xl px-4 pb-2 text-center sm:px-6 sm:pb-3 lg:shrink-0 lg:pb-1">
+        <h2 className="mb-4 text-2xl font-bold text-white sm:mb-5 sm:text-3xl md:text-4xl lg:mb-3">
+          {t('projects.sectionTitle')}
+        </h2>
+      </div>
 
-        <div className="lg:flex lg:min-h-0 lg:w-full lg:max-w-full lg:flex-1 lg:flex-col lg:justify-center">
-          <ProjectList projects={projectsWithLocale} loading={false} />
+      <div className="lg:flex lg:min-h-0 lg:w-full lg:max-w-full lg:flex-1 lg:flex-col lg:justify-center">
+        <ProjectList projects={projectsWithLocale} loading={false} />
 
-          <div className="container mx-auto max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8 lg:shrink-0 lg:pt-4">
-            <div className="flex justify-center">
-              <a
-                href="mailto:mgfd.design@gmail.com"
-                className="inline-flex w-auto items-center justify-center rounded-lg bg-white px-5 py-2 text-sm font-medium text-black shadow-sm shadow-black/40 transition-colors hover:bg-neutral-200 sm:px-7 sm:py-2.5"
-              >
-                {t('projects.cta')}
-              </a>
-            </div>
+        <div className="container mx-auto max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8 lg:shrink-0 lg:pt-4">
+          <div className="flex justify-center">
+            <a
+              href="mailto:mgfd.design@gmail.com"
+              className="inline-flex w-auto items-center justify-center rounded-lg bg-white px-5 py-2 text-sm font-medium text-black shadow-sm shadow-black/40 transition-colors hover:bg-neutral-200 sm:px-7 sm:py-2.5"
+            >
+              {t('projects.cta')}
+            </a>
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 
   return (
@@ -82,7 +81,14 @@ export default function HomePage() {
           Portfolio web Mateo G. Fontana Dalmasso (MGFD)
         </h1>
 
-        {/* Móvil: recorrido orbital de 0924ea7. Desktop: pila en profundidad. */}
+        {isDesktop === null && (
+          <div
+            className="min-h-dvh w-full"
+            aria-busy="true"
+            aria-label="Cargando"
+          />
+        )}
+
         {isDesktop === false && (
           <CircularScrollOrbit className="flex min-h-0 flex-1 flex-col">
             <OrbitPanel>
@@ -123,17 +129,6 @@ export default function HomePage() {
             </PremiumScrollJourney>
             <Footer fixed />
           </>
-        )}
-
-        {/* SSR / primer paint: estructura móvil estable hasta hidratar. */}
-        {isDesktop === null && (
-          <div className="flex min-h-0 flex-1 flex-col">
-            <Hero />
-            <Profile />
-            <Technologies />
-            {worksBlock}
-            <Footer />
-          </div>
         )}
       </main>
     </div>

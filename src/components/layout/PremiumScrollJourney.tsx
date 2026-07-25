@@ -16,6 +16,7 @@ import {
   DEPTH_UNITS_PER_SECTION,
   depthMaxUnit,
   isDepthNavScrolling,
+  isDepthSyncLocked,
   playDepthHeroIntro,
   prefersDepthStack,
   registerDepthNavDriver,
@@ -283,8 +284,8 @@ export function PremiumScrollJourney({
 
     const driveTo = (next: number) => {
       const target = Math.max(0, Math.min(depthMaxUnit(count), next));
-      // Nav/CTA: seguimiento 1:1 sin lag de suavizado (evita micro-travas).
-      if (isDepthNavScrolling()) {
+      // Nav/intro: seguimiento 1:1 sin lag de suavizado.
+      if (isDepthSyncLocked()) {
         if (smoothAnim) {
           smoothAnim.pause();
           smoothAnim = null;
@@ -308,12 +309,12 @@ export function PremiumScrollJourney({
     };
 
     const sync = () => {
-      // Durante nav/CTA el driver anima `u` directamente; no pisar con scroll.
-      if (isDepthNavScrolling()) return;
+      // Durante nav/intro el driver anima `u` directamente; no pisar con scroll.
+      if (isDepthSyncLocked()) return;
       if (rafId != null) return;
       rafId = requestAnimationFrame(() => {
         rafId = null;
-        if (isDepthNavScrolling()) return;
+        if (isDepthSyncLocked()) return;
         const viewH = viewHeight();
         const p = journeyProgress(root, viewH);
         driveTo(p * depthMaxUnit(count));
