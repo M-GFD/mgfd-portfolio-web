@@ -138,6 +138,33 @@
   }
 
   /**
+   * Escenario 3D del recorrido circular móvil (anime.js + scroll).
+   * Restaurado desde 0924ea7 para viewports < 1024px.
+   */
+  .orbit-stage {
+    perspective: min(1400px, 160vw);
+    perspective-origin: 50% 42%;
+    transform-style: preserve-3d;
+    overflow: visible;
+  }
+
+  .orbit-panel {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orbit-stage {
+      perspective: none;
+    }
+
+    .orbit-panel {
+      transform: none !important;
+    }
+  }
+
+  /**
    * Pila en profundidad: un viewport sticky, capas apiladas en Z
    * (una detrás de la otra). El scroll global hace emerger cada capa.
    */
