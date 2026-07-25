@@ -138,51 +138,124 @@
   }
 
   /**
-   * Escenario 3D del recorrido circular (anime.js + scroll).
-   * overflow visible para no aplanar preserve-3d / perspective.
+   * Viaje de scroll premium (anime.js): pin sticky + ejes X/Z/rotate.
    */
-  .orbit-stage {
-    perspective: min(1400px, 160vw);
-    perspective-origin: 50% 42%;
-    transform-style: preserve-3d;
-    overflow: visible;
+  .scroll-journey {
+    position: relative;
+    isolation: isolate;
   }
 
-  .orbit-panel {
+  .scroll-chapter {
+    position: relative;
+  }
+
+  .scroll-chapter--runway-short {
+    height: 160vh;
+  }
+
+  .scroll-chapter--runway-medium {
+    height: 200vh;
+  }
+
+  .scroll-chapter--runway-long {
+    height: 240vh;
+  }
+
+  @media (max-width: 1023px) {
+    .scroll-chapter--runway-short {
+      height: 140vh;
+    }
+
+    .scroll-chapter--runway-medium {
+      height: 170vh;
+    }
+
+    .scroll-chapter--runway-long {
+      height: 190vh;
+    }
+  }
+
+  .scroll-chapter__pin {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+    perspective: min(1400px, 160vw);
+    perspective-origin: 50% 45%;
+  }
+
+  .scroll-chapter__flow {
+    position: relative;
+    width: 100%;
+    overflow: visible;
+    perspective: min(1200px, 140vw);
+    perspective-origin: 50% 45%;
+  }
+
+  .scroll-chapter__depth {
+    pointer-events: none;
+    position: absolute;
+    inset: -12% -18%;
+    z-index: 0;
+    border-radius: 50%;
+    opacity: 0.45;
+  }
+
+  .scroll-chapter__depth--far {
+    background:
+      radial-gradient(ellipse 55% 45% at 30% 40%, rgb(255 255 255 / 0.06), transparent 70%),
+      radial-gradient(ellipse 40% 35% at 70% 65%, rgb(255 255 255 / 0.04), transparent 70%);
+  }
+
+  .scroll-chapter__depth--mid {
+    background: radial-gradient(
+      ellipse 50% 40% at 55% 50%,
+      rgb(255 255 255 / 0.05),
+      transparent 68%
+    );
+  }
+
+  .scroll-chapter__stage {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
     transform-style: preserve-3d;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
 
-  /* Móvil / táctil: sin transforms 3D (scroll nativo fluido). */
-  .orbit-stage--flat,
-  .orbit-stage--flat .orbit-panel {
-    perspective: none !important;
+  .scroll-chapter__flow .scroll-chapter__stage {
+    height: auto;
+  }
+
+  .scroll-chapter--flat .scroll-chapter__stage,
+  .scroll-chapter--flat .scroll-chapter__depth {
     transform: none !important;
-    transform-style: flat !important;
+    opacity: 1 !important;
     will-change: auto !important;
   }
 
-  @media (hover: none), (pointer: coarse), (max-width: 1023px) {
-    .orbit-stage {
-      perspective: none;
-    }
-
-    .orbit-panel {
-      transform: none !important;
-      transform-style: flat;
-      backface-visibility: visible;
-      -webkit-backface-visibility: visible;
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .orbit-stage {
+    .scroll-chapter--runway-short,
+    .scroll-chapter--runway-medium,
+    .scroll-chapter--runway-long {
+      height: auto;
+    }
+
+    .scroll-chapter__pin {
+      position: relative;
+      height: auto;
+      overflow: visible;
       perspective: none;
     }
 
-    .orbit-panel {
+    .scroll-chapter__stage,
+    .scroll-chapter__depth {
       transform: none !important;
+      opacity: 1 !important;
     }
   }
 
