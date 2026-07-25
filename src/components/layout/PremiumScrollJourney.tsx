@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, type ReactNode } from 'react';
-import { animate, onScroll } from 'animejs';
+import { animate } from 'animejs';
 import { cn } from '@/lib/utils';
 
 export type ScrollMode =
@@ -19,7 +19,6 @@ type PremiumScrollJourneyProps = {
 type ScrollChapterProps = {
   children: ReactNode;
   mode: ScrollMode;
-  /** Si false, no hay pin sticky (útil para secciones altas como Trabajos). */
   pin?: boolean;
   runway?: 'short' | 'medium' | 'long';
   className?: string;
@@ -48,17 +47,16 @@ function smoothstep(t: number) {
   return x * x * (3 - 2 * x);
 }
 
-/** Curva llegada → hold → salida. */
 function segmentProgress(p: number): { phase: 'in' | 'hold' | 'out'; u: number } {
-  if (p < 0.38) return { phase: 'in', u: smoothstep(p / 0.38) };
-  if (p > 0.62) return { phase: 'out', u: smoothstep((p - 0.62) / 0.38) };
+  if (p < 0.45) return { phase: 'in', u: smoothstep(p / 0.45) };
+  if (p > 0.68) return { phase: 'out', u: smoothstep((p - 0.68) / 0.32) };
   return { phase: 'hold', u: 0 };
 }
 
 function sampleMotion(mode: ScrollMode, p: number, compact: boolean): MotionSample {
   const { phase, u } = segmentProgress(p);
-  const depth = compact ? 0.55 : 1;
-  const lateral = compact ? 0.45 : 1;
+  const depth = compact ? 0.8 : 1;
+  const lateral = compact ? 0.75 : 1;
 
   const identity: MotionSample = {
     x: 0,
@@ -73,12 +71,12 @@ function sampleMotion(mode: ScrollMode, p: number, compact: boolean): MotionSamp
   if (mode === 'drift') {
     const swing = Math.sin((p - 0.5) * Math.PI);
     return {
-      x: swing * 28 * lateral,
+      x: swing * 48 * lateral,
       y: 0,
-      z: -Math.abs(swing) * 60 * depth,
-      rotateY: swing * -8 * lateral,
+      z: -Math.abs(swing) * 110 * depth,
+      rotateY: swing * -14 * lateral,
       rotateX: 0,
-      scale: 1 - Math.abs(swing) * 0.03,
+      scale: 1 - Math.abs(swing) * 0.05,
       opacity: 1,
     };
   }
@@ -89,101 +87,104 @@ function sampleMotion(mode: ScrollMode, p: number, compact: boolean): MotionSamp
     if (phase === 'in') {
       return {
         x: 0,
-        y: lerp(40, 0, u),
-        z: lerp(-520 * depth, 0, u),
+        y: lerp(72, 0, u),
+        z: lerp(-980 * depth, 0, u),
         rotateY: 0,
-        rotateX: lerp(12, 0, u),
-        scale: lerp(0.7, 1, u),
-        opacity: lerp(0.2, 1, u),
+        rotateX: lerp(22, 0, u),
+        scale: lerp(0.48, 1, u),
+        opacity: lerp(0.05, 1, u),
       };
     }
     return {
       x: 0,
-      y: lerp(0, -28, u),
-      z: lerp(0, 260 * depth, u),
+      y: lerp(0, -48, u),
+      z: lerp(0, 420 * depth, u),
       rotateY: 0,
-      rotateX: lerp(0, -8, u),
-      scale: lerp(1, 1.06, u),
-      opacity: lerp(1, 0.35, u),
+      rotateX: lerp(0, -14, u),
+      scale: lerp(1, 1.12, u),
+      opacity: lerp(1, 0.18, u),
     };
   }
 
   if (mode === 'horizontal') {
-    const enterX = (compact ? 140 : 320) * lateral;
-    const leaveX = (compact ? -120 : -280) * lateral;
+    const enterX = (compact ? 240 : 520) * lateral;
+    const leaveX = (compact ? -220 : -460) * lateral;
     if (phase === 'in') {
       return {
         x: lerp(enterX, 0, u),
         y: 0,
-        z: lerp(-120 * depth, 0, u),
-        rotateY: lerp(28, 0, u),
+        z: lerp(-260 * depth, 0, u),
+        rotateY: lerp(52, 0, u),
         rotateX: 0,
-        scale: lerp(0.88, 1, u),
-        opacity: lerp(0.25, 1, u),
+        scale: lerp(0.76, 1, u),
+        opacity: lerp(0.08, 1, u),
       };
     }
     return {
       x: lerp(0, leaveX, u),
       y: 0,
-      z: lerp(0, -90 * depth, u),
-      rotateY: lerp(0, -22, u),
+      z: lerp(0, -160 * depth, u),
+      rotateY: lerp(0, -40, u),
       rotateX: 0,
-      scale: lerp(1, 0.92, u),
-      opacity: lerp(1, 0.3, u),
+      scale: lerp(1, 0.86, u),
+      opacity: lerp(1, 0.14, u),
     };
   }
 
   if (mode === 'depth-out') {
-    // Entra desde delante (z positivo) y se hunde hacia el fondo al salir.
     if (phase === 'in') {
       return {
         x: 0,
-        y: lerp(-24, 0, u),
-        z: lerp(340 * depth, 0, u),
+        y: lerp(-42, 0, u),
+        z: lerp(620 * depth, 0, u),
         rotateY: 0,
-        rotateX: lerp(-10, 0, u),
-        scale: lerp(1.12, 1, u),
-        opacity: lerp(0.15, 1, u),
+        rotateX: lerp(-18, 0, u),
+        scale: lerp(1.28, 1, u),
+        opacity: lerp(0.06, 1, u),
       };
     }
     return {
       x: 0,
-      y: lerp(0, 36, u),
-      z: lerp(0, -480 * depth, u),
+      y: lerp(0, 56, u),
+      z: lerp(0, -780 * depth, u),
       rotateY: 0,
-      rotateX: lerp(0, 14, u),
-      scale: lerp(1, 0.68, u),
-      opacity: lerp(1, 0.2, u),
+      rotateX: lerp(0, 20, u),
+      scale: lerp(1, 0.52, u),
+      opacity: lerp(1, 0.1, u),
     };
   }
 
-  // helix: lateral + profundidad + giro
-  const helixInX = (compact ? -110 : -260) * lateral;
-  const helixOutX = (compact ? 100 : 240) * lateral;
+  const helixInX = (compact ? -200 : -400) * lateral;
+  const helixOutX = (compact ? 180 : 360) * lateral;
   if (phase === 'in') {
     return {
       x: lerp(helixInX, 0, u),
-      y: lerp(30, 0, u),
-      z: lerp(-380 * depth, 0, u),
-      rotateY: lerp(-36, 0, u),
-      rotateX: lerp(8, 0, u),
-      scale: lerp(0.78, 1, u),
-      opacity: lerp(0.2, 1, u),
+      y: lerp(48, 0, u),
+      z: lerp(-640 * depth, 0, u),
+      rotateY: lerp(-56, 0, u),
+      rotateX: lerp(14, 0, u),
+      scale: lerp(0.64, 1, u),
+      opacity: lerp(0.08, 1, u),
     };
   }
   return {
     x: lerp(0, helixOutX, u),
-    y: lerp(0, -20, u),
-    z: lerp(0, 220 * depth, u),
-    rotateY: lerp(0, 30, u),
-    rotateX: lerp(0, -6, u),
-    scale: lerp(1, 0.9, u),
-    opacity: lerp(1, 0.28, u),
+    y: lerp(0, -34, u),
+    z: lerp(0, 360 * depth, u),
+    rotateY: lerp(0, 44, u),
+    rotateX: lerp(0, -12, u),
+    scale: lerp(1, 0.84, u),
+    opacity: lerp(1, 0.14, u),
   };
 }
 
 function applyStageMotion(el: HTMLElement, motion: MotionSample) {
-  el.style.transform = `translate3d(${motion.x.toFixed(2)}px, ${motion.y.toFixed(2)}px, ${motion.z.toFixed(2)}px) rotateX(${motion.rotateX.toFixed(3)}deg) rotateY(${motion.rotateY.toFixed(3)}deg) scale(${motion.scale.toFixed(4)})`;
+  el.style.transform = [
+    `translate3d(${motion.x.toFixed(2)}px, ${motion.y.toFixed(2)}px, ${motion.z.toFixed(2)}px)`,
+    `rotateX(${motion.rotateX.toFixed(3)}deg)`,
+    `rotateY(${motion.rotateY.toFixed(3)}deg)`,
+    `scale(${motion.scale.toFixed(4)})`,
+  ].join(' ');
   el.style.opacity = motion.opacity.toFixed(3);
 }
 
@@ -194,9 +195,9 @@ function applyLayerMotion(
   compact: boolean,
 ) {
   const swing = (p - 0.5) * 2;
-  const z = -swing * 140 * factor * (compact ? 0.5 : 1);
-  const y = swing * 24 * factor;
-  const x = swing * 18 * factor * (compact ? 0.4 : 1);
+  const z = -swing * 220 * factor * (compact ? 0.55 : 1);
+  const y = swing * 40 * factor;
+  const x = swing * 32 * factor * (compact ? 0.45 : 1);
   el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px)`;
 }
 
@@ -207,8 +208,25 @@ function clearMotion(el: HTMLElement) {
 }
 
 /**
- * Contenedor del viaje de scroll premium (anime.js + ejes no tradicionales).
+ * Progreso 0→1 del capítulo.
+ * Con runway sticky: 0 cuando el top del capítulo llega al top del viewport,
+ * 1 cuando el bottom del capítulo llega al bottom del viewport.
  */
+function chapterProgress(root: HTMLElement): number {
+  const viewH = window.innerHeight || 1;
+  const rect = root.getBoundingClientRect();
+  const scrollable = rect.height - viewH;
+
+  if (scrollable > 1) {
+    return clamp01(-rect.top / scrollable);
+  }
+
+  // Capítulos sin pin (altura ≈ contenido): tránsito por el viewport.
+  const traveled = viewH - rect.top;
+  const distance = viewH + rect.height;
+  return clamp01(traveled / Math.max(distance, 1));
+}
+
 export function PremiumScrollJourney({
   children,
   className,
@@ -254,34 +272,53 @@ export function ScrollChapter({
     if (far) far.style.willChange = 'transform';
     if (mid) mid.style.willChange = 'transform';
 
-    const proxy = { p: 0.5 };
-    const render = () => {
+    const proxy = { p: chapterProgress(root) };
+    let smoothAnim: ReturnType<typeof animate> | null = null;
+
+    const paint = () => {
       const motion = sampleMotion(mode, proxy.p, compact);
       applyStageMotion(stage, motion);
-      if (far) applyLayerMotion(far, proxy.p, 1.35, compact);
-      if (mid) applyLayerMotion(mid, proxy.p, 0.75, compact);
+      if (far) applyLayerMotion(far, proxy.p, 1.4, compact);
+      if (mid) applyLayerMotion(mid, proxy.p, 0.8, compact);
     };
 
-    render();
+    paint();
 
-    const animation = animate(proxy, {
-      p: [0, 1],
-      ease: 'linear',
-      autoplay: false,
-      onRender: render,
-    });
+    const driveTo = (next: number) => {
+      const target = clamp01(next);
+      // Si el salto es mínimo, pintar directo (evita lag al inicio).
+      if (Math.abs(target - proxy.p) < 0.002) {
+        proxy.p = target;
+        paint();
+        return;
+      }
+      if (smoothAnim) smoothAnim.pause();
+      smoothAnim = animate(proxy, {
+        p: target,
+        duration: compact ? 140 : 200,
+        ease: 'out(2)',
+        onRender: paint,
+      });
+    };
 
-    const observer = onScroll({
-      target: root,
-      sync: compact ? 0.18 : 0.1,
-      enter: 'top bottom',
-      leave: 'bottom top',
-      repeat: true,
-    }).link(animation);
+    let rafId: number | null = null;
+    const sync = () => {
+      if (rafId != null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        driveTo(chapterProgress(root));
+      });
+    };
+
+    window.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync, { passive: true });
+    sync();
 
     return () => {
-      observer.revert();
-      animation.revert();
+      window.removeEventListener('scroll', sync);
+      window.removeEventListener('resize', sync);
+      if (rafId != null) cancelAnimationFrame(rafId);
+      if (smoothAnim) smoothAnim.pause();
       clearMotion(stage);
       if (far) clearMotion(far);
       if (mid) clearMotion(mid);
