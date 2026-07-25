@@ -198,6 +198,7 @@
     width: 100%;
     height: 100%;
     margin: 0;
+    overflow: hidden;
     transform-style: preserve-3d;
     transform-origin: 50% 50%;
     backface-visibility: hidden;
@@ -207,6 +208,33 @@
     opacity: 0;
     transform: translate3d(0, 48px, -1000px) rotateX(26deg) scale(0.42);
     pointer-events: none;
+  }
+
+  /*
+   * Dentro de la pila, el carrusel no debe usar 100vw (se pasa del viewport
+   * y con perspectiva del padre parece ~105% más grande).
+   */
+  .depth-stack__layer .works-carousel {
+    left: auto;
+    width: 100%;
+    max-width: 100%;
+    transform: none;
+    --works-slide: min(86%, 28rem);
+    --works-pad: max(1rem, calc((100% - min(86%, 28rem)) / 2));
+  }
+
+  @media (min-width: 640px) {
+    .depth-stack__layer .works-carousel {
+      --works-slide: min(72%, 32rem);
+      --works-pad: max(1.25rem, calc((100% - min(72%, 32rem)) / 2));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .depth-stack__layer .works-carousel {
+      --works-slide: 28rem;
+      --works-pad: max(1.25rem, calc((100% - 28rem) / 2));
+    }
   }
 
   .depth-stack__chapter {
@@ -395,11 +423,17 @@
     overflow: visible;
     cursor: grab;
     user-select: none;
+    /* pan-y: el scroll vertical de la pila (móvil = desktop) sigue al documento */
     touch-action: pan-y;
     perspective: min(1200px, 100vw);
     perspective-origin: center center;
     transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
+  }
+
+  .depth-stack__layer .works-carousel__scene {
+    /* Perspectiva propia; no hereda la del journey (evita hinchar el slide activo) */
+    perspective: min(1000px, 90vw);
   }
 
   .works-carousel__scene.is-dragging {

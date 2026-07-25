@@ -33,15 +33,16 @@ type MotionSample = {
   scale: number;
   opacity: number;
   interactive: boolean;
+  atRest: boolean;
 };
 
-/** Fracción local: emerger hasta el 100%; la última se detiene ahí (sin overshoot). */
+/** Fracción local: emerger hasta el 100%; la última se detiene ahí. */
 const EMERGE_END = 0.72;
 /** Hold corto solo para capas intermedias antes de salir. */
 const HOLD_END = 0.8;
-/** Unidades de scroll por sección (1 = un “slot” de la pila). */
 const UNITS_PER_SECTION = 1;
 const SCROLL_VH_PER_UNIT = 1.15;
+const SMOOTH_MS = 160;
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
@@ -56,35 +57,35 @@ function smoothstep(t: number) {
   return x * x * (3 - 2 * x);
 }
 
-function deepPark(compact: boolean, queue: number): MotionSample {
-  const depth = compact ? 0.85 : 1;
-  const step = 220 * depth;
+function viewHeight() {
+  return window.visualViewport?.height || window.innerHeight || 1;
+}
+
+function deepPark(queue: number): MotionSample {
+  const step = 220;
   return {
     y: 48,
-    z: -1000 * depth - Math.max(0, queue) * step,
+    z: -1000 - Math.max(0, queue) * step,
     rotateX: 26,
     scale: 0.42,
     opacity: 0,
     interactive: false,
+    atRest: false,
   };
 }
 
-function exitedPark(compact: boolean): MotionSample {
-  const depth = compact ? 0.85 : 1;
+function exitedPark(): MotionSample {
   return {
     y: -36,
-    z: 520 * depth,
+    z: 520,
     rotateX: -12,
     scale: 0.9,
     opacity: 0,
     interactive: false,
+    atRest: false,
   };
 }
 
-/**
- * local: posición de la capa en el eje de la pila (0 = empieza a emerger).
- * isLast: la última no sale hacia adelante; se queda en pantalla.
- */
 function restMotion(): MotionSample {
   return {
     y: 0,
@@ -93,44 +94,39 @@ function restMotion(): MotionSample {
     scale: 1,
     opacity: 1,
     interactive: true,
+    atRest: true,
   };
 }
 
-function sampleLayer(
-  local: number,
-  isLast: boolean,
-  compact: boolean,
-): MotionSample {
-  const depth = compact ? 0.85 : 1;
+function emergeMotion(local: number): MotionSample {
+  const u = smoothstep(local / EMERGE_END);
+  return {
+    y: lerp(48, 0, u),
+    z: lerp(-1000, 0, u),
+    rotateX: lerp(26, 0, u),
+    scale: lerp(0.42, 1, u),
+    opacity: lerp(0, 1, u),
+    interactive: u > 0.55,
+    atRest: false,
+  };
+}
 
+/**
+ * local: posición de la capa en el eje de la pila (0 = empieza a emerger).
+ * isLast: la última no sale hacia adelante; se queda en pantalla al 100%.
+ */
+function sampleLayer(local: number, isLast: boolean): MotionSample {
   if (local < 0) {
-    return deepPark(compact, -local);
+    return deepPark(-local);
   }
 
-  // Última sección: solo emerge 0→100% y se queda; nunca escala/Z por encima de reposo.
   if (isLast) {
     if (local >= EMERGE_END) return restMotion();
-    const u = smoothstep(local / EMERGE_END);
-    return {
-      y: lerp(48, 0, u),
-      z: lerp(-1000 * depth, 0, u),
-      rotateX: lerp(26, 0, u),
-      scale: lerp(0.42, 1, u),
-      opacity: lerp(0, 1, u),
-      interactive: u > 0.55,
-    };
+    return emergeMotion(local);
   }
 
   if (local <= EMERGE_END) {
-    const u = smoothstep(local / EMERGE_END);
-    return {
-      y: lerp(48, 0, u),
-      z: lerp(-1000 * depth, 0, u),
-      rotateX: lerp(26, 0, u),
-      scale: lerp(0.42, 1, u),
-      opacity: lerp(0, 1, u),
-      interactive: u > 0.55,
-    };
+    return emergeMotion(local);
   }
 
   if (local <= HOLD_END) {
@@ -138,27 +134,38 @@ function sampleLayer(
   }
 
   if (local >= UNITS_PER_SECTION) {
-    return exitedPark(compact);
+    return exitedPark();
   }
 
   const u = smoothstep((local - HOLD_END) / (UNITS_PER_SECTION - HOLD_END));
   return {
     y: lerp(0, -36, u),
-    z: lerp(0, 520 * depth, u),
+    z: lerp(0, 520, u),
     rotateX: lerp(0, -12, u),
-    // Capas intermedias pueden alejarse; la escala no pasa de 1 (evita sensación de 105%).
-    scale: lerp(1, 0.92, u),
+    scale: lerp(1, 0.9, u),
     opacity: lerp(1, 0, u),
     interactive: u < 0.35,
+    atRest: false,
   };
 }
 
 function applyLayerMotion(el: HTMLElement, motion: MotionSample) {
-  // Nunca por encima del tamaño de reposo (evita sensación de ~105%).
-  const scale = Math.min(1, motion.scale);
-  const z = Math.min(motion.z, 520);
+  // En reposo: sin transform del padre. Evita que perspectiva/scale
+  // hinchen el contenido (p. ej. carrusel 3D de Trabajos).
+  if (motion.atRest) {
+    el.style.transform = 'none';
+    el.style.opacity = '1';
+    el.style.transformStyle = 'flat';
+    el.style.pointerEvents = 'auto';
+    el.setAttribute('aria-hidden', 'false');
+    return;
+  }
+
+  // Escala nunca por encima de 1 (tamaño natural = 100%).
+  const scale = Math.min(1, Math.max(0.42, motion.scale));
+  el.style.transformStyle = 'preserve-3d';
   el.style.transform = [
-    `translate3d(0px, ${motion.y.toFixed(2)}px, ${z.toFixed(2)}px)`,
+    `translate3d(0px, ${motion.y.toFixed(2)}px, ${motion.z.toFixed(2)}px)`,
     `rotateX(${motion.rotateX.toFixed(3)}deg)`,
     `scale(${scale.toFixed(4)})`,
   ].join(' ');
@@ -170,12 +177,10 @@ function applyLayerMotion(el: HTMLElement, motion: MotionSample) {
 function journeyProgress(root: HTMLElement, viewH: number): number {
   const rect = root.getBoundingClientRect();
   const scrollable = Math.max(root.offsetHeight - viewH, 1);
-  // Exacto en 0 cuando el top del runway está en el top del viewport.
   return clamp01(-rect.top / scrollable);
 }
 
 function maxUnit(sectionCount: number) {
-  // Termina exactamente al 100% emergido de la última (sin hold extra ni overshoot).
   return Math.max(sectionCount - 1, 0) * UNITS_PER_SECTION + EMERGE_END;
 }
 
@@ -206,15 +211,12 @@ export function PremiumScrollJourney({
       layers.forEach((el) => {
         el.style.removeProperty('transform');
         el.style.removeProperty('opacity');
+        el.style.removeProperty('transform-style');
         el.style.pointerEvents = 'auto';
         el.removeAttribute('aria-hidden');
       });
       return;
     }
-
-    const compact =
-      window.matchMedia('(max-width: 1023px)').matches ||
-      window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
     const footerH = () => {
       const footer = document.getElementById('contact');
@@ -222,7 +224,7 @@ export function PremiumScrollJourney({
     };
 
     const layout = () => {
-      const viewH = window.innerHeight || 1;
+      const viewH = viewHeight();
       const pinH = Math.max(viewH - footerH(), 240);
       const unitPx = viewH * SCROLL_VH_PER_UNIT;
       const scrollable = unitPx * maxUnit(count);
@@ -239,11 +241,10 @@ export function PremiumScrollJourney({
       const u = proxy.u;
       const painted = layers.map((el, i) => {
         const local = u - i * UNITS_PER_SECTION;
-        const motion = sampleLayer(local, i === count - 1, compact);
+        const motion = sampleLayer(local, i === count - 1);
         applyLayerMotion(el, motion);
-        return { el, z: motion.z };
+        return { el, z: motion.atRest ? 0 : motion.z };
       });
-      // Orden de pintura por cercanía a la cámara (no por orden del DOM).
       [...painted]
         .sort((a, b) => a.z - b.z)
         .forEach((item, rank) => {
@@ -251,7 +252,6 @@ export function PremiumScrollJourney({
         });
     };
 
-    // Estado inicial forzado: pila en 0% emergido (antes de cualquier scroll).
     proxy.u = 0;
     paint();
 
@@ -265,8 +265,8 @@ export function PremiumScrollJourney({
       if (smoothAnim) smoothAnim.pause();
       smoothAnim = animate(proxy, {
         u: target,
-        duration: compact ? 120 : 180,
-        ease: 'out(2)',
+        duration: SMOOTH_MS,
+        ease: 'linear',
         onRender: paint,
       });
     };
@@ -276,7 +276,7 @@ export function PremiumScrollJourney({
       if (rafId != null) return;
       rafId = requestAnimationFrame(() => {
         rafId = null;
-        const viewH = window.innerHeight || 1;
+        const viewH = viewHeight();
         const p = journeyProgress(root, viewH);
         driveTo(p * maxUnit(count));
       });
@@ -289,11 +289,15 @@ export function PremiumScrollJourney({
 
     window.addEventListener('scroll', sync, { passive: true });
     window.addEventListener('resize', onResize, { passive: true });
+    window.visualViewport?.addEventListener('resize', onResize);
+    window.visualViewport?.addEventListener('scroll', sync);
     sync();
 
     return () => {
       window.removeEventListener('scroll', sync);
       window.removeEventListener('resize', onResize);
+      window.visualViewport?.removeEventListener('resize', onResize);
+      window.visualViewport?.removeEventListener('scroll', sync);
       if (rafId != null) cancelAnimationFrame(rafId);
       if (smoothAnim) smoothAnim.pause();
       root.classList.remove('depth-stack--flat');
@@ -302,6 +306,7 @@ export function PremiumScrollJourney({
         el.style.removeProperty('opacity');
         el.style.removeProperty('pointer-events');
         el.style.removeProperty('will-change');
+        el.style.removeProperty('transform-style');
         el.removeAttribute('aria-hidden');
       });
     };

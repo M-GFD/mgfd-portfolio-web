@@ -53,18 +53,18 @@ export default function HomePage() {
           <ScrollChapter>
             <section
               id="works"
-              className="scroll-mt-[calc(5.5rem+env(safe-area-inset-top))] flex h-full min-h-full w-full flex-col justify-center pt-2 sm:pt-4"
+              className="scroll-mt-[calc(5.5rem+env(safe-area-inset-top))] flex h-full min-h-0 w-full max-w-full flex-col justify-center overflow-hidden px-0 pt-2 sm:pt-4"
             >
-              <div className="container mx-auto w-full max-w-6xl px-4 pb-2 text-center sm:px-6 sm:pb-3">
-                <h2 className="mb-4 text-2xl font-bold text-white sm:mb-5 sm:text-3xl md:text-4xl">
+              <div className="container mx-auto w-full max-w-6xl shrink-0 px-4 pb-1 text-center sm:px-6 sm:pb-2">
+                <h2 className="mb-2 text-2xl font-bold text-white sm:mb-3 sm:text-3xl md:text-4xl">
                   {t('projects.sectionTitle')}
                 </h2>
               </div>
 
-              <div className="w-full pt-2 sm:pt-4">
+              <div className="flex min-h-0 w-full max-w-full flex-1 flex-col justify-center">
                 <ProjectList projects={projectsWithLocale} loading={false} />
 
-                <div className="container mx-auto max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8">
+                <div className="container mx-auto max-w-6xl shrink-0 px-4 pt-3 sm:px-6 sm:pt-4">
                   <div className="flex justify-center">
                     <a
                       href="mailto:mgfd.design@gmail.com"
