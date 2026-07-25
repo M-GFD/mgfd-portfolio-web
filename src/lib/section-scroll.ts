@@ -170,8 +170,18 @@ export function animateScrollTo(
   });
 }
 
+/** En táctil, el scroll nativo del SO es más suave que animar con rAF. */
+function prefersNativeAnchorScroll(): boolean {
+  if (typeof window === 'undefined') return false;
+  return (
+    window.matchMedia('(hover: none), (pointer: coarse)').matches ||
+    window.matchMedia('(max-width: 1023px)').matches ||
+    navigator.maxTouchPoints > 0
+  );
+}
+
 export async function scrollToSectionElement(section: Element): Promise<void> {
-  if (usesNativeSectionSnap()) {
+  if (prefersNativeAnchorScroll() || usesNativeSectionSnap()) {
     (section as HTMLElement).scrollIntoView({
       behavior: 'smooth',
       block: 'start',
@@ -189,12 +199,17 @@ export async function scrollToSectionByHash(hash: string): Promise<void> {
     return;
   }
 
+  if (prefersNativeAnchorScroll() || usesNativeSectionSnap()) {
+    (section as HTMLElement).scrollIntoView({
+      behavior: 'smooth',
+      block: hash === '#contact' ? 'end' : 'start',
+    });
+    history.replaceState(null, '', hash);
+    return;
+  }
+
   if (hash === '#contact') {
-    if (usesNativeSectionSnap()) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    } else {
-      await animateScrollTo(getSectionBottomTargetY(section));
-    }
+    await animateScrollTo(getSectionBottomTargetY(section));
   } else {
     await scrollToSectionElement(section);
   }

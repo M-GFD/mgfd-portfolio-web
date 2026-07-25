@@ -55,25 +55,37 @@ export default function Header({ onMenuToggle }: HeaderProps) {
 
   useEffect(() => {
     lastScrollYRef.current = window.scrollY;
+    let rafId: number | null = null;
+    let pendingY = window.scrollY;
 
-    const onScroll = () => {
-      const y = window.scrollY;
+    const apply = () => {
+      rafId = null;
+      const y = pendingY;
       const prev = lastScrollYRef.current;
       const delta = y - prev;
 
       if (mobileMenuOpen || y < 24) {
         setHeaderHidden(false);
-      } else if (delta > 6) {
+      } else if (delta > 10) {
         setHeaderHidden(true);
-      } else if (delta < -6) {
+      } else if (delta < -10) {
         setHeaderHidden(false);
       }
 
       lastScrollYRef.current = y;
     };
 
+    const onScroll = () => {
+      pendingY = window.scrollY;
+      if (rafId != null) return;
+      rafId = requestAnimationFrame(apply);
+    };
+
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId != null) cancelAnimationFrame(rafId);
+    };
   }, [mobileMenuOpen]);
 
   const handleMenuToggle = () => {

@@ -154,6 +154,28 @@
     -webkit-backface-visibility: hidden;
   }
 
+  /* Móvil / táctil: sin transforms 3D (scroll nativo fluido). */
+  .orbit-stage--flat,
+  .orbit-stage--flat .orbit-panel {
+    perspective: none !important;
+    transform: none !important;
+    transform-style: flat !important;
+    will-change: auto !important;
+  }
+
+  @media (hover: none), (pointer: coarse), (max-width: 1023px) {
+    .orbit-stage {
+      perspective: none;
+    }
+
+    .orbit-panel {
+      transform: none !important;
+      transform-style: flat;
+      backface-visibility: visible;
+      -webkit-backface-visibility: visible;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .orbit-stage {
       perspective: none;
@@ -198,6 +220,7 @@
   /** Cada sección del portfolio actúa como un “estado” a pantalla completa. */
   .snap-section {
     min-height: 100dvh;
+    scroll-margin-top: calc(5.5rem + env(safe-area-inset-top));
   }
 
   /**

@@ -16,16 +16,11 @@ type CircularScrollOrbitProps = {
   className?: string;
 };
 
-function orbitConfig(intensity: OrbitIntensity, narrow: boolean) {
-  // Ángulos más suaves para no percibir tirones al cruzar secciones.
+function orbitConfig(intensity: OrbitIntensity) {
   if (intensity === 'soft') {
-    return narrow
-      ? { angle: 8, radius: 36, perspective: 1100 }
-      : { angle: 12, radius: 56, perspective: 1400 };
+    return { angle: 12, radius: 56, perspective: 1400 };
   }
-  return narrow
-    ? { angle: 14, radius: 52, perspective: 1200 }
-    : { angle: 22, radius: 96, perspective: 1600 };
+  return { angle: 22, radius: 96, perspective: 1600 };
 }
 
 function applyOrbitTransform(
@@ -35,7 +30,6 @@ function applyOrbitTransform(
   radius: number,
   perspective: number,
 ) {
-  // progress 0 → entra abajo; 0.5 → frente al eje; 1 → sale arriba
   const angle = angleMax * (1 - 2 * progress);
   const rad = (angle * Math.PI) / 180;
   const x = Math.sin(rad) * radius;
@@ -44,9 +38,27 @@ function applyOrbitTransform(
   panel.style.transform = `perspective(${perspective}px) translate3d(${x.toFixed(2)}px, 0, ${z.toFixed(2)}px) rotateY(${angle.toFixed(3)}deg)`;
 }
 
+function clearPanelTransforms(stage: HTMLElement) {
+  stage
+    .querySelectorAll<HTMLElement>('[data-orbit-panel]')
+    .forEach((panel) => {
+      panel.style.removeProperty('transform');
+      panel.style.removeProperty('will-change');
+      panel.style.removeProperty('transform-origin');
+    });
+}
+
+/** Táctil / coarse: sin orbit 3D para no pelear con el scroll nativo. */
+function isTouchLikeViewport(): boolean {
+  return (
+    window.matchMedia('(hover: none), (pointer: coarse)').matches ||
+    window.matchMedia('(max-width: 1023px)').matches ||
+    navigator.maxTouchPoints > 0
+  );
+}
+
 /**
- * Recorrido circular ligado al scroll con anime.js:
- * cada panel orbita alrededor de un eje vertical central.
+ * Recorrido circular ligado al scroll con anime.js (solo desktop fino).
  */
 export function CircularScrollOrbit({
   children,
@@ -61,32 +73,41 @@ export function CircularScrollOrbit({
     const reducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     );
-    if (reducedMotion.matches) return;
+    if (reducedMotion.matches || isTouchLikeViewport()) {
+      clearPanelTransforms(stage);
+      stage.classList.add('orbit-stage--flat');
+      return;
+    }
+
+    stage.classList.remove('orbit-stage--flat');
 
     const observers: ScrollObserver[] = [];
     const animations: JSAnimation[] = [];
-    const proxies: Array<{ p: number }> = [];
 
     const setup = () => {
       observers.splice(0).forEach((o) => o.revert());
       animations.splice(0).forEach((a) => a.revert());
-      proxies.length = 0;
 
-      const narrow = window.matchMedia('(max-width: 639px)').matches;
+      if (isTouchLikeViewport() || reducedMotion.matches) {
+        clearPanelTransforms(stage);
+        stage.classList.add('orbit-stage--flat');
+        return;
+      }
+
+      stage.classList.remove('orbit-stage--flat');
       const panels = stage.querySelectorAll<HTMLElement>('[data-orbit-panel]');
 
       panels.forEach((panel) => {
         const intensity =
           (panel.dataset.orbitIntensity as OrbitIntensity | undefined) ??
           'full';
-        const { angle, radius, perspective } = orbitConfig(intensity, narrow);
+        const { angle, radius, perspective } = orbitConfig(intensity);
 
         panel.style.willChange = 'transform';
         panel.style.transformOrigin = '50% 50%';
         applyOrbitTransform(panel, 0.5, angle, radius, perspective);
 
         const proxy = { p: 0.5 };
-        proxies.push(proxy);
 
         const animation = animate(proxy, {
           p: [0, 1],
@@ -99,7 +120,6 @@ export function CircularScrollOrbit({
 
         const observer = onScroll({
           target: panel,
-          // Sync lineal con el scroll: evita “rubber-band” de catch-up.
           sync: true,
           enter: 'bottom bottom',
           leave: 'top top',
@@ -122,13 +142,8 @@ export function CircularScrollOrbit({
       window.removeEventListener('orientationchange', onResize);
       observers.forEach((o) => o.revert());
       animations.forEach((a) => a.revert());
-      stage
-        .querySelectorAll<HTMLElement>('[data-orbit-panel]')
-        .forEach((panel) => {
-          panel.style.removeProperty('transform');
-          panel.style.removeProperty('will-change');
-          panel.style.removeProperty('transform-origin');
-        });
+      clearPanelTransforms(stage);
+      stage.classList.remove('orbit-stage--flat');
     };
   }, []);
 
