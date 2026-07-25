@@ -34,7 +34,14 @@ const INTERACTIVE_SELECTOR = [
   '[contenteditable="true"]',
   '[contenteditable=""]',
   '.cursor-pointer',
+  '.works-carousel',
 ].join(', ');
+
+const NATIVE_CURSOR_VALUES = new Set([
+  'pointer',
+  'grab',
+  'grabbing',
+]);
 
 function isTrackablePointer(pointerType: string) {
   return pointerType !== 'touch';
@@ -45,11 +52,11 @@ function isClickCursorTarget(target: EventTarget | null): boolean {
 
   if (target.closest(INTERACTIVE_SELECTOR)) return true;
 
-  // Si el estilo computado pide pointer (p. ej. onClick en un div), ceder al cursor nativo.
+  // Si el estilo computado pide pointer/grab (p. ej. carrusel), ceder al cursor nativo.
   let node: Element | null = target;
   while (node && node !== document.documentElement) {
     const cursor = getComputedStyle(node).cursor;
-    if (cursor === 'pointer') return true;
+    if (NATIVE_CURSOR_VALUES.has(cursor)) return true;
     node = node.parentElement;
   }
 
