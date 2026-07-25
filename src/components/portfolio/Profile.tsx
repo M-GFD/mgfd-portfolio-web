@@ -1,5 +1,6 @@
 'use client';
 
+import { TextReveal } from '@/components/ui/text-reveal';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Profile() {
@@ -22,21 +23,22 @@ export default function Profile() {
             className="glass-card min-w-0 w-full flex-1 p-5 text-left sm:p-7 sm:text-justify md:w-auto md:p-8 md:text-left"
             aria-labelledby="about-heading"
           >
-            <h3
-              id="about-heading"
-              className="mb-3 text-2xl font-bold text-white sm:mb-4 sm:text-3xl md:text-4xl"
-            >
-              {t('about.title')}
+            <h3 id="about-heading" className="mb-3 sm:mb-4">
+              <TextReveal
+                textClassName="text-2xl font-bold leading-tight text-white/20 sm:text-3xl md:text-4xl"
+                wordClassName="text-white"
+              >
+                {t('about.title')}
+              </TextReveal>
             </h3>
             {(['p1', 'p2', 'p3'] as const).map((key, i) => (
-              <p
+              <TextReveal
                 key={key}
-                className={`text-sm leading-relaxed text-neutral-300 sm:text-base ${
-                  i < 2 ? 'mb-4 sm:mb-5' : ''
-                }`}
+                delay={0.15 + i * 0.35}
+                className={i < 2 ? 'mb-4 sm:mb-5' : ''}
               >
                 {t(`about.${key}`)}
-              </p>
+              </TextReveal>
             ))}
           </article>
         </div>

@@ -125,9 +125,10 @@ export default function Hero() {
             {showCta ? (
               <PulsatingButton
                 type="button"
-                pulseColor="rgba(255,255,255,0.55)"
-                duration="1.6s"
-                distance="10px"
+                variant="pulse"
+                pulseColor="rgba(255,255,255,0.65)"
+                duration="1.5s"
+                distance="8px"
                 className="mx-auto bg-white px-5 py-2.5 text-sm font-medium text-black shadow-sm shadow-black/30 hover:bg-neutral-200 sm:px-8 sm:py-3 sm:text-base"
                 onClick={() => {
                   void scrollToSectionByHash('#works');
