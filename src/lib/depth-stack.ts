@@ -8,6 +8,18 @@ export const DEPTH_SCROLL_VH_PER_UNIT = 1.15;
 /** Nav/CTA: sin hold al 100%; scroll manual: con fijación leve. */
 let depthNavScrolling = false;
 
+type DepthNavDriver = {
+  getUnit: () => number;
+  setUnit: (unit: number) => void;
+  getCount: () => number;
+};
+
+let depthNavDriver: DepthNavDriver | null = null;
+
+export function registerDepthNavDriver(driver: DepthNavDriver | null) {
+  depthNavDriver = driver;
+}
+
 export function setDepthNavScrolling(active: boolean) {
   depthNavScrolling = active;
   if (typeof document !== 'undefined') {
@@ -16,11 +28,6 @@ export function setDepthNavScrolling(active: boolean) {
       if (active) root.dataset.depthNav = 'true';
       else delete root.dataset.depthNav;
     }
-  }
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(
-      new CustomEvent('depth-stack-nav', { detail: { active } }),
-    );
   }
 }
 
@@ -62,6 +69,10 @@ function getMaxScrollY(): number {
     0,
     document.documentElement.scrollHeight - viewHeight(),
   );
+}
+
+function easeOutCubic(t: number): number {
+  return 1 - (1 - t) ** 3;
 }
 
 /** Índice de capa (0…n-1) para un hash (#about, #works, #contact, …). */
@@ -125,4 +136,66 @@ export function getDepthStackTargetY(hash: string): number | null {
 
   const unit = unitForSectionIndex(index, count);
   return scrollYForDepthUnit(root, unit, count);
+}
+
+/**
+ * Navegación por ancla: anima la unidad de la pila directamente (sin hold)
+ * y sincroniza window.scrollY. Más fluido que scroll→progress→paint.
+ */
+export async function animateDepthNavToHash(
+  hash: string,
+  durationMs: number,
+): Promise<boolean> {
+  const root = getDepthJourney();
+  if (!isDepthStackActive(root) || !root || !depthNavDriver) return false;
+
+  const count = depthNavDriver.getCount();
+  const index = resolveDepthSectionIndex(hash, root);
+  if (index == null) return false;
+
+  const targetUnit = unitForSectionIndex(index, count);
+  const startUnit = depthNavDriver.getUnit();
+  const distance = Math.abs(targetUnit - startUnit);
+
+  if (distance < 0.001) {
+    depthNavDriver.setUnit(targetUnit);
+    window.scrollTo(0, scrollYForDepthUnit(root, targetUnit, count));
+    return true;
+  }
+
+  const reducedMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)',
+  ).matches;
+  if (reducedMotion) {
+    depthNavDriver.setUnit(targetUnit);
+    window.scrollTo(0, scrollYForDepthUnit(root, targetUnit, count));
+    return true;
+  }
+
+  setDepthNavScrolling(true);
+
+  await new Promise<void>((resolve) => {
+    const start = performance.now();
+
+    const step = (now: number) => {
+      const t = Math.min(1, (now - start) / durationMs);
+      const eased = easeOutCubic(t);
+      const unit = startUnit + (targetUnit - startUnit) * eased;
+      depthNavDriver?.setUnit(unit);
+      window.scrollTo(0, scrollYForDepthUnit(root, unit, count));
+
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        depthNavDriver?.setUnit(targetUnit);
+        window.scrollTo(0, scrollYForDepthUnit(root, targetUnit, count));
+        resolve();
+      }
+    };
+
+    requestAnimationFrame(step);
+  });
+
+  setDepthNavScrolling(false);
+  return true;
 }

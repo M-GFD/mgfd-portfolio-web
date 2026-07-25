@@ -1,6 +1,7 @@
 import {
+  animateDepthNavToHash,
   getDepthStackTargetY,
-  setDepthNavScrolling,
+  isDepthStackActive,
 } from '@/lib/depth-stack';
 
 export const SECTION_SELECTOR = '.snap-section';
@@ -227,28 +228,31 @@ export async function scrollToSectionByHash(hash: string): Promise<void> {
 
   await waitForDepthStackReady();
 
-  // Pila en profundidad: scroll del documento → el journey pinta el efecto.
-  let depthY = getDepthStackTargetY(normalized);
-  if (depthY == null) {
-    await new Promise<void>((r) => {
-      requestAnimationFrame(() => requestAnimationFrame(() => r()));
-    });
-    depthY = getDepthStackTargetY(normalized);
-  }
-  if (depthY != null) {
-    const distance = Math.abs(depthY - window.scrollY);
-    const durationMs = Math.min(
-      DEPTH_NAV_MAX_MS,
-      Math.max(DEPTH_NAV_MIN_MS, distance * DEPTH_NAV_PX_FACTOR),
-    );
-    setDepthNavScrolling(true);
-    try {
-      await animateScrollTo(depthY, durationMs);
-    } finally {
-      setDepthNavScrolling(false);
+  // Pila en profundidad: anima la unidad de la pila (sin hold intermedio).
+  if (isDepthStackActive()) {
+    let depthY = getDepthStackTargetY(normalized);
+    if (depthY == null) {
+      await new Promise<void>((r) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => r()));
+      });
+      depthY = getDepthStackTargetY(normalized);
     }
-    history.replaceState(null, '', normalized);
-    return;
+    if (depthY != null) {
+      const distance = Math.abs(depthY - window.scrollY);
+      const durationMs = Math.min(
+        DEPTH_NAV_MAX_MS,
+        Math.max(DEPTH_NAV_MIN_MS, distance * DEPTH_NAV_PX_FACTOR),
+      );
+      const ok = await animateDepthNavToHash(normalized, durationMs);
+      if (ok) {
+        history.replaceState(null, '', normalized);
+        return;
+      }
+      // Fallback si el driver aún no está listo.
+      await animateScrollTo(depthY, durationMs);
+      history.replaceState(null, '', normalized);
+      return;
+    }
   }
 
   const section = document.querySelector(normalized);

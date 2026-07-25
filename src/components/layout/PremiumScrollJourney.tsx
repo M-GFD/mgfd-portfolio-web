@@ -17,6 +17,7 @@ import {
   depthMaxUnit,
   isDepthNavScrolling,
   prefersDepthStack,
+  registerDepthNavDriver,
 } from '@/lib/depth-stack';
 
 export type ScrollMode = 'depth-in';
@@ -115,6 +116,19 @@ function emergeMotion(local: number): MotionSample {
 }
 
 /**
+ * En nav/CTA comprime cada slot: ~55% emerger + ~45% salir, sin meseta al 100%.
+ */
+function warpLocalForNav(local: number): number {
+  if (local < 0 || local >= DEPTH_UNITS_PER_SECTION) return local;
+  const emergePortion = 0.55;
+  if (local <= emergePortion) {
+    return (local / emergePortion) * DEPTH_EMERGE_END;
+  }
+  const t = (local - emergePortion) / (1 - emergePortion);
+  return DEPTH_EMERGE_END + t * (DEPTH_UNITS_PER_SECTION - DEPTH_EMERGE_END);
+}
+
+/**
  * @param skipHold — true en nav/CTA: emerge → sale sin pausa al 100%.
  *                   false en scroll manual: leve fijación en reposo.
  */
@@ -123,31 +137,38 @@ function sampleLayer(
   isLast: boolean,
   skipHold: boolean,
 ): MotionSample {
-  if (local < 0) {
-    return deepPark(-local);
+  let L = local;
+  if (skipHold && !isLast) {
+    L = warpLocalForNav(local);
+  }
+
+  if (L < 0) {
+    return deepPark(-L);
   }
 
   if (isLast) {
-    if (local >= DEPTH_EMERGE_END) return restMotion();
-    return emergeMotion(local);
+    if (L >= DEPTH_EMERGE_END) return restMotion();
+    return emergeMotion(L);
   }
 
-  if (local <= DEPTH_EMERGE_END) {
-    return emergeMotion(local);
+  if (L <= DEPTH_EMERGE_END) {
+    return emergeMotion(L);
   }
 
   // Scroll manual: breve hold al 100% antes de salir.
-  if (!skipHold && local <= DEPTH_HOLD_END) {
+  if (!skipHold && L <= DEPTH_HOLD_END) {
     return restMotion();
   }
 
-  if (local >= DEPTH_UNITS_PER_SECTION) {
+  if (L >= DEPTH_UNITS_PER_SECTION) {
     return exitedPark();
   }
 
   const exitStart = skipHold ? DEPTH_EMERGE_END : DEPTH_HOLD_END;
   const span = Math.max(DEPTH_UNITS_PER_SECTION - exitStart, 0.001);
-  const u = smoothstep((local - exitStart) / span);
+  const t = clamp01((L - exitStart) / span);
+  // Nav: ease-out en la salida → abandona el 100% enseguida.
+  const u = skipHold ? 1 - (1 - t) ** 3 : smoothstep(t);
   return {
     y: lerp(0, -36, u),
     z: lerp(0, 520, u),
@@ -286,9 +307,12 @@ export function PremiumScrollJourney({
     };
 
     const sync = () => {
+      // Durante nav/CTA el driver anima `u` directamente; no pisar con scroll.
+      if (isDepthNavScrolling()) return;
       if (rafId != null) return;
       rafId = requestAnimationFrame(() => {
         rafId = null;
+        if (isDepthNavScrolling()) return;
         const viewH = viewHeight();
         const p = journeyProgress(root, viewH);
         driveTo(p * depthMaxUnit(count));
@@ -306,6 +330,7 @@ export function PremiumScrollJourney({
 
     const enableFlat = () => {
       stopDepth();
+      registerDepthNavDriver(null);
       root.classList.add('depth-stack--flat');
       root.style.removeProperty('height');
       root.style.removeProperty('--depth-pin-h');
@@ -327,6 +352,15 @@ export function PremiumScrollJourney({
 
       proxy.u = 0;
       paint();
+
+      registerDepthNavDriver({
+        getUnit: () => proxy.u,
+        setUnit: (unit) => {
+          proxy.u = Math.max(0, Math.min(depthMaxUnit(count), unit));
+          paint();
+        },
+        getCount: () => count,
+      });
 
       window.addEventListener('scroll', sync, { passive: true });
       window.addEventListener('resize', onResize, { passive: true });
@@ -362,6 +396,7 @@ export function PremiumScrollJourney({
       desktopMq.removeEventListener('change', onMqChange);
       motionMq.removeEventListener('change', onMqChange);
       stopDepth();
+      registerDepthNavDriver(null);
       delete root.dataset.depthReady;
       root.classList.remove('depth-stack--flat');
       root.style.removeProperty('height');

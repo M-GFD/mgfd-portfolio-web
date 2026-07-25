@@ -7,6 +7,7 @@ import { AnchorSmoothScroll } from '@/components/layout/AnchorSmoothScroll';
 import { SmoothSectionScroll } from '@/components/layout/SmoothSectionScroll';
 import { BackgroundVideoLayer } from '@/components/layout/BackgroundVideoLayer';
 import { ExperienceGate } from '@/components/layout/ExperienceGate';
+import { SmoothCursor } from '@/components/ui/smooth-cursor';
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -23,6 +24,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
           <BackgroundVideoLayer />
           <AnchorSmoothScroll />
           <SmoothSectionScroll />
+          <SmoothCursor />
           <div className="relative z-10">{children}</div>
           <ExperienceGate />
         </ExperienceProvider>
