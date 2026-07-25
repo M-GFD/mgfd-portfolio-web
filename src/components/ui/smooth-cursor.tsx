@@ -20,8 +20,40 @@ export interface SmoothCursorProps {
 
 const DESKTOP_POINTER_QUERY = '(any-hover: hover) and (any-pointer: fine)';
 
+/** Elementos donde el SO muestra cursor de click / texto / etc. */
+const INTERACTIVE_SELECTOR = [
+  'a[href]',
+  'button',
+  'input',
+  'textarea',
+  'select',
+  'label',
+  'summary',
+  '[role="button"]',
+  '[role="link"]',
+  '[contenteditable="true"]',
+  '[contenteditable=""]',
+  '.cursor-pointer',
+].join(', ');
+
 function isTrackablePointer(pointerType: string) {
   return pointerType !== 'touch';
+}
+
+function isClickCursorTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false;
+
+  if (target.closest(INTERACTIVE_SELECTOR)) return true;
+
+  // Si el estilo computado pide pointer (p. ej. onClick en un div), ceder al cursor nativo.
+  let node: Element | null = target;
+  while (node && node !== document.documentElement) {
+    const cursor = getComputedStyle(node).cursor;
+    if (cursor === 'pointer') return true;
+    node = node.parentElement;
+  }
+
+  return false;
 }
 
 const DefaultCursorSVG: FC = () => {
@@ -103,6 +135,9 @@ export function SmoothCursor({
   const accumulatedRotation = useRef(0);
   const [isEnabled, setIsEnabled] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  /** Oculto sobre links/botones para no superponerse al cursor nativo. */
+  const [yieldToNative, setYieldToNative] = useState(false);
+  const yieldToNativeRef = useRef(false);
 
   const cursorX = useSpring(0, springConfig);
   const cursorY = useSpring(0, springConfig);
@@ -164,6 +199,18 @@ export function SmoothCursor({
         return;
       }
 
+      const overClickable = isClickCursorTarget(e.target);
+      if (overClickable !== yieldToNativeRef.current) {
+        yieldToNativeRef.current = overClickable;
+        setYieldToNative(overClickable);
+        document.body.style.cursor = overClickable ? '' : 'none';
+      }
+
+      if (overClickable) {
+        setIsVisible(false);
+        return;
+      }
+
       setIsVisible(true);
 
       const currentPos = { x: e.clientX, y: e.clientY };
@@ -221,7 +268,8 @@ export function SmoothCursor({
 
     return () => {
       window.removeEventListener('pointermove', throttledPointerMove);
-      document.body.style.cursor = 'auto';
+      document.body.style.cursor = '';
+      yieldToNativeRef.current = false;
       if (rafId) cancelAnimationFrame(rafId);
       if (timeout !== null) {
         clearTimeout(timeout);
@@ -232,6 +280,8 @@ export function SmoothCursor({
   if (!isEnabled) {
     return null;
   }
+
+  const showCustom = isVisible && !yieldToNative;
 
   return (
     <motion.div
@@ -246,13 +296,14 @@ export function SmoothCursor({
         zIndex: 200,
         pointerEvents: 'none',
         willChange: 'transform',
-        opacity: isVisible ? 1 : 0,
+        opacity: showCustom ? 1 : 0,
       }}
       initial={false}
-      animate={{ opacity: isVisible ? 1 : 0 }}
+      animate={{ opacity: showCustom ? 1 : 0 }}
       transition={{
-        duration: 0.15,
+        duration: 0.12,
       }}
+      aria-hidden
     >
       {cursor}
     </motion.div>
