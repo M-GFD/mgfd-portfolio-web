@@ -75,6 +75,128 @@ function easeOutCubic(t: number): number {
   return 1 - (1 - t) ** 3;
 }
 
+function easeInOutCubic(t: number): number {
+  return t < 0.5
+    ? 4 * t * t * t
+    : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+/** Abortar intro automática del Hero (p. ej. si el usuario navega o hace scroll). */
+let heroIntroAbort: (() => void) | null = null;
+
+export function abortDepthHeroIntro() {
+  heroIntroAbort?.();
+  heroIntroAbort = null;
+}
+
+const HERO_INTRO_MS = 3600;
+
+/**
+ * Emersión lenta del Hero al 100% al entrar (solo pila desktop).
+ * Se omite si hay hash a otra sección o reduced-motion.
+ */
+export async function playDepthHeroIntro(): Promise<boolean> {
+  abortDepthHeroIntro();
+
+  const root = getDepthJourney();
+  if (!isDepthStackActive(root) || !root || !depthNavDriver) return false;
+
+  const hash = window.location.hash;
+  if (
+    hash === '#about' ||
+    hash === '#works' ||
+    hash === '#technologies'
+  ) {
+    return false;
+  }
+
+  const reducedMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)',
+  ).matches;
+  if (reducedMotion) {
+    const count = depthNavDriver.getCount();
+    const target = unitForSectionIndex(0, count);
+    depthNavDriver.setUnit(target);
+    window.scrollTo(0, scrollYForDepthUnit(root, target, count));
+    return true;
+  }
+
+  // Esperar a que cierre el Experience Gate.
+  if (document.querySelector('[data-experience-gate]')) {
+    await new Promise<void>((resolve) => {
+      const done = () => {
+        observer.disconnect();
+        window.clearTimeout(timeout);
+        resolve();
+      };
+      const observer = new MutationObserver(() => {
+        if (!document.querySelector('[data-experience-gate]')) done();
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      const timeout = window.setTimeout(done, 12000);
+    });
+    await new Promise((r) => window.setTimeout(r, 200));
+  }
+
+  if (!depthNavDriver || !isDepthStackActive(root)) return false;
+  if (window.scrollY > 32) return false;
+
+  const count = depthNavDriver.getCount();
+  const targetUnit = unitForSectionIndex(0, count);
+  const startUnit = 0;
+
+  depthNavDriver.setUnit(startUnit);
+  window.scrollTo(0, 0);
+
+  let cancelled = false;
+  const cancel = () => {
+    cancelled = true;
+    setDepthNavScrolling(false);
+  };
+  heroIntroAbort = cancel;
+
+  const onUserInterrupt = () => cancel();
+  window.addEventListener('wheel', onUserInterrupt, { passive: true });
+  window.addEventListener('touchstart', onUserInterrupt, { passive: true });
+  window.addEventListener('pointerdown', onUserInterrupt, { passive: true });
+
+  setDepthNavScrolling(true);
+
+  await new Promise<void>((resolve) => {
+    const t0 = performance.now();
+
+    const step = (now: number) => {
+      if (cancelled || !depthNavDriver) {
+        resolve();
+        return;
+      }
+
+      const t = Math.min(1, (now - t0) / HERO_INTRO_MS);
+      const unit = startUnit + (targetUnit - startUnit) * easeInOutCubic(t);
+      depthNavDriver.setUnit(unit);
+      window.scrollTo(0, scrollYForDepthUnit(root, unit, count));
+
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        depthNavDriver.setUnit(targetUnit);
+        window.scrollTo(0, scrollYForDepthUnit(root, targetUnit, count));
+        resolve();
+      }
+    };
+
+    requestAnimationFrame(step);
+  });
+
+  window.removeEventListener('wheel', onUserInterrupt);
+  window.removeEventListener('touchstart', onUserInterrupt);
+  window.removeEventListener('pointerdown', onUserInterrupt);
+
+  if (!cancelled) setDepthNavScrolling(false);
+  if (heroIntroAbort === cancel) heroIntroAbort = null;
+  return !cancelled;
+}
+
 /** Índice de capa (0…n-1) para un hash (#about, #works, #contact, …). */
 export function resolveDepthSectionIndex(
   hash: string,
@@ -146,6 +268,8 @@ export async function animateDepthNavToHash(
   hash: string,
   durationMs: number,
 ): Promise<boolean> {
+  abortDepthHeroIntro();
+
   const root = getDepthJourney();
   if (!isDepthStackActive(root) || !root || !depthNavDriver) return false;
 

@@ -16,6 +16,7 @@ import {
   DEPTH_UNITS_PER_SECTION,
   depthMaxUnit,
   isDepthNavScrolling,
+  playDepthHeroIntro,
   prefersDepthStack,
   registerDepthNavDriver,
 } from '@/lib/depth-stack';
@@ -370,6 +371,9 @@ export function PremiumScrollJourney({
 
       root.dataset.depthReady = 'true';
       window.dispatchEvent(new CustomEvent('depth-stack-ready'));
+
+      // Primera entrada: Hero emerge solo hasta el 100%.
+      void playDepthHeroIntro();
     };
 
     const onResize = () => {
