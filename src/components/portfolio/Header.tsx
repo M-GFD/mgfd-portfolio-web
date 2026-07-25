@@ -1,14 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Menu, Volume2, VolumeX, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useExperience } from '@/contexts/ExperienceContext';
 import { AudioWaveIndicator } from '@/components/portfolio/AudioWaveIndicator';
+import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   onMenuToggle?: (isOpen: boolean) => void;
 }
+
+/** Volver a `true` cuando el Blog deba mostrarse otra vez en el nav. */
+const SHOW_BLOG_NAV = false;
 
 const localePillClass = (active: boolean) =>
   `rounded px-2 py-1 text-sm font-medium transition-colors ${
@@ -45,11 +49,37 @@ function MusicControls() {
 
 export default function Header({ onMenuToggle }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [headerHidden, setHeaderHidden] = useState(false);
+  const lastScrollYRef = useRef(0);
   const { locale, setLocale, t } = useLanguage();
+
+  useEffect(() => {
+    lastScrollYRef.current = window.scrollY;
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      const prev = lastScrollYRef.current;
+      const delta = y - prev;
+
+      if (mobileMenuOpen || y < 24) {
+        setHeaderHidden(false);
+      } else if (delta > 6) {
+        setHeaderHidden(true);
+      } else if (delta < -6) {
+        setHeaderHidden(false);
+      }
+
+      lastScrollYRef.current = y;
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [mobileMenuOpen]);
 
   const handleMenuToggle = () => {
     const newState = !mobileMenuOpen;
     setMobileMenuOpen(newState);
+    if (newState) setHeaderHidden(false);
     onMenuToggle?.(newState);
   };
 
@@ -59,7 +89,15 @@ export default function Header({ onMenuToggle }: HeaderProps) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[120] bg-transparent pt-[env(safe-area-inset-top)]">
+    <header
+      className={cn(
+        'fixed top-0 left-0 right-0 z-[120] pt-[env(safe-area-inset-top)] transition-[transform,background-color] duration-300 ease-out',
+        mobileMenuOpen
+          ? 'bg-zinc-950/92 backdrop-blur-[12px] md:bg-transparent md:backdrop-blur-none'
+          : 'bg-transparent',
+        headerHidden && !mobileMenuOpen && '-translate-y-full',
+      )}
+    >
       <div className="flex w-full items-center justify-between px-3 py-3 sm:px-5 sm:py-3.5 md:px-6 md:py-4">
         <div className="flex min-w-0 flex-1 items-center pr-2">
           <a href="/" className="flex min-w-0 items-center">
@@ -90,12 +128,14 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           >
             {t('nav.works')}
           </a>
-          <a
-            href="/blog"
-            className="text-neutral-400 transition-colors hover:text-white"
-          >
-            {t('nav.blog')}
-          </a>
+          {SHOW_BLOG_NAV && (
+            <a
+              href="/blog"
+              className="text-neutral-400 transition-colors hover:text-white"
+            >
+              {t('nav.blog')}
+            </a>
+          )}
           <div className="flex items-center gap-3 border-l border-white/15 pl-6">
             <MusicControls />
             <div className="flex items-center gap-1">
@@ -148,6 +188,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
             className="ml-0.5 text-neutral-200"
             onClick={handleMenuToggle}
             aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -155,7 +196,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
       </div>
 
       {mobileMenuOpen && (
-        <nav className="px-3 py-3 sm:px-6 sm:py-4 md:hidden">
+        <nav className="border-t border-white/10 bg-zinc-950/92 px-3 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-[12px] sm:px-6 sm:py-4 md:hidden">
           <a
             href="/#about"
             className="block py-2 text-neutral-400 transition-colors hover:text-white"
@@ -177,13 +218,15 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           >
             {t('nav.works')}
           </a>
-          <a
-            href="/blog"
-            className="block py-2 text-neutral-400 transition-colors hover:text-white"
-            onClick={handleNavClick}
-          >
-            {t('nav.blog')}
-          </a>
+          {SHOW_BLOG_NAV && (
+            <a
+              href="/blog"
+              className="block py-2 text-neutral-400 transition-colors hover:text-white"
+              onClick={handleNavClick}
+            >
+              {t('nav.blog')}
+            </a>
+          )}
         </nav>
       )}
     </header>
