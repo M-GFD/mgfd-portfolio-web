@@ -104,6 +104,21 @@ export function abortDepthHeroIntro() {
   heroIntroAbort = null;
 }
 
+/** Emitido cuando el SVG del Hero terminó de emerger (o la intro se omitió). */
+export const HERO_INTRO_COMPLETE_EVENT = 'mgfd-hero-intro-complete';
+
+let heroIntroCompleted = false;
+
+export function hasHeroIntroCompleted() {
+  return heroIntroCompleted;
+}
+
+export function notifyHeroIntroComplete() {
+  heroIntroCompleted = true;
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent(HERO_INTRO_COMPLETE_EVENT));
+}
+
 const HERO_INTRO_MS = 3600;
 
 /**
@@ -114,7 +129,10 @@ export async function playDepthHeroIntro(): Promise<boolean> {
   abortDepthHeroIntro();
 
   const root = getDepthJourney();
-  if (!isDepthStackActive(root) || !root || !depthNavDriver) return false;
+  if (!isDepthStackActive(root) || !root || !depthNavDriver) {
+    notifyHeroIntroComplete();
+    return false;
+  }
 
   const hash = window.location.hash;
   if (
@@ -122,6 +140,7 @@ export async function playDepthHeroIntro(): Promise<boolean> {
     hash === '#works' ||
     hash === '#technologies'
   ) {
+    notifyHeroIntroComplete();
     return false;
   }
 
@@ -133,6 +152,7 @@ export async function playDepthHeroIntro(): Promise<boolean> {
     const target = unitForSectionIndex(0, count);
     depthNavDriver.setUnit(target);
     window.scrollTo(0, scrollYForDepthUnit(root, target, count));
+    notifyHeroIntroComplete();
     return true;
   }
 
@@ -153,8 +173,14 @@ export async function playDepthHeroIntro(): Promise<boolean> {
     await new Promise((r) => window.setTimeout(r, 200));
   }
 
-  if (!depthNavDriver || !isDepthStackActive(root)) return false;
-  if (window.scrollY > 32) return false;
+  if (!depthNavDriver || !isDepthStackActive(root)) {
+    notifyHeroIntroComplete();
+    return false;
+  }
+  if (window.scrollY > 32) {
+    notifyHeroIntroComplete();
+    return false;
+  }
 
   const count = depthNavDriver.getCount();
   // Tope duro: 100% emergido del Hero (sin entrar en hold/salida).
@@ -165,13 +191,15 @@ export async function playDepthHeroIntro(): Promise<boolean> {
   window.scrollTo(0, 0);
 
   let cancelled = false;
-  const cancel = () => {
+  let userInterrupted = false;
+  const cancel = (fromUser = false) => {
     cancelled = true;
+    if (fromUser) userInterrupted = true;
     setDepthProgrammatic(false);
   };
-  heroIntroAbort = cancel;
+  heroIntroAbort = () => cancel(false);
 
-  const onUserInterrupt = () => cancel();
+  const onUserInterrupt = () => cancel(true);
   window.addEventListener('wheel', onUserInterrupt, { passive: true });
   window.addEventListener('touchstart', onUserInterrupt, { passive: true });
   // No pointerdown: el click del gate cancelaría la intro al entrar.
@@ -215,7 +243,11 @@ export async function playDepthHeroIntro(): Promise<boolean> {
     window.scrollTo(0, scrollYForDepthUnit(root, targetUnit, count));
     setDepthProgrammatic(false);
   }
-  if (heroIntroAbort === cancel) heroIntroAbort = null;
+  if (heroIntroAbort) heroIntroAbort = null;
+  // Completo o interrumpido por el usuario (no por reentrada de playDepthHeroIntro).
+  if (!cancelled || userInterrupted) {
+    notifyHeroIntroComplete();
+  }
   return !cancelled;
 }
 

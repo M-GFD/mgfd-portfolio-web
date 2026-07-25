@@ -3,7 +3,32 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Magic UI Pulsating Button */
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--pulse-color, oklch(from var(--bg) l c h / 0.5));
+  }
+  50% {
+    box-shadow: 0 0 0 var(--distance, 8px)
+      var(--pulse-color, oklch(from var(--bg) l c h / 0.5));
+  }
+}
+
+@keyframes pulse-ripple {
+  0% {
+    box-shadow: 0 0 0 0 oklch(from var(--pulse-color, var(--bg)) l c h / 1);
+  }
+  100% {
+    box-shadow: 0 0 0 var(--distance, 8px)
+      oklch(from var(--pulse-color, var(--bg)) l c h / 0);
+  }
+}
+
 @theme inline {
+  --animate-pulse: pulse var(--duration, 1.5s) ease-out infinite;
+  --animate-pulse-ripple: pulse-ripple var(--duration, 1.5s)
+    cubic-bezier(0.16, 1, 0.3, 1) infinite;
   --font-family-sans: 'Geist Mono', ui-monospace, monospace;
   --font-sans: 'Geist Mono', ui-monospace, monospace;
   --color-background: var(--background);
