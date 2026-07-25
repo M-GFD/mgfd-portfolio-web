@@ -226,6 +226,9 @@ function easeOutCubic(t: number): number {
   return 1 - (1 - t) ** 3;
 }
 
+/** Duración del relleno del dot activo antes de avanzar a la siguiente card. */
+const DOT_TIMER_MS = 5500;
+
 export default function ProjectList({ projects, loading }: ProjectListProps) {
   const { t } = useLanguage();
   const trackRef = useRef<HTMLDivElement>(null);
@@ -233,6 +236,9 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   const sceneRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [timerPaused, setTimerPaused] = useState(false);
+  const [timerKey, setTimerKey] = useState(0);
+  const [autoplayEnabled, setAutoplayEnabled] = useState(true);
   const depthRafRef = useRef<number | null>(null);
   const offsetRef = useRef(0);
   const animRafRef = useRef<number | null>(null);
@@ -240,6 +246,11 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   const dragPointerIdRef = useRef<number | null>(null);
   const dragStartXRef = useRef(0);
   const dragStartOffsetRef = useRef(0);
+  const activeIndexRef = useRef(0);
+  const projectsLenRef = useRef(projects.length);
+
+  activeIndexRef.current = activeIndex;
+  projectsLenRef.current = projects.length;
 
   const isInteractiveDragTarget = (target: EventTarget | null) => {
     if (!(target instanceof HTMLElement)) return false;
@@ -384,6 +395,37 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     snapToIndex(findNearestSnapIndex());
   }, [findNearestSnapIndex, snapToIndex]);
 
+  const restartDotTimer = useCallback(() => {
+    setTimerKey((k) => k + 1);
+  }, []);
+
+  const goToNextSlide = useCallback(() => {
+    const len = projectsLenRef.current;
+    if (len < 2) return;
+    const next = (activeIndexRef.current + 1) % len;
+    snapToIndex(next);
+  }, [snapToIndex]);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setAutoplayEnabled(!mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    const onVisibility = () => {
+      setTimerPaused(document.visibilityState !== 'visible' || isDraggingRef.current);
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
+
+  useEffect(() => {
+    restartDotTimer();
+  }, [activeIndex, restartDotTimer]);
+
   useEffect(() => {
     const syncLayout = () => {
       snapToIndex(findNearestSnapIndex(), 0);
@@ -431,6 +473,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     }
 
     isDraggingRef.current = true;
+    setTimerPaused(true);
     dragPointerIdRef.current = e.pointerId;
     dragStartXRef.current = e.clientX;
     dragStartOffsetRef.current = offsetRef.current;
@@ -465,10 +508,13 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     }
 
     snapToNearest();
+    setTimerPaused(document.visibilityState !== 'visible');
+    restartDotTimer();
   };
 
   const scrollToSlide = (index: number) => {
     snapToIndex(index);
+    restartDotTimer();
   };
 
   if (loading) {
@@ -552,26 +598,39 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
 
       {projects.length > 1 && (
         <div
-          className="works-carousel__dots"
+          className={cn(
+            'works-carousel__dots',
+            timerPaused && 'works-carousel__dots--paused',
+          )}
           role="tablist"
           aria-label={t('projects.sectionTitle')}
         >
-          {projects.map((project, index) => (
-            <button
-              key={project.id}
-              type="button"
-              role="tab"
-              aria-selected={index === activeIndex}
-              aria-label={`${project.title} (${index + 1}/${projects.length})`}
-              onClick={() => scrollToSlide(index)}
-              className={cn(
-                'h-1.5 rounded-full transition-all duration-300 ease-out',
-                index === activeIndex
-                  ? 'w-7 bg-white'
-                  : 'w-1.5 bg-white/35 hover:bg-white/55',
-              )}
-            />
-          ))}
+          {projects.map((project, index) => {
+            const isActive = index === activeIndex;
+            return (
+              <button
+                key={project.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                aria-label={`${project.title} (${index + 1}/${projects.length})`}
+                onClick={() => scrollToSlide(index)}
+                className={cn(
+                  'works-carousel__dot',
+                  isActive && 'works-carousel__dot--active',
+                )}
+              >
+                {isActive && autoplayEnabled && (
+                  <span
+                    key={`${activeIndex}-${timerKey}`}
+                    className="works-carousel__dot-fill"
+                    style={{ animationDuration: `${DOT_TIMER_MS}ms` }}
+                    onAnimationEnd={goToNextSlide}
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
