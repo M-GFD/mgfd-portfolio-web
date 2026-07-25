@@ -280,14 +280,13 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   const updateSlideDepth = useCallback(() => {
     depthRafRef.current = null;
 
-    const reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-    if (reducedMotion) return;
-
     const trackEl = trackRef.current;
     const items = slideRefs.current.filter(Boolean) as HTMLElement[];
     if (!trackEl || items.length === 0) return;
+
+    const reducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
 
     const trackRect = trackEl.getBoundingClientRect();
     const centerX = trackRect.left + trackRect.width / 2;
@@ -307,6 +306,13 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
       if (distance < closestDistance) {
         closestDistance = distance;
         closestIndex = i;
+      }
+
+      if (reducedMotion) {
+        slide.style.transform = '';
+        slide.style.opacity = '1';
+        slide.style.zIndex = '';
+        continue;
       }
 
       const rotateY = (offset / falloff) * -38;
@@ -389,13 +395,20 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
 
   const snapToIndex = useCallback(
     (index: number, durationMs = 420) => {
-      animateToOffset(getSnapOffset(index), durationMs);
+      const clamped = Math.max(
+        0,
+        Math.min(index, Math.max(0, projectsLenRef.current - 1)),
+      );
+      activeIndexRef.current = clamped;
+      setActiveIndex(clamped);
+      animateToOffset(getSnapOffset(clamped), durationMs);
     },
     [animateToOffset, getSnapOffset],
   );
 
   const snapToNearest = useCallback(() => {
-    snapToIndex(findNearestSnapIndex());
+    const nearest = findNearestSnapIndex();
+    snapToIndex(nearest);
   }, [findNearestSnapIndex, snapToIndex]);
 
   const setTimerPaused = useCallback((paused: boolean) => {
@@ -415,8 +428,9 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     const len = projectsLenRef.current;
     if (len < 2) return;
     const next = (activeIndexRef.current + 1) % len;
+    restartDotTimer();
     snapToIndex(next);
-  }, [snapToIndex]);
+  }, [restartDotTimer, snapToIndex]);
 
   goToNextSlideRef.current = goToNextSlide;
 
@@ -430,13 +444,15 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
         } else {
           const delta = now - timerLastTsRef.current;
           timerLastTsRef.current = now;
-          timerProgressRef.current = Math.min(
+          const nextProgress = Math.min(
             1,
             timerProgressRef.current + delta / DOT_TIMER_MS,
           );
-          setDotProgress(timerProgressRef.current);
+          timerProgressRef.current = nextProgress;
+          setDotProgress(nextProgress);
 
-          if (timerProgressRef.current >= 1) {
+          if (nextProgress >= 1) {
+            // Evita reentradas en el mismo frame tras completar el ciclo.
             timerProgressRef.current = 0;
             timerLastTsRef.current = null;
             setDotProgress(0);
