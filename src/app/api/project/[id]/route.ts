@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import { projects } from '@/data/projects';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const project = projects.find(p => p.id === parseInt(params.id));
-  
+  const { id } = await params;
+  const project = projects.find((p) => p.id === Number(id));
+
   if (!project) {
     return NextResponse.json({ error: 'Project not found' }, { status: 404 });
   }

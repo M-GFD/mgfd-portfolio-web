@@ -5,6 +5,19 @@ const IMG_V = 'v=4';
 
 export const projects: Project[] = [
   {
+    id: 6,
+    title: 'Vertic',
+    subtitle: 'Diseño y desarrollo de landing page',
+    description:
+      'Landing page para Vertic, software de Recursos Humanos que combina una plataforma intuitiva, inteligencia artificial y acompañamiento de expertos para simplificar la gestión de equipos.',
+    fullDescription:
+      'Landing page para Vertic, software de Recursos Humanos que combina una plataforma intuitiva, inteligencia artificial y acompañamiento de expertos para simplificar la gestión de equipos.',
+    image: `/images/vertic_isologo.svg?${IMG_V}`,
+    technologies: [],
+    reversed: false,
+    websiteUrl: 'https://vertictechnology.com/',
+  },
+  {
     id: 5,
     title: 'Federación Entrerriana de Golf (FEG)',
     subtitle: 'Diseño y desarrollo web',

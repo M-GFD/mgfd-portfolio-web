@@ -48,6 +48,12 @@
     "lightboxAria": "Expanded image"
   },
   "projectsList": {
+    "6": {
+      "title": "Vertic",
+      "subtitle": "Landing page design and development",
+      "description": "Landing page for Vertic, an HR software that combines an intuitive platform, artificial intelligence and expert support to simplify team management.",
+      "fullDescription": "Landing page for Vertic, an HR software that combines an intuitive platform, artificial intelligence and expert support to simplify team management."
+    },
     "5": {
       "title": "Entre Ríos Golf Federation (FEG)",
       "subtitle": "Web design and development",
