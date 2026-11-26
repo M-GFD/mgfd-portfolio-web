@@ -46,6 +46,8 @@ type MotionSample = {
   opacity: number;
   interactive: boolean;
   atRest: boolean;
+  /** Saliendo hacia cámara: va detrás de la capa que entra para no taparla. */
+  exiting?: boolean;
 };
 
 const SMOOTH_MS = 160;
@@ -89,6 +91,7 @@ function exitedPark(): MotionSample {
     opacity: 0,
     interactive: false,
     atRest: false,
+    exiting: true,
   };
 }
 
@@ -104,30 +107,27 @@ function restMotion(): MotionSample {
   };
 }
 
-function emergeMotion(local: number): MotionSample {
-  const u = smoothstep(local / DEPTH_EMERGE_END);
+/**
+ * Solapamiento entre capas: la siguiente empieza a emerger EMERGE_LEAD unidades
+ * antes de su slot y la actual tarda EXIT_SPAN en salir. Así siempre hay una
+ * sección visible (sin tramos de scroll donde solo se ve el video).
+ */
+const EMERGE_LEAD = 0.32;
+const EXIT_SPAN = 0.5;
+
+function emergeMotion(local: number, start: number): MotionSample {
+  const p = clamp01((local - start) / (DEPTH_EMERGE_END - start));
+  const u = smoothstep(p);
   return {
     y: lerp(48, 0, u),
     z: lerp(-1000, 0, u),
     rotateX: lerp(26, 0, u),
     scale: lerp(0.42, 1, u),
-    opacity: lerp(0, 1, u),
+    // La opacidad llega antes que la posición: la capa se lee mientras termina de acercarse.
+    opacity: smoothstep(p * 1.6),
     interactive: u > 0.55,
     atRest: false,
   };
-}
-
-/**
- * En nav/CTA comprime cada slot: ~55% emerger + ~45% salir, sin meseta al 100%.
- */
-function warpLocalForNav(local: number): number {
-  if (local < 0 || local >= DEPTH_UNITS_PER_SECTION) return local;
-  const emergePortion = 0.55;
-  if (local <= emergePortion) {
-    return (local / emergePortion) * DEPTH_EMERGE_END;
-  }
-  const t = (local - emergePortion) / (1 - emergePortion);
-  return DEPTH_EMERGE_END + t * (DEPTH_UNITS_PER_SECTION - DEPTH_EMERGE_END);
 }
 
 /**
@@ -136,49 +136,49 @@ function warpLocalForNav(local: number): number {
  */
 function sampleLayer(
   local: number,
+  isFirst: boolean,
   isLast: boolean,
   skipHold: boolean,
 ): MotionSample {
-  let L = local;
-  if (skipHold && !isLast) {
-    L = warpLocalForNav(local);
+  // La primera capa no se solapa con nada: arranca en 0 (intro del Hero).
+  const start = isFirst ? 0 : -EMERGE_LEAD;
+
+  if (local < start) {
+    return deepPark(start - local);
   }
 
-  if (L < 0) {
-    return deepPark(-L);
+  // `<` y no `<=`: en el punto de reposo exacto (destino de nav/intro) la capa
+  // queda plana (transform: none) → texto nítido y clics fiables dentro del carrusel.
+  // Margen mínimo: el scroll al final da ~0.9998 de progreso por redondeo de píxeles.
+  if (local < DEPTH_EMERGE_END - 0.002) {
+    return emergeMotion(local, start);
   }
 
-  if (isLast) {
-    if (L >= DEPTH_EMERGE_END) return restMotion();
-    return emergeMotion(L);
-  }
+  if (isLast) return restMotion();
 
-  if (L <= DEPTH_EMERGE_END) {
-    return emergeMotion(L);
-  }
+  const exitStart = skipHold ? DEPTH_EMERGE_END : DEPTH_HOLD_END;
 
   // Scroll manual: breve hold al 100% antes de salir.
-  if (!skipHold && L <= DEPTH_HOLD_END) {
+  if (local <= exitStart) {
     return restMotion();
   }
 
-  if (L >= DEPTH_UNITS_PER_SECTION) {
+  const t = (local - exitStart) / EXIT_SPAN;
+  if (t >= 1) {
     return exitedPark();
   }
 
-  const exitStart = skipHold ? DEPTH_EMERGE_END : DEPTH_HOLD_END;
-  const span = Math.max(DEPTH_UNITS_PER_SECTION - exitStart, 0.001);
-  const t = clamp01((L - exitStart) / span);
-  // Nav: ease-out en la salida → abandona el 100% enseguida.
-  const u = skipHold ? 1 - (1 - t) ** 3 : smoothstep(t);
+  const u = smoothstep(t);
   return {
     y: lerp(0, -36, u),
     z: lerp(0, 520, u),
     rotateX: lerp(0, -12, u),
     scale: lerp(1, 0.9, u),
-    opacity: lerp(1, 0, u),
-    interactive: u < 0.35,
+    // Se desvanece en la primera mitad de la salida para no superponerse con la que entra.
+    opacity: 1 - smoothstep(t * 1.8),
+    interactive: t < 0.3,
     atRest: false,
+    exiting: true,
   };
 }
 
@@ -271,9 +271,15 @@ export function PremiumScrollJourney({
       const skipHold = isDepthNavScrolling();
       const painted = layers.map((el, i) => {
         const local = u - i * DEPTH_UNITS_PER_SECTION;
-        const motion = sampleLayer(local, i === count - 1, skipHold);
+        const motion = sampleLayer(local, i === 0, i === count - 1, skipHold);
         applyLayerMotion(el, motion);
-        return { el, z: motion.atRest ? 0 : motion.z };
+        // Las capas que salen van al fondo del orden: la que entra se lee limpia.
+        const order = motion.exiting
+          ? -10000 + motion.z
+          : motion.atRest
+            ? 0
+            : motion.z;
+        return { el, z: order };
       });
       [...painted]
         .sort((a, b) => a.z - b.z)

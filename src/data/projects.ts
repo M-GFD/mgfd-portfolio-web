@@ -1,7 +1,7 @@
 import { Project } from '@/types/portfolio';
 
 // Bump when you replace image files (same names) so the browser loads the new versions
-const IMG_V = 'v=4';
+const IMG_V = 'v=5';
 
 export const projects: Project[] = [
   {
@@ -25,7 +25,7 @@ export const projects: Project[] = [
       'Portal web integral para llevar el Golf de Entre Ríos, Argentina, a un nuevo nivel de objetivos y comunicación clara y útil.',
     fullDescription:
       'Portal web integral para llevar el Golf de Entre Ríos, Argentina, a un nuevo nivel de objetivos y comunicación clara y útil.',
-    image: '/images/LOGO_FEG.png',
+    image: '/images/LOGO_FEG.webp',
     technologies: [],
     reversed: false,
     websiteUrl: 'https://feg.ar/',
@@ -43,17 +43,17 @@ Implementación del sistema "Wilson" para diseñar de forma simultánea múltipl
 Desarrollo de piezas promocionales para social media y YouTube con foco en CTR y recordación (thumbnails, banners, posters), optimizando producción mediante sistema multi-cut. Creación de key visuals para campañas OTT de AFA Play con jugadores destacados, versiones para home hero, social push y material promocional de temporada.
 
 Diseño de presentaciones institucionales: quiénes somos, portfolio, partners y clientes, con estilos visuales, retícula y componentes reutilizables para propuestas comerciales.`,
-    image: `/images/project-01.png?${IMG_V}`,
+    image: `/images/project-01.webp?${IMG_V}`,
     technologies: ['Photoshop', 'Illustrator', 'Figma', 'PowerPoint'],
     reversed: false,
     galleryImages: [
-      `/images/1190_asset_01.png?${IMG_V}`,
-      `/images/1190_asset_02.png?${IMG_V}`,
-      `/images/1190_asset_03.png?${IMG_V}`,
-      `/images/1190_asset_04.png?${IMG_V}`,
-      `/images/1190_asset_05.png?${IMG_V}`,
-      `/images/1190_asset_06.png?${IMG_V}`,
-      `/images/1190_asset_07.png?${IMG_V}`,
+      `/images/1190_asset_01.webp?${IMG_V}`,
+      `/images/1190_asset_02.webp?${IMG_V}`,
+      `/images/1190_asset_03.webp?${IMG_V}`,
+      `/images/1190_asset_04.webp?${IMG_V}`,
+      `/images/1190_asset_05.webp?${IMG_V}`,
+      `/images/1190_asset_06.webp?${IMG_V}`,
+      `/images/1190_asset_07.webp?${IMG_V}`,
     ],
     sectionImages: [
       {
@@ -73,10 +73,10 @@ Diseño de presentaciones institucionales: quiénes somos, portfolio, partners y
 Diseño del home y esquema completo de la web app: vistas de registro, login, mapa interactivo, analytics, formularios y estados operativos en dark/light mode para empresas distribuidoras (monitoreo de cilindros, estado por zonas y métricas clave).
 
 Diseño de app mobile para usuarios finales con monitoreo en tiempo real del estado del cilindro, vistas en light y dark mode, componentes de estado, indicadores de consumo y acciones de recarga/pedido.`,
-    image: `/images/project-02.png?${IMG_V}`,
+    image: `/images/project-02.webp?${IMG_V}`,
     technologies: ['Figma', 'Design System', 'UX Research', 'Mobile UI'],
     reversed: true,
-    galleryImages: [`/images/novogas_desktop.png?${IMG_V}`, `/images/novogas_mobile.png?${IMG_V}`],
+    galleryImages: [`/images/novogas_desktop.webp?${IMG_V}`, `/images/novogas_mobile.webp?${IMG_V}`],
   },
   {
     id: 3,
@@ -87,7 +87,7 @@ Diseño de app mobile para usuarios finales con monitoreo en tiempo real del est
     fullDescription: `Experiencia en POLI Studio trabajando en corrección de color, propuestas creativas y revisión de diseños para múltiples clientes.
 
 Participación en campañas visuales, piezas para redes y mejoras iterativas de comunicación gráfica orientada a negocio.`,
-    image: `/images/project-03.png?${IMG_V}`,
+    image: `/images/project-03.webp?${IMG_V}`,
     technologies: ['Photoshop', 'Illustrator', 'Social Design'],
     reversed: false,
   },

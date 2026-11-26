@@ -37,6 +37,12 @@ function applyOrbitTransform(
 ) {
   // progress 0 → entra abajo; 0.5 → frente al eje; 1 → sale arriba
   const angle = angleMax * (1 - 2 * progress);
+  // De frente: sin transform → texto nítido y toques fiables (el 3D residual
+  // desviaba el hit-testing y los botones/links del panel no respondían).
+  if (Math.abs(angle) < 0.05) {
+    panel.style.transform = 'none';
+    return;
+  }
   const rad = (angle * Math.PI) / 180;
   const x = Math.sin(rad) * radius;
   const z = (Math.cos(rad) - 1) * radius;
@@ -75,7 +81,11 @@ export function CircularScrollOrbit({
       const narrow = window.matchMedia('(max-width: 639px)').matches;
       const panels = stage.querySelectorAll<HTMLElement>('[data-orbit-panel]');
 
-      panels.forEach((panel) => {
+      panels.forEach((panel, index) => {
+        // El último panel no puede "salir" por arriba (no hay más página): antes quedaba
+        // trabado girado ~8° al final del scroll. Ahora llega de frente (p = 0.5) justo
+        // cuando su borde inferior toca el del viewport.
+        const isLast = index === panels.length - 1;
         const intensity =
           (panel.dataset.orbitIntensity as OrbitIntensity | undefined) ??
           'full';
@@ -89,7 +99,7 @@ export function CircularScrollOrbit({
         proxies.push(proxy);
 
         const animation = animate(proxy, {
-          p: [0, 1],
+          p: isLast ? [0, 0.5] : [0, 1],
           ease: 'linear',
           autoplay: false,
           onRender: () => {
@@ -101,8 +111,8 @@ export function CircularScrollOrbit({
           target: panel,
           // Sync lineal con el scroll: evita “rubber-band” de catch-up.
           sync: true,
-          enter: 'bottom bottom',
-          leave: 'top top',
+          enter: isLast ? 'bottom top' : 'bottom bottom',
+          leave: isLast ? 'bottom bottom' : 'top top',
           repeat: true,
         }).link(animation);
 

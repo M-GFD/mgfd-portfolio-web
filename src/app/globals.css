@@ -211,7 +211,10 @@
     margin-inline: auto;
     display: grid;
     place-items: center;
-    overflow: visible;
+    /* clip (no hidden): recorta en X las capas que se acercan a cámara sin
+       crear contenedor de scroll, así no aparece barra horizontal ni se rompe sticky. */
+    overflow-x: clip;
+    overflow-y: visible;
     perspective: min(1400px, 160vw);
     perspective-origin: 50% 50%;
     transform-style: preserve-3d;
@@ -468,6 +471,42 @@
     height: auto;
     transform: translate(-50%, -50%) scale(1.06);
     object-fit: cover;
+    /* Grade común para que escenas muy distintas (cielo, fuego, campo) se sientan una sola pieza. */
+    filter: saturate(0.78) contrast(1.06) brightness(0.86);
+  }
+
+  /*
+   * Scrim en capas: base pareja + oscurecido arriba (nav) y abajo (footer)
+   * + viñeta. Mantiene el texto legible aunque la escena sea clara.
+   */
+  .bg-video-layer__scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        to bottom,
+        rgb(9 9 11 / 0.72) 0%,
+        rgb(9 9 11 / 0.18) 22%,
+        rgb(9 9 11 / 0) 50%,
+        rgb(9 9 11 / 0.2) 78%,
+        rgb(9 9 11 / 0.7) 100%
+      ),
+      radial-gradient(
+        ellipse 75% 70% at 50% 48%,
+        rgb(9 9 11 / 0) 0%,
+        rgb(9 9 11 / 0.45) 100%
+      ),
+      rgb(9 9 11 / 0.42);
+  }
+
+  /* Grano sutil: unifica clips de distinta calidad y suma textura editorial. */
+  .bg-video-layer__grain {
+    position: absolute;
+    inset: -50%;
+    opacity: 0.07;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
   }
   /** Cada sección del portfolio actúa como un “estado” a pantalla completa. */
   .snap-section {

@@ -251,6 +251,31 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   const timerLastTsRef = useRef<number | null>(null);
   const timerRafRef = useRef<number | null>(null);
   const goToNextSlideRef = useRef<() => void>(() => {});
+  /** Autoplay: pausa con hover/foco y se apaga del todo tras la primera interacción. */
+  const hoverRef = useRef(false);
+  const focusWithinRef = useRef(false);
+  const autoplayStoppedRef = useRef(false);
+  const [autoplayStopped, setAutoplayStopped] = useState(false);
+
+  const stopAutoplay = useCallback(() => {
+    if (autoplayStoppedRef.current) return;
+    autoplayStoppedRef.current = true;
+    setAutoplayStopped(true);
+  }, []);
+
+  /** Solo corre el timer si el carrusel se ve de verdad (en viewport y con su capa 3D al frente). */
+  const isCarouselOnScreen = useCallback(() => {
+    const scene = sceneRef.current;
+    if (!scene) return false;
+    const rect = scene.getBoundingClientRect();
+    const viewH = window.innerHeight || 1;
+    if (rect.bottom <= 0 || rect.top >= viewH) return false;
+    const layer = scene.closest<HTMLElement>('[data-depth-panel]');
+    if (layer && layer.style.opacity !== '') {
+      return Number(layer.style.opacity) > 0.9;
+    }
+    return true;
+  }, []);
 
   activeIndexRef.current = activeIndex;
   projectsLenRef.current = projects.length;
@@ -288,17 +313,20 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
       '(prefers-reduced-motion: reduce)',
     ).matches;
 
-    const trackRect = trackEl.getBoundingClientRect();
-    const centerX = trackRect.left + trackRect.width / 2;
-    const falloff = Math.max(trackRect.width * 0.42, 1);
+    // Medidas de layout (offsetLeft + desplazamiento de la fila), no getBoundingClientRect:
+    // el rect incluye la rotación propia de cada card y la del panel 3D que la contiene
+    // (órbita móvil / pila desktop), y eso realimentaba el cálculo y descentraba la card activa.
+    const trackWidth = trackEl.clientWidth;
+    const centerX = trackWidth / 2;
+    const falloff = Math.max(trackWidth * 0.42, 1);
 
     let closestIndex = 0;
     let closestDistance = Number.POSITIVE_INFINITY;
 
     for (let i = 0; i < items.length; i++) {
       const slide = items[i];
-      const rect = slide.getBoundingClientRect();
-      const slideCenter = rect.left + rect.width / 2;
+      const slideCenter =
+        slide.offsetLeft + slide.offsetWidth / 2 + offsetRef.current;
       const offset = slideCenter - centerX;
       const distance = Math.abs(offset);
       const t = Math.min(1, distance / falloff);
@@ -316,7 +344,9 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
       }
 
       const rotateY = (offset / falloff) * -38;
-      const translateZ = -t * 220;
+      // +1px: la card activa queda apenas delante del plano de la fila; con Z negativo
+      // Chrome manda el clic a la fila/track (no abría la vista ampliada ni los links).
+      const translateZ = 1 - t * 221;
       const scale = 1 - t * 0.14;
       const opacity = 1 - t * 0.72;
 
@@ -437,8 +467,20 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
   useEffect(() => {
     if (loading || projects.length < 2) return;
 
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      stopAutoplay();
+      return;
+    }
+
     const tick = (now: number) => {
-      if (!timerPausedRef.current && document.visibilityState === 'visible') {
+      const canRun =
+        !autoplayStoppedRef.current &&
+        !timerPausedRef.current &&
+        !hoverRef.current &&
+        !focusWithinRef.current &&
+        document.visibilityState === 'visible' &&
+        isCarouselOnScreen();
+      if (canRun) {
         if (timerLastTsRef.current == null) {
           timerLastTsRef.current = now;
         } else {
@@ -473,7 +515,7 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
         timerRafRef.current = null;
       }
     };
-  }, [loading, projects.length]);
+  }, [loading, projects.length, stopAutoplay, isCarouselOnScreen]);
 
   useEffect(() => {
     const onVisibility = () => {
@@ -523,6 +565,24 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
       }
     };
   }, [scheduleDepthUpdate]);
+
+  const findTapTarget = (x: number, y: number): HTMLElement | null => {
+    const slide = slideRefs.current[activeIndexRef.current];
+    if (!slide) return null;
+    let best: HTMLElement | null = null;
+    let bestArea = Number.POSITIVE_INFINITY;
+    slide.querySelectorAll<HTMLElement>('a, button').forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (x < r.left || x > r.right || y < r.top || y > r.bottom) return;
+      const area = r.width * r.height;
+      // El más chico que contiene el punto: flechas/dots ganan sobre el botón de portada.
+      if (area < bestArea) {
+        best = el;
+        bestArea = area;
+      }
+    });
+    return best;
+  };
 
   const handleTrackPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 || isInteractiveDragTarget(e.target)) return;
@@ -574,14 +634,47 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
       // iOS a veces ya liberó la captura
     }
 
+    // Tap sin arrastre: con transforms 3D anidados (pila desktop / órbita móvil) el
+    // navegador a veces entrega el puntero al track en vez del botón/link de la card.
+    // Resolvemos el destino por geometría (rects ya transformados) dentro de la card activa.
+    // Solo con el carrusel quieto: si el toque cortó una animación de snap, la card
+    // activa no está centrada y hay que terminar de encajarla (si no, queda a mitad).
+    const moved = Math.abs(e.clientX - dragStartXRef.current);
+    const settled =
+      Math.abs(
+        dragStartOffsetRef.current - getSnapOffset(activeIndexRef.current),
+      ) < 2;
+    if (moved < 6 && settled) {
+      const hit = findTapTarget(e.clientX, e.clientY);
+      if (hit) {
+        applyRowOffset(dragStartOffsetRef.current);
+        scheduleDepthUpdate();
+        setTimerPaused(document.visibilityState !== 'visible');
+        hit.click();
+        return;
+      }
+    }
+
     snapToNearest();
     setTimerPaused(document.visibilityState !== 'visible');
     restartDotTimer();
   };
 
   const scrollToSlide = (index: number) => {
+    stopAutoplay();
     snapToIndex(index);
     restartDotTimer();
+  };
+
+  const handleCarouselKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const target = e.target as HTMLElement;
+    // Las flechas de la galería interna y la vista ampliada manejan sus propias teclas.
+    if (target.closest('[aria-modal="true"]')) return;
+    e.preventDefault();
+    const len = projectsLenRef.current;
+    const delta = e.key === 'ArrowRight' ? 1 : -1;
+    scrollToSlide((activeIndexRef.current + delta + len) % len);
   };
 
   if (loading) {
@@ -596,6 +689,23 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
     <div
       className="works-carousel flex flex-col"
       aria-label={t('projects.sectionTitle')}
+      aria-roledescription="carousel"
+      onPointerEnter={(e) => {
+        if (e.pointerType === 'mouse') hoverRef.current = true;
+      }}
+      onPointerLeave={() => {
+        hoverRef.current = false;
+      }}
+      onPointerDownCapture={stopAutoplay}
+      onFocusCapture={() => {
+        focusWithinRef.current = true;
+      }}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+          focusWithinRef.current = false;
+        }
+      }}
+      onKeyDown={handleCarouselKeyDown}
     >
       <div
         ref={sceneRef}
@@ -688,7 +798,9 @@ export default function ProjectList({ projects, loading }: ProjectListProps) {
                 {isActive && (
                   <span
                     className="works-carousel__dot-fill"
-                    style={{ transform: `scaleX(${dotProgress})` }}
+                    style={{
+                      transform: `scaleX(${autoplayStopped ? 1 : dotProgress})`,
+                    }}
                   />
                 )}
               </button>

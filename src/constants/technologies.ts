@@ -26,6 +26,7 @@ export const technologies: Technology[] = [
     name: 'Kling',
     icon: '▲',
     color: '#000000',
+    imageFile: 'kling.webp',
   },
   {
     name: 'Claude',

@@ -94,10 +94,8 @@ export function BackgroundVideoLayer() {
         disablePictureInPicture
         disableRemotePlayback
       />
-      <div
-        className="absolute inset-0 bg-zinc-950/54 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-        aria-hidden
-      />
+      <div className="bg-video-layer__scrim" aria-hidden />
+      <div className="bg-video-layer__grain" aria-hidden />
     </div>
   );
 }

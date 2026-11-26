@@ -14,7 +14,7 @@ export default function Profile() {
         <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-8 sm:gap-10 md:flex-row md:items-center md:gap-12">
           <div className="flex h-44 w-44 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-black ring-1 ring-white/12 sm:h-52 sm:w-52 md:h-72 md:w-72 lg:h-80 lg:w-80">
             <img
-              src="/images/profile_03.png"
+              src="/images/profile_03.webp"
               alt="MGFD - Profile"
               className="h-full w-full object-cover"
             />

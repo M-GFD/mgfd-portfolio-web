@@ -1,7 +1,8 @@
 /** Constantes compartidas del viaje en profundidad (scroll + navegación). */
 
 export const DEPTH_EMERGE_END = 0.72;
-export const DEPTH_HOLD_END = 0.8;
+/** Más reposo al 100% para leer; la salida se solapa con la siguiente capa. */
+export const DEPTH_HOLD_END = 0.9;
 export const DEPTH_UNITS_PER_SECTION = 1;
 export const DEPTH_SCROLL_VH_PER_UNIT = 1.15;
 
