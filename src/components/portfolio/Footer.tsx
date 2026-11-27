@@ -3,12 +3,6 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
-type FooterProps = {
-  embedded?: boolean;
-  /** Fijo al fondo del viewport; no participa del scroll de la página. */
-  fixed?: boolean;
-};
-
 function SocialLinks({ embedded }: { embedded: boolean }) {
   const iconClass = cn(embedded ? 'h-5 w-5' : 'h-6 w-6');
 
@@ -51,25 +45,14 @@ function SocialLinks({ embedded }: { embedded: boolean }) {
   );
 }
 
-export default function Footer({
-  embedded = false,
-  fixed = false,
-}: FooterProps) {
+export default function Footer() {
   const { t } = useLanguage();
-  const compact = embedded || fixed;
+  const compact = false;
 
   return (
     <footer
       id="contact"
-      className={cn(
-        'border-none bg-zinc-950/86 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.45)] backdrop-blur-[10px] transition-[backdrop-filter] duration-300 ease-out hover:backdrop-blur-[12px]',
-        fixed &&
-          'pointer-events-auto fixed inset-x-0 bottom-0 z-[110] mt-0 shrink-0',
-        !fixed &&
-          embedded &&
-          'mt-auto flex flex-1 flex-col pt-6 sm:pt-8 md:pt-10',
-        !fixed && !embedded && 'mt-16 shrink-0 sm:mt-20 md:mt-24',
-      )}
+      className="mt-[var(--section-gap)] border-t border-white/[0.06] bg-zinc-950/80 pb-[env(safe-area-inset-bottom)] shadow-[0_-24px_60px_-30px_rgba(0,0,0,0.7)] backdrop-blur-[12px]"
     >
       <div
         className={cn(

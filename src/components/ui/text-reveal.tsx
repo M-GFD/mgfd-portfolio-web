@@ -56,22 +56,6 @@ export const TextReveal: FC<TextRevealProps> = ({
     let rafId = 0;
 
     const isVisible = () => {
-      const panel = el.closest('[data-depth-panel]') as HTMLElement | null;
-      const inDepth =
-        panel &&
-        panel.closest('[data-scroll-journey]') &&
-        !panel.closest('.depth-stack--flat');
-
-      if (inDepth && panel) {
-        return parseFloat(getComputedStyle(panel).opacity || '0') > 0.45;
-      }
-
-      const orbitPanel = el.closest('.orbit-panel') as HTMLElement | null;
-      if (orbitPanel) {
-        const opacity = parseFloat(getComputedStyle(orbitPanel).opacity || '1');
-        if (opacity < 0.45) return false;
-      }
-
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight || 1;
       return rect.top < vh * 0.82 && rect.bottom > vh * 0.18;

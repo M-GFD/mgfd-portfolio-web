@@ -1,3 +1,4 @@
+import { expect, it } from 'vitest';
 import { existsSync } from 'node:fs';
 import sharp from 'sharp';
 import { mockupScreens, screensFor } from './mockup-screens';

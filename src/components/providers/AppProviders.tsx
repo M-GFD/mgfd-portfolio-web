@@ -3,8 +3,7 @@
 import { ThemeProvider } from 'next-themes';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ExperienceProvider } from '@/contexts/ExperienceContext';
-import { AnchorSmoothScroll } from '@/components/layout/AnchorSmoothScroll';
-import { SmoothSectionScroll } from '@/components/layout/SmoothSectionScroll';
+import { SmoothScroll } from '@/components/layout/SmoothScroll';
 import { BackgroundVideoLayer } from '@/components/layout/BackgroundVideoLayer';
 import { ExperienceGate } from '@/components/layout/ExperienceGate';
 import { SmoothCursor } from '@/components/ui/smooth-cursor';
@@ -22,8 +21,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       <LanguageProvider>
         <ExperienceProvider>
           <BackgroundVideoLayer />
-          <AnchorSmoothScroll />
-          <SmoothSectionScroll />
+          <SmoothScroll />
           <SmoothCursor />
           <div className="relative z-10">{children}</div>
           <ExperienceGate />

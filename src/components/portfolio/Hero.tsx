@@ -1,24 +1,33 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { MorphingText } from '@/components/ui/morphing-text';
-import { PulsatingButton } from '@/components/ui/pulsating-button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import {
-  HERO_INTRO_COMPLETE_EVENT,
-  hasHeroIntroCompleted,
-  notifyHeroIntroComplete,
-} from '@/lib/depth-stack';
-import { scrollToSectionByHash } from '@/lib/section-scroll';
+import { scrollToHash } from '@/lib/smooth-scroll';
+import { cn } from '@/lib/utils';
 
-const CTA_AFTER_SUBTITLE_MS = 1100;
-const MOBILE_REVEAL_MS = 700;
+const SUBTITLE_AFTER_TITLE_MS = 650;
+const CTA_AFTER_SUBTITLE_MS = 900;
+
+/** Espera a que se cierre el Experience Gate (si está abierto) antes de revelar el Hero. */
+function whenGateClosed(cb: () => void): () => void {
+  if (!document.querySelector('[data-experience-gate]')) {
+    cb();
+    return () => {};
+  }
+  const observer = new MutationObserver(() => {
+    if (!document.querySelector('[data-experience-gate]')) {
+      observer.disconnect();
+      cb();
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+  return () => observer.disconnect();
+}
 
 export default function Hero() {
   const { t, locale } = useLanguage();
-  const [showSubtitle, setShowSubtitle] = useState(false);
-  const [showCta, setShowCta] = useState(false);
-  const revealedRef = useRef(false);
+  const [stage, setStage] = useState(0); // 0 nada · 1 título · 2 subtítulo · 3 CTA
 
   const morphTexts = useMemo(
     () =>
@@ -30,114 +39,56 @@ export default function Hero() {
   );
 
   useEffect(() => {
-    let cancelled = false;
-    let ctaTimer: number | undefined;
-    let mobileTimer: number | undefined;
-    let gateObserver: MutationObserver | undefined;
-
-    const revealSequence = () => {
-      if (cancelled || revealedRef.current) return;
-      revealedRef.current = true;
-      setShowSubtitle(true);
-      ctaTimer = window.setTimeout(() => {
-        if (!cancelled) setShowCta(true);
-      }, CTA_AFTER_SUBTITLE_MS);
-    };
-
-    const onIntroComplete = () => revealSequence();
-    window.addEventListener(HERO_INTRO_COMPLETE_EVENT, onIntroComplete);
-
-    if (hasHeroIntroCompleted()) {
-      revealSequence();
-    } else if (!window.matchMedia('(min-width: 1024px)').matches) {
-      const startMobileReveal = () => {
-        if (cancelled || document.querySelector('[data-experience-gate]')) {
-          return;
-        }
-        notifyHeroIntroComplete();
-      };
-
-      const armMobileReveal = () => {
-        window.clearTimeout(mobileTimer);
-        mobileTimer = window.setTimeout(startMobileReveal, MOBILE_REVEAL_MS);
-      };
-
-      if (document.querySelector('[data-experience-gate]')) {
-        gateObserver = new MutationObserver(() => {
-          if (!document.querySelector('[data-experience-gate]')) {
-            gateObserver?.disconnect();
-            armMobileReveal();
-          }
-        });
-        gateObserver.observe(document.body, {
-          childList: true,
-          subtree: true,
-        });
-      } else {
-        armMobileReveal();
-      }
-    }
-
+    const timers: number[] = [];
+    const stopWaiting = whenGateClosed(() => {
+      setStage(1);
+      timers.push(window.setTimeout(() => setStage(2), SUBTITLE_AFTER_TITLE_MS));
+      timers.push(
+        window.setTimeout(() => setStage(3), SUBTITLE_AFTER_TITLE_MS + CTA_AFTER_SUBTITLE_MS),
+      );
+    });
     return () => {
-      cancelled = true;
-      gateObserver?.disconnect();
-      window.removeEventListener(HERO_INTRO_COMPLETE_EVENT, onIntroComplete);
-      window.clearTimeout(ctaTimer);
-      window.clearTimeout(mobileTimer);
+      stopWaiting();
+      timers.forEach((id) => window.clearTimeout(id));
     };
   }, []);
+
+  const reveal = (visible: boolean) =>
+    cn(
+      'transition-[opacity,transform] duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none',
+      visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-6 opacity-0',
+    );
 
   return (
     <section
       id="hero"
-      className="snap-section flex min-h-dvh w-full flex-col pt-[calc(5.5rem+env(safe-area-inset-top))] lg:min-h-full"
+      className="relative flex min-h-dvh w-full flex-col pt-[calc(5.5rem+env(safe-area-inset-top))]"
     >
-      <div className="flex flex-1 flex-col items-center justify-center px-4 pb-14 sm:px-6 md:pb-16">
-        <div className="mx-auto w-full max-w-7xl text-center">
-          <div className="relative mx-auto mb-5 w-full max-w-4xl sm:mb-6">
-            <img
-              src="/images/title-image.svg"
-              alt="Mateo G. Fontana Dalmasso (MGFD) — logotipo del portfolio"
-              className="h-auto w-full object-contain invert brightness-0 contrast-200"
+      <div className="content-wrap flex flex-1 flex-col items-center justify-center pb-[var(--space-6)] text-center">
+        <div className={cn('relative mx-auto mb-[var(--space-3)] w-full max-w-4xl', reveal(stage >= 1))}>
+          <img
+            src="/images/title-image.svg"
+            alt="Mateo G. Fontana Dalmasso (MGFD) — logotipo del portfolio"
+            className="h-auto w-full object-contain invert brightness-0 contrast-200 [filter:invert(1)_brightness(2)_drop-shadow(0_10px_40px_rgb(0_0_0/0.55))]"
+          />
+        </div>
+
+        <div
+          className={cn('mx-auto mb-[var(--space-4)] w-full max-w-3xl', reveal(stage >= 2))}
+          aria-hidden={stage < 2}
+        >
+          {stage >= 2 ? (
+            <MorphingText
+              texts={morphTexts}
+              className="text-lift h-8 max-w-full text-[clamp(0.8rem,2.4vw,1.35rem)] font-semibold tracking-tight text-[var(--text-body)] md:h-10 md:text-xl lg:h-12 lg:text-2xl"
             />
-          </div>
+          ) : null}
+        </div>
 
-          <div
-            className={`mx-auto mb-6 w-full max-w-3xl transition-opacity duration-700 sm:mb-8 ${
-              showSubtitle ? 'opacity-100' : 'pointer-events-none opacity-0'
-            }`}
-            aria-hidden={!showSubtitle}
-          >
-            {showSubtitle ? (
-              <MorphingText
-                texts={morphTexts}
-                className="h-8 max-w-full text-[clamp(0.7rem,2.4vw,1.35rem)] font-semibold tracking-tight text-neutral-300 [text-shadow:0_1px_3px_rgba(0,0,0,0.75)] md:h-10 md:text-xl lg:h-12 lg:text-2xl"
-              />
-            ) : null}
-          </div>
-
-          <div
-            className={`transition-opacity duration-700 ${
-              showCta ? 'opacity-100' : 'pointer-events-none opacity-0'
-            }`}
-            aria-hidden={!showCta}
-          >
-            {showCta ? (
-              <PulsatingButton
-                type="button"
-                variant="pulse"
-                pulseColor="rgba(255,255,255,0.65)"
-                duration="1.5s"
-                distance="8px"
-                className="mx-auto bg-white px-5 py-2.5 text-sm font-medium text-black shadow-sm shadow-black/30 hover:bg-neutral-200 sm:px-8 sm:py-3 sm:text-base"
-                onClick={() => {
-                  void scrollToSectionByHash('#works');
-                }}
-              >
-                {t('hero.cta')}
-              </PulsatingButton>
-            ) : null}
-          </div>
+        <div className={reveal(stage >= 3)} aria-hidden={stage < 3}>
+          <button type="button" className="btn-primary" onClick={() => scrollToHash('#works')}>
+            {t('hero.cta')}
+          </button>
         </div>
       </div>
     </section>
