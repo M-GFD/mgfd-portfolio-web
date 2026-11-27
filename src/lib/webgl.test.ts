@@ -8,3 +8,6 @@ it('false si no hay contexto', () => {
 it('true con contexto webgl2', () => {
   expect(canUseWebGL(() => ({ getContext: (k: string) => (k === 'webgl2' ? {} : null) }) as unknown as HTMLCanvasElement)).toBe(true);
 });
+it('false con solo WebGL1: three (r163+) exige WebGL2', () => {
+  expect(canUseWebGL(() => ({ getContext: (k: string) => (k === 'webgl' ? {} : null) }) as unknown as HTMLCanvasElement)).toBe(false);
+});
