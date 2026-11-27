@@ -50,3 +50,6 @@ server.log
 # Skills directory
 /skills/
 .env*.local
+
+# Bocetos de brainstorming
+.superpowers/
