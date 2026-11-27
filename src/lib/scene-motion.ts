@@ -106,3 +106,18 @@ export function slotsFor(devices: DeviceKind[]): Slot[] {
     return { device, rest: pose((i - (unique.length - 1) / 2) * 2.4, 0), from: 'bottom' };
   });
 }
+
+const TEXT_SHIFT_PX = 24;
+
+/** Fase del bloque de texto de una escena: misma cronología que los equipos, en px de pantalla. */
+export function textPoseAt(progress: number): { opacity: number; y: number } {
+  const t = clamp01(Number.isFinite(progress) ? progress : 0);
+  const { enterEnd, holdEnd } = SCENE_PHASES;
+  if (t >= enterEnd && t <= holdEnd) return { opacity: 1, y: 0 };
+  if (t < enterEnd) {
+    const u = t / enterEnd;
+    return { opacity: smoothstep(0, 0.6, u), y: TEXT_SHIFT_PX * (1 - easeOutCubic(u)) };
+  }
+  const v = (t - holdEnd) / (1 - holdEnd);
+  return { opacity: 1 - smoothstep(0.4, 1, v), y: -TEXT_SHIFT_PX * easeInCubic(v) };
+}

@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { CylinderGeometry } from 'three';
 import { squircleBody, squirclePlane } from '../geometry/squircle';
-import { deviceMaterials } from './materials';
+import { useDeviceMaterials } from './materials';
 import { Screen } from './Screen';
 import { screenState, type DeviceProps } from './shared';
 
@@ -16,7 +16,7 @@ const SCREEN_H = 1.43;
 
 /** Celular con marco de grafito, isla de cámara, botones laterales y módulo trasero. */
 export function Phone({ screen, screens, cycle, ...group }: DeviceProps) {
-  const m = deviceMaterials();
+  const m = useDeviceMaterials();
   const { urls, active } = screenState({ screen, screens, cycle });
   const geo = useMemo(
     () => ({

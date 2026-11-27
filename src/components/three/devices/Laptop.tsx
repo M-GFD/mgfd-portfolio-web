@@ -3,7 +3,7 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { BoxGeometry, CylinderGeometry, Matrix4, type InstancedMesh } from 'three';
 import { squircleBody, squirclePlane } from '../geometry/squircle';
-import { deviceMaterials } from './materials';
+import { useDeviceMaterials } from './materials';
 import { Screen } from './Screen';
 import { screenState, type DeviceProps } from './shared';
 
@@ -24,7 +24,7 @@ const KEY_W = 0.162;
 
 /** Notebook de aluminio: base con teclado y trackpad, bisagra y tapa con pantalla. */
 export function Laptop({ screen, screens, cycle, ...group }: DeviceProps) {
-  const m = deviceMaterials();
+  const m = useDeviceMaterials();
   const { urls, active } = screenState({ screen, screens, cycle });
   const keysRef = useRef<InstancedMesh>(null);
 

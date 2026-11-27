@@ -1,11 +1,11 @@
 'use client';
 
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { invalidate, useFrame, useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import { MathUtils, SRGBColorSpace, type MeshBasicMaterial, type Texture } from 'three';
 import { squirclePlane } from '../geometry/squircle';
-import { deviceMaterials } from './materials';
+import { DeviceFadeContext, useDeviceMaterials } from './materials';
 
 type ScreenProps = {
   urls: string[];
@@ -19,21 +19,24 @@ type ScreenProps = {
 
 /** Pantalla emisiva con fundido entre capturas y cristal reflectante encima. */
 export function Screen({ urls, active, width, height, radius, glass }: ScreenProps) {
-  const textures = useTexture(urls) as Texture[];
   const gl = useThree((s) => s.gl);
-  const invalidate = useThree((s) => s.invalidate);
-  const [initial] = useState(active);
-  const mats = useRef<(MeshBasicMaterial | null)[]>([]);
-
-  useLayoutEffect(() => {
+  const textures = useTexture(urls, (loaded) => {
     const aniso = gl.capabilities.getMaxAnisotropy();
-    for (const t of textures) {
+    for (const t of Array.isArray(loaded) ? loaded : [loaded]) {
       t.colorSpace = SRGBColorSpace;
       t.anisotropy = aniso;
       t.needsUpdate = true;
     }
+  }) as Texture[];
+  const [initial] = useState(active);
+  const mats = useRef<(MeshBasicMaterial | null)[]>([]);
+  const mix = useRef<number[]>([]);
+  const fade = useContext(DeviceFadeContext);
+  const glassMat = useDeviceMaterials().glass;
+
+  useLayoutEffect(() => {
     invalidate();
-  }, [textures, gl, invalidate]);
+  }, [textures]);
 
   const screenGeo = useMemo(() => squirclePlane(width, height, radius), [width, height, radius]);
   const glassGeo = useMemo(
@@ -42,14 +45,19 @@ export function Screen({ urls, active, width, height, radius, glass }: ScreenPro
   );
 
   useFrame((_, dt) => {
+    const f = fade ? fade.current : 1;
     let moving = false;
     mats.current.forEach((m, i) => {
       if (!m) return;
       const target = i === active ? 1 : 0;
-      if (m.opacity === target) return;
-      const next = MathUtils.damp(m.opacity, target, 7, dt);
-      m.opacity = Math.abs(next - target) < 0.003 ? target : next;
-      moving = true;
+      let w = mix.current[i] ?? (i === initial ? 1 : 0);
+      if (w !== target) {
+        const next = MathUtils.damp(w, target, 7, dt);
+        w = Math.abs(next - target) < 0.003 ? target : next;
+        moving = true;
+      }
+      mix.current[i] = w;
+      m.opacity = w * f;
     });
     if (moving) invalidate();
   });
@@ -70,7 +78,7 @@ export function Screen({ urls, active, width, height, radius, glass }: ScreenPro
           />
         </mesh>
       ))}
-      <mesh geometry={glassGeo} material={deviceMaterials().glass} position-z={0.002} renderOrder={20} />
+      <mesh geometry={glassGeo} material={glassMat} position-z={0.002} renderOrder={20} />
     </group>
   );
 }

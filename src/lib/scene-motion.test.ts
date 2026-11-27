@@ -31,3 +31,11 @@ it('slotsFor da un slot por equipo y composiciones distintas', () => {
   expect(slotsFor(['laptop']).length).toBe(1);
   expect(slotsFor(['laptop', 'tablet', 'phone']).map((s) => s.device)).toEqual(['laptop', 'tablet', 'phone']);
 });
+
+it('textPoseAt: el texto entra desde abajo, reposa nítido y sale hacia arriba', async () => {
+  const { textPoseAt } = await import('./scene-motion');
+  expect(textPoseAt(0)).toEqual({ opacity: 0, y: 24 });
+  expect(textPoseAt(0.5)).toEqual({ opacity: 1, y: 0 });
+  expect(textPoseAt(1)).toEqual({ opacity: 0, y: -24 });
+  expect(textPoseAt(-2)).toEqual(textPoseAt(0));
+});

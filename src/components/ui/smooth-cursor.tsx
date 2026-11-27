@@ -34,7 +34,6 @@ const INTERACTIVE_SELECTOR = [
   '[contenteditable="true"]',
   '[contenteditable=""]',
   '.cursor-pointer',
-  '.works-carousel',
 ].join(', ');
 
 const NATIVE_CURSOR_VALUES = new Set([

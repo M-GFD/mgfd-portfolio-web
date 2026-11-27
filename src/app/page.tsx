@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import Header from '@/components/portfolio/Header';
 import Hero from '@/components/portfolio/Hero';
 import Profile from '@/components/portfolio/Profile';
-import ProjectList from '@/components/portfolio/ProjectList';
+import WorksScenes from '@/components/works/WorksScenes';
 import Footer from '@/components/portfolio/Footer';
 import { projects } from '@/data/projects';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -41,7 +41,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-[var(--space-5)]">
-            <ProjectList projects={projectsWithLocale} loading={false} />
+            <WorksScenes projects={projectsWithLocale} />
           </div>
 
           <div className="content-wrap mt-[var(--space-5)] flex justify-center">
