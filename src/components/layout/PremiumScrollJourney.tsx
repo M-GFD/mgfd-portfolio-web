@@ -133,15 +133,22 @@ function emergeMotion(local: number, start: number): MotionSample {
 /**
  * @param skipHold — true en nav/CTA: emerge → sale sin pausa al 100%.
  *                   false en scroll manual: leve fijación en reposo.
+ * @param heroSettled — el Hero ya llegó al 100% una vez (intro hecha): al volver
+ *                   al tope de la página se queda visible en vez de hundirse.
  */
 function sampleLayer(
   local: number,
   isFirst: boolean,
   isLast: boolean,
   skipHold: boolean,
+  heroSettled: boolean,
 ): MotionSample {
   // La primera capa no se solapa con nada: arranca en 0 (intro del Hero).
   const start = isFirst ? 0 : -EMERGE_LEAD;
+
+  if (isFirst && heroSettled && local < DEPTH_EMERGE_END) {
+    return restMotion();
+  }
 
   if (local < start) {
     return deepPark(start - local);
@@ -244,6 +251,7 @@ export function PremiumScrollJourney({
 
     let smoothAnim: ReturnType<typeof animate> | null = null;
     let rafId: number | null = null;
+    let heroSettled = false;
     const proxy = { u: 0 };
 
     const footerH = () => {
@@ -269,9 +277,16 @@ export function PremiumScrollJourney({
     const paint = () => {
       const u = proxy.u;
       const skipHold = isDepthNavScrolling();
+      if (u >= DEPTH_EMERGE_END - 0.002) heroSettled = true;
       const painted = layers.map((el, i) => {
         const local = u - i * DEPTH_UNITS_PER_SECTION;
-        const motion = sampleLayer(local, i === 0, i === count - 1, skipHold);
+        const motion = sampleLayer(
+          local,
+          i === 0,
+          i === count - 1,
+          skipHold,
+          heroSettled,
+        );
         applyLayerMotion(el, motion);
         // Las capas que salen van al fondo del orden: la que entra se lee limpia.
         const order = motion.exiting
@@ -359,6 +374,7 @@ export function PremiumScrollJourney({
       }
 
       proxy.u = 0;
+      heroSettled = false;
       paint();
 
       registerDepthNavDriver({
