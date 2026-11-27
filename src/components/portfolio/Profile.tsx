@@ -1,47 +1,105 @@
 'use client';
 
-import { TextReveal } from '@/components/ui/text-reveal';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { ToolsRow } from '@/components/portfolio/Technologies';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+
+/** Revela su contenido (opacidad + desplazamiento) la primera vez que entra en pantalla. */
+function Reveal({
+  children,
+  delay = 0,
+  className,
+}: {
+  children: ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShown(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '0px 0px -12% 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      style={{ transitionDelay: `${delay}ms` }}
+      className={cn(
+        'transition-[opacity,transform] duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none',
+        shown ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function Profile() {
   const { t } = useLanguage();
   return (
-    <section
-      id="about"
-      className="section-rhythm flex min-h-dvh w-full items-center justify-center px-4 py-10 sm:px-6 sm:py-12 md:py-16 lg:min-h-full"
-    >
-      <div className="mx-auto w-full max-w-7xl">
-        <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-8 sm:gap-10 md:flex-row md:items-center md:gap-12">
-          <div className="flex h-44 w-44 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-black ring-1 ring-white/12 sm:h-52 sm:w-52 md:h-72 md:w-72 lg:h-80 lg:w-80">
-            <img
-              src="/images/profile_03.webp"
-              alt="MGFD - Profile"
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <article
-            className="glass-card min-w-0 w-full flex-1 p-5 text-left sm:p-7 sm:text-justify md:w-auto md:p-8 md:text-left"
-            aria-labelledby="about-heading"
-          >
-            <h3 id="about-heading" className="mb-3 sm:mb-4">
-              <TextReveal
-                textClassName="text-2xl font-bold leading-tight text-white/20 sm:text-3xl md:text-4xl"
-                wordClassName="text-white"
+    <section id="about" aria-labelledby="about-heading" className="section-rhythm scroll-mt-24">
+      <div className="content-wrap">
+        <div className="grid grid-cols-1 items-center gap-[var(--space-5)] lg:grid-cols-12 lg:gap-x-[var(--space-5)]">
+          <Reveal className="mx-auto w-full max-w-[320px] lg:col-span-5 lg:max-w-none">
+            <figure className="surface-2 rim-light relative aspect-[4/5] overflow-hidden rounded-[28px] shadow-[0_48px_110px_-36px_rgb(0_0_0/0.85),0_2px_6px_rgb(0_0_0/0.45)]">
+              <img
+                src="/images/profile_portrait.webp"
+                alt="Mateo G. Fontana Dalmasso (MGFD)"
+                width={810}
+                height={1012}
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgb(255_255_255/0.07),transparent_38%),linear-gradient(to_top,rgb(0_0_0/0.35),transparent_30%)]"
+              />
+            </figure>
+          </Reveal>
+
+          <Reveal delay={120} className="lg:col-span-7">
+            <article className="surface-1 rim-light relative rounded-[28px] p-[clamp(28px,4vw,56px)]">
+              <p className="mb-[var(--space-2)] text-xs font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">
+                {t('nav.about')}
+              </p>
+              <h2
+                id="about-heading"
+                className="text-lift text-[clamp(2rem,3.6vw,3.25rem)] leading-[1.05] font-bold tracking-tight text-[var(--text-strong)]"
               >
                 {t('about.title')}
-              </TextReveal>
-            </h3>
-            {(['p1', 'p2', 'p3'] as const).map((key, i) => (
-              <TextReveal
-                key={key}
-                delay={0.15 + i * 0.35}
-                className={i < 2 ? 'mb-4 sm:mb-5' : ''}
-              >
-                {t(`about.${key}`)}
-              </TextReveal>
-            ))}
-          </article>
+              </h2>
+              <p className="mt-[var(--space-4)] text-[clamp(1.25rem,1.6vw,1.6rem)] leading-[1.45] font-medium tracking-[-0.01em] text-pretty text-[var(--text-strong)]">
+                {t('about.p1')}
+              </p>
+              <p className="mt-[var(--space-3)] max-w-[62ch] text-base leading-[1.7] text-pretty text-[var(--text-body)]">
+                {t('about.p2')}
+              </p>
+              <p className="mt-[var(--space-2)] max-w-[62ch] text-base leading-[1.7] text-pretty text-[var(--text-body)]">
+                {t('about.p3')}
+              </p>
+            </article>
+          </Reveal>
         </div>
+
+        <Reveal delay={80} className="mt-[var(--space-5)]">
+          <ToolsRow />
+        </Reveal>
       </div>
     </section>
   );

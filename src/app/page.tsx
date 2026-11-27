@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import Header from '@/components/portfolio/Header';
 import Hero from '@/components/portfolio/Hero';
 import Profile from '@/components/portfolio/Profile';
-import Technologies from '@/components/portfolio/Technologies';
 import ProjectList from '@/components/portfolio/ProjectList';
 import Footer from '@/components/portfolio/Footer';
 import { projects } from '@/data/projects';
@@ -33,7 +32,6 @@ export default function HomePage() {
 
         <Hero />
         <Profile />
-        <Technologies />
 
         <section id="works" className="section-rhythm scroll-mt-24">
           <div className="content-wrap text-center">
