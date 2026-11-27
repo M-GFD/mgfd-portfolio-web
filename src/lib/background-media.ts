@@ -1,4 +1,9 @@
-export const BACKGROUND_VIDEO_SRC = '/images/portfolio_vid_bg.mp4';
+export const BACKGROUND_POSTER_SRC = '/images/bg_poster.webp';
+
+/** 720p alcanza hasta ~1400 px físicos de ancho; por encima, 1080p. */
+export function pickBackgroundSrc(viewportWidth: number, dpr: number) {
+  return viewportWidth * dpr <= 1400 ? '/images/bg_720.mp4' : '/images/bg_1080.mp4';
+}
 
 let backgroundVideoEl: HTMLVideoElement | null = null;
 

@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 import {
-  BACKGROUND_VIDEO_SRC,
+  BACKGROUND_POSTER_SRC,
+  pickBackgroundSrc,
   primeBackgroundVideo,
   registerBackgroundVideo,
   tryPlayBackgroundVideo,
@@ -63,6 +64,11 @@ export function BackgroundVideoLayer() {
       void tryPlayBackgroundVideo(video);
     };
 
+    // La resolución depende de los píxeles físicos del cliente: se elige aquí, no en el render del servidor.
+    if (!video.getAttribute('src')) {
+      video.src = pickBackgroundSrc(window.innerWidth, window.devicePixelRatio || 1);
+    }
+
     kick();
     primeBackgroundVideo();
     video.addEventListener('loadeddata', kick);
@@ -85,7 +91,7 @@ export function BackgroundVideoLayer() {
       <video
         ref={videoRef}
         className="bg-video-layer__media"
-        src={BACKGROUND_VIDEO_SRC}
+        poster={BACKGROUND_POSTER_SRC}
         autoPlay
         loop
         muted
