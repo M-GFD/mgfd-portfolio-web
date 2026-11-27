@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import { CircleGeometry } from 'three';
 import { squircleBody, squirclePlane } from '../geometry/squircle';
 import { useDeviceMaterials } from './materials';
@@ -15,17 +14,23 @@ const SCREEN_W = 1.65;
 const SCREEN_H = 2.36;
 
 /** Tablet de aluminio con bisel negro uniforme y cámara frontal. */
+/** Geometrías de dimensiones fijas: se construyen una vez y las comparten todas las escenas. */
+let cache: ReturnType<typeof build> | null = null;
+function build() {
+  return {
+    body: squircleBody(W, H, R, D),
+    bezel: squirclePlane(W - 0.03, H - 0.03, R - 0.015),
+    camera: new CircleGeometry(0.009, 24),
+  };
+}
+function geometries() {
+  return (cache ??= build());
+}
+
 export function Tablet({ screen, screens, cycle, ...group }: DeviceProps) {
   const m = useDeviceMaterials();
   const { urls, active } = screenState({ screen, screens, cycle });
-  const geo = useMemo(
-    () => ({
-      body: squircleBody(W, H, R, D),
-      bezel: squirclePlane(W - 0.03, H - 0.03, R - 0.015),
-      camera: new CircleGeometry(0.009, 24),
-    }),
-    [],
-  );
+  const geo = geometries();
   const front = D / 2;
   return (
     <group {...group}>

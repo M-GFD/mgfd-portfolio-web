@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { BoxGeometry, CylinderGeometry, Matrix4, type InstancedMesh } from 'three';
 import { squircleBody, squirclePlane } from '../geometry/squircle';
 import { useDeviceMaterials } from './materials';
@@ -23,24 +23,30 @@ const KEY_ROWS = 5;
 const KEY_W = 0.162;
 
 /** Notebook de aluminio: base con teclado y trackpad, bisagra y tapa con pantalla. */
+/** Geometrías de dimensiones fijas: se construyen una vez y las comparten todas las escenas. */
+let cache: ReturnType<typeof build> | null = null;
+function build() {
+  return {
+    lid: squircleBody(W, LID_H, R, LID_D),
+    base: squircleBody(W, BASE_DEPTH, R, BASE_T),
+    bezel: squirclePlane(W - 0.05, LID_H - 0.05, R - 0.025),
+    notch: squirclePlane(0.18, 0.04, 0.018, 6),
+    well: squirclePlane(2.62, 0.96, 0.05),
+    trackpad: squirclePlane(1.18, 0.74, 0.06),
+    hinge: new CylinderGeometry(0.045, 0.045, 2.5, 32),
+    key: new BoxGeometry(KEY_W, 0.012, 0.15),
+  };
+}
+function geometries() {
+  return (cache ??= build());
+}
+
 export function Laptop({ screen, screens, cycle, ...group }: DeviceProps) {
   const m = useDeviceMaterials();
   const { urls, active } = screenState({ screen, screens, cycle });
   const keysRef = useRef<InstancedMesh>(null);
 
-  const geo = useMemo(
-    () => ({
-      lid: squircleBody(W, LID_H, R, LID_D),
-      base: squircleBody(W, BASE_DEPTH, R, BASE_T),
-      bezel: squirclePlane(W - 0.05, LID_H - 0.05, R - 0.025),
-      notch: squirclePlane(0.18, 0.04, 0.018, 6),
-      well: squirclePlane(2.62, 0.96, 0.05),
-      trackpad: squirclePlane(1.18, 0.74, 0.06),
-      hinge: new CylinderGeometry(0.045, 0.045, 2.5, 32),
-      key: new BoxGeometry(KEY_W, 0.012, 0.15),
-    }),
-    [],
-  );
+  const geo = geometries();
 
   const keyCount = KEY_COLS * KEY_ROWS;
   useLayoutEffect(() => {

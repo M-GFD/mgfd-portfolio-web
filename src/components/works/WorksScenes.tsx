@@ -39,21 +39,41 @@ export default function WorksScenes({ projects }: { projects: Project[] }) {
   const [near, setNear] = useState(false);
   const modeRef = useRef<LayoutMode | null>(null);
   const restoreRef = useRef<string | null>(null);
+  const activeRef = useRef<string | null>(null);
 
-  // Modo según ancho y reduced-motion; al cruzar el breakpoint conserva la escena visible.
+  // Escena en el centro del viewport, actualizada con el scroll. Cuando `matchMedia` avisa del cambio de
+  // modo el viewport ya cambió y el DOM ya refluyó, así que medir en ese momento daría otra escena.
+  useEffect(() => {
+    let raf = 0;
+    const track = () => {
+      raf = 0;
+      const root = rootRef.current;
+      if (!root) return;
+      const mid = window.innerHeight / 2;
+      const scenes = Array.from(root.querySelectorAll<HTMLElement>('[id^="project-"]'));
+      const active = scenes.find((s) => {
+        const r = s.getBoundingClientRect();
+        return r.top <= mid && r.bottom >= mid;
+      });
+      activeRef.current = active?.id ?? null;
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(track);
+    };
+    track();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Modo según ancho y reduced-motion; al cruzar el breakpoint conserva la escena que se estaba viendo.
   useEffect(() => {
     const apply = () => {
       const next = readMode();
       if (next === modeRef.current) return;
-      if (modeRef.current && rootRef.current) {
-        const mid = window.innerHeight / 2;
-        const scenes = Array.from(rootRef.current.querySelectorAll<HTMLElement>('[id^="project-"]'));
-        const active = scenes.find((s) => {
-          const r = s.getBoundingClientRect();
-          return r.top <= mid && r.bottom >= mid;
-        });
-        restoreRef.current = active?.id ?? null;
-      }
+      if (modeRef.current) restoreRef.current = activeRef.current;
       modeRef.current = next;
       setMode(next);
     };

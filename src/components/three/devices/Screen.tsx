@@ -1,9 +1,10 @@
 'use client';
 
-import { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { invalidate, useFrame, useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
-import { MathUtils, SRGBColorSpace, type MeshBasicMaterial, type Texture } from 'three';
+import { MathUtils, type MeshBasicMaterial, type Texture } from 'three';
+import { prepareScreenTextures } from './prepare-texture';
 import { squirclePlane } from '../geometry/squircle';
 import { DeviceFadeContext, useDeviceMaterials } from './materials';
 
@@ -20,14 +21,12 @@ type ScreenProps = {
 /** Pantalla emisiva con fundido entre capturas y cristal reflectante encima. */
 export function Screen({ urls, active, width, height, radius, glass }: ScreenProps) {
   const gl = useThree((s) => s.gl);
-  const textures = useTexture(urls, (loaded) => {
-    const aniso = gl.capabilities.getMaxAnisotropy();
-    for (const t of Array.isArray(loaded) ? loaded : [loaded]) {
-      t.colorSpace = SRGBColorSpace;
-      t.anisotropy = aniso;
-      t.needsUpdate = true;
-    }
-  }) as Texture[];
+  // drei sube cada textura a la GPU apenas se monta (initTexture); acá solo se configura una vez.
+  const onLoad = useCallback(
+    (loaded: Texture | Texture[]) => void prepareScreenTextures(loaded, gl.capabilities.getMaxAnisotropy()),
+    [gl],
+  );
+  const textures = useTexture(urls, onLoad) as Texture[];
   const [initial] = useState(active);
   const mats = useRef<(MeshBasicMaterial | null)[]>([]);
   const mix = useRef<number[]>([]);

@@ -32,7 +32,9 @@ export function Studio({ quality, floorY = -1.5 }: { quality: 'high' | 'low'; fl
         blur={2.6}
         far={4}
         scale={16}
-        resolution={high ? 1024 : 512}
+        // Se redibuja en cada cuadro (profundidad + 2 pasadas de blur): con blur 2.6 sobre 16 unidades,
+        // 512 se ve igual que 1024 y cuesta un cuarto en GPUs integradas.
+        resolution={high ? 512 : 256}
         color="#000000"
       />
     </>

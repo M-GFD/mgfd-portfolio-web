@@ -1,8 +1,8 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { invalidate, useFrame } from '@react-three/fiber';
-import { PerspectiveCamera, View } from '@react-three/drei';
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { invalidate, useFrame, useThree } from '@react-three/fiber';
+import { PerspectiveCamera, useTexture, View } from '@react-three/drei';
 import { MathUtils, type Group, type PerspectiveCamera as PerspectiveCameraImpl } from 'three';
 import { Laptop } from '@/components/three/devices/Laptop';
 import { Tablet } from '@/components/three/devices/Tablet';
@@ -13,8 +13,15 @@ import {
   DeviceMaterialsContext,
 } from '@/components/three/devices/materials';
 import { Studio } from '@/components/three/Studio';
-import { screensFor, type DeviceKind } from '@/data/mockup-screens';
+import { mockupScreens, screensFor, type DeviceKind } from '@/data/mockup-screens';
 import { poseAt, SCENE_PHASES, slotsFor, type Slot } from '@/lib/scene-motion';
+
+// Todas las capturas se piden en paralelo al cargar este módulo (el lienzo se monta 150vh antes de
+// Trabajos). Sin esto cada equipo suspende por turno y las primeras escenas quedaban montándose (y
+// subiendo texturas) recién al llegar a ellas.
+for (const project of mockupScreens) {
+  for (const urls of Object.values(project.devices)) urls?.forEach((url) => useTexture.preload(url));
+}
 
 const DEVICE_ORDER: DeviceKind[] = ['laptop', 'tablet', 'phone'];
 /** Medio ancho / medio alto de cada equipo (unidades de mundo) para encuadrar la composición. */
@@ -122,6 +129,29 @@ function DeviceRig({ projectId, progress, quality }: { projectId: number; progre
   );
 }
 
+/**
+ * Compila los shaders de la escena apenas se monta (el lienzo se monta 150vh antes de Trabajos), en
+ * paralelo con KHR_parallel_shader_compile. Sin esto, ANGLE/D3D11 compila en el primer cuadro visible y
+ * congela el scroll hasta ~3 s.
+ */
+function Precompile() {
+  const gl = useThree((s) => s.gl);
+  const scene = useThree((s) => s.scene);
+  const camera = useThree((s) => s.camera);
+  useLayoutEffect(() => {
+    let alive = true;
+    gl.compileAsync(scene, camera)
+      .then(() => {
+        if (alive) invalidate();
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [gl, scene, camera]);
+  return null;
+}
+
 /** Región del lienzo compartido para una escena: se coloca en el DOM y sigue su rectángulo. */
 export default function DeviceRigView({
   projectId,
@@ -138,6 +168,7 @@ export default function DeviceRigView({
     <View className={className}>
       <Suspense fallback={null}>
         <DeviceRig projectId={projectId} progress={progress} quality={quality} />
+        <Precompile />
       </Suspense>
     </View>
   );

@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { Check, Link2, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+
+const noopSubscribe = () => () => {};
 
 type BlogShareButtonProps = {
   url: string;
@@ -14,11 +16,12 @@ type BlogShareButtonProps = {
 export function BlogShareButton({ url, title, className }: BlogShareButtonProps) {
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
-  const [canNativeShare, setCanNativeShare] = useState(false);
-
-  useEffect(() => {
-    setCanNativeShare(typeof navigator !== 'undefined' && typeof navigator.share === 'function');
-  }, []);
+  // false en el servidor y en la hidratación; el valor real del navegador después, sin setState en efecto.
+  const canNativeShare = useSyncExternalStore(
+    noopSubscribe,
+    () => typeof navigator.share === 'function',
+    () => false,
+  );
 
   const share = async () => {
     try {
